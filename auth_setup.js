@@ -14,7 +14,7 @@ import { BasicStrategy } from 'passport-http';
 Promise.promisifyAll(redis.RedisClient.prototype);
 const redisClient = redis.createClient(process.env.REDIS_URL || {...config.redis, password: config.redis.pass});
 
-module.exports = (app, db) => {
+module.exports = (app) => {
   app.use(passport.initialize());
 
   /* functors */
@@ -114,10 +114,12 @@ module.exports = (app, db) => {
     });
 
   return (opts) => {
+    const oauth2Server = oauth2orize.createServer();
     const name = opts.strategyName;
-    adminOAuthServer.exchange(passwordExchanger(opts));
-    adminOAuthServer.exchange(refreshTokenExchanger(opts));
+    oauth2Server.exchange(passwordExchanger(opts));
+    oauth2Server.exchange(refreshTokenExchanger(opts));
     passport.use(name, jwtStrategyFactory({model: opts.model, secretOrKey: opts.jwtSecret}));
+    return oauth2Server;
   };
 };
 

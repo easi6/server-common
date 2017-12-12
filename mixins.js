@@ -123,7 +123,7 @@ const mixins = {
     }
   }),
 
-  i18nMixin: locales => (name: string, DataTypes: Object, makePure: boolean=false) => (
+  i18nMixin: locales => (name: string, makePure: boolean=false) => (
     locales.reduce((acc, locale) => ({
       ...acc,
       [`${name}_${locale}`]: {
