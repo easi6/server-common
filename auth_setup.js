@@ -9,8 +9,7 @@ import { ExtractJwt as ExtractJwt } from 'passport-jwt';
 import oauth2orize from 'oauth2orize';
 import redis from 'redis';
 import Promise from 'bluebird';
-import _ from 'lodash';
-import { BasicStrategy } from 'passport-http';
+import crypto from 'crypto';
 Promise.promisifyAll(redis.RedisClient.prototype);
 const redisClient = redis.createClient(process.env.REDIS_URL || {...config.redis, password: config.redis.pass});
 
@@ -30,7 +29,7 @@ module.exports = (app) => {
 
       // renew refresh token
       const namespace = `${model.name}_refresh_token`;
-      const refreshToken = myutil.randomToken(16);
+      const refreshToken = (await crypto.randomBytes(16)).toString('hex');
       await redisClient.hsetAsync(namespace, refreshToken, `${entity.id},${entity.auth_count}`);
       console.log(`tokenIssuer refreshToken=${refreshToken}, namespace=${namespace}`);
 
@@ -118,6 +117,7 @@ module.exports = (app) => {
     const name = opts.strategyName;
     oauth2Server.exchange(passwordExchanger(opts));
     oauth2Server.exchange(refreshTokenExchanger(opts));
+    oauth2Server.issueToken = tokenIssuer(opts);
     passport.use(name, jwtStrategyFactory({model: opts.model, secretOrKey: opts.jwtSecret}));
     return oauth2Server;
   };
