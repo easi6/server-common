@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import moment from 'moment'
 
 const mixins = {
-  authMixin: locales => (identifier: Object) => ({
+  authMixin: locales => (identifier: Object, opts: Object={}) => ({
     [identifier.column]: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -31,69 +31,75 @@ const mixins = {
         conn: false,
       },
     },
-    locale: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'en',
-      validate: {
-        isIn: [locales]
+    ...(opts.locale ? {
+      locale: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'en',
+        validate: {
+          isIn: [locales]
+        }
       }
-    },
-    old_reset_token: {
-      type: DataTypes.STRING, // for checking already password is changed with token
-      roles: {
-        admin: true,
-        user: false,
-        conn: false,
+    } : {}),
+    ...(opts.resettable ? {
+        old_reset_token: {
+        type: DataTypes.STRING, // for checking already password is changed with token
+        roles: {
+          admin: true,
+          user: false,
+          conn: false,
+        },
       },
-    },
-    reset_token: {
-      type: DataTypes.STRING,
-      roles: {
-        admin: true,
-        user: false,
-        conn: false,
+      reset_token: {
+        type: DataTypes.STRING,
+        roles: {
+          admin: true,
+          user: false,
+          conn: false,
+        },
       },
-    },
-    reset_token_created_at: {
-      type: DataTypes.DATE,
-      roles: {
-        admin: true,
-        user: false,
-        conn: false,
+      reset_token_created_at: {
+        type: DataTypes.DATE,
+        roles: {
+          admin: true,
+          user: false,
+          conn: false,
+        },
       },
-    },
+    } : {})
   }),
 
-  authMixinMethods: (model, {noTokenError}) => {
+  authMixinMethods: (model, {resettable, noTokenError}) => {
     model.prototype.comparePassword = async function(password) {
       return await bcrypt.compare(password, this.password_hashed);
     };
 
-    model.prototype._resetPassword = function(newPassword, opts={}) {
-      return this.updateAttributes({
-        password: newPassword,
-        reset_token: null,
-        old_reset_token: this.reset_token,
-      }, opts);
-    };
+    if (resettable) {
+      model.prototype._resetPassword = function(newPassword, opts={}) {
+        return this.updateAttributes({
+          password: newPassword,
+          reset_token: null,
+          old_reset_token: this.reset_token,
+        }, opts);
+      };
 
-    model.prototype.checkAndResetPassword = function(resetToken, newPassword, opts={}) {
-      if (this.reset_token && this.reset_token === resetToken) {
-        return this._resetPassword(newPassword, opts);
-      }
-      throw noTokenError;
-    };
+      model.prototype.checkAndResetPassword = function(resetToken, newPassword, opts={}) {
+        if (this.reset_token && this.reset_token === resetToken) {
+          return this._resetPassword(newPassword, opts);
+        }
+        throw noTokenError;
+      };
 
-    model.prototype.generateResetToken = async function(opts={}) {
-      let resetToken;
-      if (this.reset_token_created_at && this.reset_token && new Date() - this.reset_token_created_at < 30*60*1000) { // don't generate new token in 30mins
-        resetToken = this.reset_token;
-      } else {
-        resetToken = (await crypto.randomBytes(16)).toString('hex'); // 32 digits hex string
-      }
-      return this.updateAttributes({reset_token: resetToken, reset_token_created_at: new Date()}, opts);
-    };
+      model.prototype.generateResetToken = async function(opts={}) {
+        let resetToken;
+        if (this.reset_token_created_at && this.reset_token && new Date() - this.reset_token_created_at < 30*60*1000) { // don't generate new token in 30mins
+          resetToken = this.reset_token;
+        } else {
+          resetToken = (await crypto.randomBytes(16)).toString('hex'); // 32 digits hex string
+        }
+        return this.updateAttributes({reset_token: resetToken, reset_token_created_at: new Date()}, opts);
+      };
+    }
 
     model.hook('beforeUpdate', 'changeAuthCount', (instance) => {
       if (instance.changed('password_hashed')) {
