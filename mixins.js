@@ -69,7 +69,7 @@ const mixins = {
     } : {})
   }),
 
-  authMixinMethods: (model, {resettable, noTokenError}) => {
+  authMixinMethods: (model, {resettable, noTokenError, oldTokenError}) => {
     model.prototype.comparePassword = async function(password) {
       return await bcrypt.compare(password, this.password_hashed);
     };
@@ -86,6 +86,9 @@ const mixins = {
       model.prototype.checkAndResetPassword = function(resetToken, newPassword, opts={}) {
         if (this.reset_token && this.reset_token === resetToken) {
           return this._resetPassword(newPassword, opts);
+        }
+        if (this.old_reset_token && this.old_reset_token === resetToken) {
+          throw oldTokenError
         }
         throw noTokenError;
       };
