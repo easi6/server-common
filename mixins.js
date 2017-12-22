@@ -132,13 +132,13 @@ const mixins = {
     }
   }),
 
-  i18nMixin: locales => (name: string, makePure: boolean=false) => (
+  i18nMixin: locales => (name: string, makePure: boolean=false, type: Function=DataTypes.STRING) => (
     locales.reduce((acc, locale) => ({
       ...acc,
       [`${name}_${locale}`]: {
-        type: DataTypes.STRING,
+        type,
       }
-    }), makePure ? {[name]: {type: DataTypes.STRING, allowNull: false}} : {})
+    }), makePure ? {[name]: {type, allowNull: false}} : {})
   ),
 };
 
