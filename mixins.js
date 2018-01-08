@@ -35,7 +35,7 @@ const mixins = {
       locale: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'en',
+        defaultValue: (opts.defaultLocale ? opts.defaultLocale : 'en'),
         validate: {
           isIn: [locales]
         }
