@@ -56,7 +56,7 @@ module.exports = (app) => {
         const match = await entity.comparePassword(password);
         if (!match) {
           const error = new Error('Incorrect password');
-          error.name = 'IncorrectCredentials Error';
+          error.name = 'IncorrectCredentialsError';
           return done(error);
         }
       } catch (error) {
