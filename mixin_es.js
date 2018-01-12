@@ -89,20 +89,20 @@ export default (model, opts) => {
 
       const targetModel = association.target;
 
-      if (association.associationType !== 'HasMany') {
-        throw new Error('only HasMany relation target can be auto re-indexed');
+      if (association.associationType === 'HasMany' || association.associationType === 'BelongsTo') {
+        const fname = association.accessors.get;
+        model.hook('afterUpdate', `update${targetModel.name}ToES`, (function(fname) {
+          return (instance, opts) => {
+            const {transaction} = opts;
+            const cb = () => instance[fname]().then((targets) => {
+              return Promise.map(_.castArray(targets), (target) => target.addES && target.addES());
+            });
+            transaction ? transaction.afterCommit(cb, true) : setTimeout(cb);
+          };
+        })(fname));
+      } else {
+        throw new Error('only HasMany or BelongsTo relation target can be auto re-indexed');
       }
-
-      const fname = association.accessors.get;
-      model.hook('afterUpdate', `update${targetModel.name}ToES`, (function(fname) {
-        return (instance, opts) => {
-          const {transaction} = opts;
-          const cb = () => instance[fname]().then((targets) => {
-            return Promise.map(targets, (target) => target.addES && target.addES());
-          });
-          transaction ? transaction.afterCommit(cb, true) : setTimeout(cb);
-        };
-      })(fname));
     })(association));
   });
 
@@ -145,7 +145,21 @@ export default (model, opts) => {
       <queryObj> := | {<op>: [<queryObj>]
                     | {field: q}
       <op>는 $and 또는 $or 이다
-      {field: q}는 "field: *q*" 형태로 변환된다.
+      {field: q}는 다음과 같이 변환한다.
+
+      1) q.type == 'text'
+        * q.wildcard == 'both'
+          "field: *{q.value}*"
+        * q.wildcard == 'prefix'
+          "field: {q.value}*"
+        * q.wildcard == 'postfix'
+          "field: *{q.value}" // 용례: 전화번호 뒷자리
+        * q.wildcard == false
+          "field: q" // exact match
+
+      2) q.value == 'range'
+        * "field: [ ${q.value[0]}, ${q.value[1]} ]"
+
       op로 연결된 query들은 op를 infix로 넣어서 결합한다.
       */
 
@@ -155,7 +169,16 @@ export default (model, opts) => {
         return '(' + arr.map(q => obj2esquery(q)).join(` ${key.replace("$", '').toUpperCase()} `) + ')';
       } else {
         const q = queryObj[key];
-        return `(${key}: *` + (typeof q === 'string' ? q.split(/\s+/).map(s => escapeString(s)).join(" AND ") : q) + "*)"
+
+        if (q.type === 'text') {
+          const v = q.value;
+          return `(${key}: ${q.wildcard === 'both' || q.wildcard === 'postfix' ? '*' : ''}` +
+            (typeof v === 'string' ? v.split(/\s+/).map(s => escapeString(s)).join(" AND ") : v) +
+            `${q.wildcard === 'both' || q.wildcard === 'prefix' ? '*' : ''})`;
+        } else if (q.type === 'range') {
+          const [from, to] = q.value;
+          return `(${key}: [${from} TO ${to}])`;
+        }
       }
     }
 
@@ -163,7 +186,8 @@ export default (model, opts) => {
       /*
       queryObj의 각 k,v 쌍은 다음의 경우 중 하나다
       <elem> := | {<op>: [...] | {}}
-                | {field: q}
+                | {field: q} => q가 스트링인 경우. value, wildcard, type 형태로 변환함
+                | {field: {value, wildcard, type}
       이 함수는 queryObj의 각 object 형태를 키가 한개인 형태로 변환한다
       op가 없이 그냥 연결하면 $and op로 취급한다.
        */
@@ -188,7 +212,26 @@ export default (model, opts) => {
           }
           return {[key]: subQuery.map(s => convertQueryObj(s))};
         } else {
-          return queryObj;
+          const key = Object.keys(queryObj)[0];
+          let value = queryObj[key];
+          if (typeof value !== 'object') {
+            value = {value: value, type: 'text', wildcard: 'both'};
+          } else {
+            if (!value.value) {
+              throw new Error('invalid search query. value must be defined');
+            }
+
+            if (value.type === 'text' || !value.type) {
+              value = {type: 'text', wildcard: 'both', ...value};
+            } else if (value.type === 'range') {
+              if (!(_.isArray(value.value) && value.value.length === 2)) {
+                throw new Error('invalid search value. should be an array having length of 2');
+              }
+            } else {
+              throw new Error('invalid search query type. only support term and range but got ' + value.type);
+            }
+          }
+          return {[key]: value};
         }
       }
 
