@@ -13,9 +13,11 @@ import crypto from 'crypto';
 Promise.promisifyAll(redis.RedisClient.prototype);
 const redisClient = redis.createClient(process.env.REDIS_URL || {...config.redis, password: config.redis.pass});
 
-module.exports = (app) => {
+module.exports = (app, logger) => {
   app.use(passport.initialize());
-
+  if (!logger) {
+    logger = console;
+  }
   /* functors */
   const tokenIssuer = ({model, getData, jwtSecret}) =>
     async (entity, done) => {
@@ -31,7 +33,7 @@ module.exports = (app) => {
       const namespace = `${model.name}_refresh_token`;
       const refreshToken = (await crypto.randomBytes(16)).toString('hex');
       await redisClient.hsetAsync(namespace, refreshToken, `${entity.id},${entity.auth_count}`);
-      console.log(`tokenIssuer refreshToken=${refreshToken}, namespace=${namespace}`);
+      logger.log('tokenIssuer generated token', {refreshToken, namespace, accessToken});
 
       return done(null, accessToken, refreshToken, data);
     };
@@ -42,7 +44,7 @@ module.exports = (app) => {
       try {
         entity = await model.find({where: {[idkey]: username}});
       } catch (error) {
-        console.error(error.stack);
+        logger.error(error.stack);
         return done(error);
       }
 
@@ -60,7 +62,7 @@ module.exports = (app) => {
           return done(error);
         }
       } catch (error) {
-        console.error(error.stack);
+        logger.error(error.stack);
         return done(error);
       }
 
@@ -71,8 +73,7 @@ module.exports = (app) => {
   const refreshTokenExchanger = ({model, idkey, getData, jwtSecret}) =>
     oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       const namespace = `${model.name}_refresh_token`;
-      console.log(`namespace=${namespace}`);
-      console.log(`refresh_token=${refreshToken}`);
+      logger.log('refreshTokenExchanger', {namespace, refreshToken});
       const str = await redisClient.hgetAsync(namespace, refreshToken);
       const [id, auth_count] = str.split(',').map((x) => parseInt(x));
       if (!id) {
