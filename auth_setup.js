@@ -44,7 +44,7 @@ module.exports = (app, logger) => {
       try {
         entity = await model.find({where: {[idkey]: username}});
       } catch (error) {
-        logger.error(error.stack);
+        logger.error('model find error', {message: error.message, stack: error.stack});
         return done(error);
       }
 
@@ -62,7 +62,7 @@ module.exports = (app, logger) => {
           return done(error);
         }
       } catch (error) {
-        logger.error(error.stack);
+        logger.error('compare password error', {message: error.message, stack: error.stack});
         return done(error);
       }
 
