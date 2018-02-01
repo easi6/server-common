@@ -157,7 +157,7 @@ export default (model, opts) => {
         * q.wildcard == false
           "field: q" // exact match
 
-      2) q.value == 'range'
+      2) q.type == 'range'
         * "field: [ ${q.value[0]}, ${q.value[1]} ]"
 
       op로 연결된 query들은 op를 infix로 넣어서 결합한다.
