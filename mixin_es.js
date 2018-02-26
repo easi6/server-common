@@ -134,7 +134,7 @@ export default (model, opts) => {
 
     const query = _.omit(originalQuery, 'company_id');
 
-    const specialChars = '[(' + '+ - = && || ! ( ) { } [ ] ^ " ~ * ? : \\ /'.split(' ').map(x => `\\${x}`).join('') + ')]';
+    const specialChars = '([' + '+ - = & | ! ( ) { } [ ] ^ " ~ * ? : \\ /'.split(' ').map(x => `\\${x}`).join('') + '])';
     const regex = new RegExp(specialChars, 'g');
     const regex2 = /[<>]/g;
     const escapeString = (str) => str.replace(regex2, '').replace(regex, '\\$1');
@@ -173,7 +173,7 @@ export default (model, opts) => {
         if (q.type === 'text') {
           const v = q.value;
           return `(${key}: ${q.wildcard === 'both' || q.wildcard === 'postfix' ? '*' : ''}` +
-            (typeof v === 'string' ? v.split(/\s+/).map(s => escapeString(s)).join(" AND ") : v) +
+            (typeof v === 'string' ? v.split(/[\s-]+/).map(s => escapeString(s)).join(" AND ") : v) +
             `${q.wildcard === 'both' || q.wildcard === 'prefix' ? '*' : ''})`;
         } else if (q.type === 'range') {
           const [from, to] = q.value;
