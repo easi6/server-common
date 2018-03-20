@@ -1,15 +1,12 @@
 import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
-import { Strategy as BearerStrategy } from 'passport-http-bearer';
-import bcrypt from 'bcrypt';
 import config from 'config';
 import jwt from 'jsonwebtoken';
-import { Strategy as JwtStrategy } from 'passport-jwt';
-import { ExtractJwt as ExtractJwt } from 'passport-jwt';
+import {ExtractJwt as ExtractJwt, Strategy as JwtStrategy} from 'passport-jwt';
 import oauth2orize from 'oauth2orize';
 import redis from 'redis';
 import Promise from 'bluebird';
 import crypto from 'crypto';
+
 Promise.promisifyAll(redis.RedisClient.prototype);
 const redisClient = redis.createClient(process.env.REDIS_URL || {...config.redis, password: config.redis.pass});
 
@@ -65,7 +62,7 @@ module.exports = (app, logger) => {
         logger.error('compare password error', {message: error.message, stack: error.stack});
         return done(error);
       }
-
+      await entity.updateAttributes({auth_count: entity.auth_count + 1});
       const issueToken = tokenIssuer({model, getData, jwtSecret});
       await issueToken(entity, done.bind(this));
     });
@@ -89,7 +86,8 @@ module.exports = (app, logger) => {
       }
 
       if (entity.auth_count !== auth_count) {
-        return done(null, false);
+        const error = new Error('Incorrect auth_count');
+        return done(error);
       }
 
       // remove old refresh token
