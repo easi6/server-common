@@ -29,7 +29,7 @@ module.exports = (app, logger) => {
       // renew refresh token
       const namespace = `${model.name}_refresh_token`;
       const refreshToken = (await crypto.randomBytes(16)).toString('hex');
-      await redisClient.hsetAsync(namespace, refreshToken, `${entity.id},${entity.auth_count}`);
+      await redisClient.setexAsync(`${namespace}_${refreshToken}`, 60*60*3, `${entity.id},${entity.auth_count}`);
       logger.log('tokenIssuer generated token', {refreshToken, namespace, accessToken});
 
       return done(null, accessToken, refreshToken, data);
@@ -71,8 +71,16 @@ module.exports = (app, logger) => {
     oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       const namespace = `${model.name}_refresh_token`;
       logger.log('refreshTokenExchanger', {namespace, refreshToken});
-      const str = await redisClient.hgetAsync(namespace, refreshToken);
+      const str = await redisClient.getAsync(`${namespace}_${refreshToken}`);
+
+      if (str === null) {
+        const error = new Error('Expired refresh token');
+        error.name = 'IncorrectCredentialsError';
+        return done(error);
+      }
+
       const [id, auth_count] = str.split(',').map((x) => parseInt(x));
+
       if (!id) {
         const error = new Error('Incorrect login');
         error.name = 'IncorrectCredentialsError';
