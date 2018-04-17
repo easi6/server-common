@@ -35,8 +35,8 @@ module.exports = (app, logger) => {
       return done(null, accessToken, refreshToken, data);
     };
 
-  const passwordExchanger = ({model, idkey, getData, jwtSecret}) =>
-    oauth2orize.exchange.password(async (client, username, password, done) => {
+  function passwordExchanger({model, idkey, getData, jwtSecret}) {
+    return oauth2orize.exchange.password(async (client, username, password, done) => {
       let entity;
       try {
         entity = await model.find({where: {[idkey]: username}});
@@ -66,9 +66,10 @@ module.exports = (app, logger) => {
       const issueToken = tokenIssuer({model, getData, jwtSecret});
       await issueToken(entity, done.bind(this));
     });
+  }
 
-  const refreshTokenExchanger = ({model, idkey, getData, jwtSecret}) =>
-    oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
+  function refreshTokenExchanger({model, idkey, getData, jwtSecret}) {
+    return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       const namespace = `${model.name}_refresh_token`;
       logger.log('refreshTokenExchanger', {namespace, refreshToken});
       const str = await redisClient.getAsync(`${namespace}_${refreshToken}`);
@@ -104,6 +105,7 @@ module.exports = (app, logger) => {
       const issueToken = tokenIssuer({model, getData, jwtSecret});
       await issueToken(entity, done.bind(this));
     });
+  }
 
   const jwtStrategyFactory = ({model, secretOrKey}) =>
     new JwtStrategy({secretOrKey, jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()}, async (jwtPayload, done) => {
