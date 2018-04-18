@@ -111,7 +111,11 @@ module.exports = (app, logger) => {
   function jwtStrategyFactory({model, secretOrKey}) {
     return new JwtStrategy({
       secretOrKey,
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        ExtractJwt.fromUrlQueryParameter('access_token'),
+        ExtractJwt.fromBodyField('access_token'),
+      ])
     }, async (jwtPayload, done) => {
       const entity = await model.find({where: {id: jwtPayload.sub}});
       if (!entity) {
