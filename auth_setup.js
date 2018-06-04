@@ -16,10 +16,10 @@ module.exports = (app, logger) => {
     logger = console;
   }
   /* functors */
-  function tokenIssuer({model, getData, jwtSecret}) {
+  function tokenIssuer({model, idkey, getData, jwtSecret}) {
     return async (entity, done) => {
       const payload = {
-        sub: entity.id,
+        sub: entity[idkey],
         cnt: entity.auth_count,
       };
 
@@ -29,7 +29,7 @@ module.exports = (app, logger) => {
       // renew refresh token
       const namespace = `${model.name}_refresh_token`;
       const refreshToken = (await crypto.randomBytes(16)).toString('hex');
-      await redisClient.setexAsync(`${namespace}_${refreshToken}`, 60 * 60 * 3, `${entity.id},${entity.auth_count}`);
+      await redisClient.setexAsync(`${namespace}_${refreshToken}`, 60 * 60 * 3, `${entity[idkey]},${entity.auth_count}`);
       logger.log('tokenIssuer generated token', {refreshToken, namespace, accessToken});
 
       return done(null, accessToken, refreshToken, data);
@@ -64,7 +64,7 @@ module.exports = (app, logger) => {
         return done(error);
       }
       await entity.updateAttributes({auth_count: entity.auth_count + 1});
-      const issueToken = tokenIssuer({model, getData, jwtSecret});
+      const issueToken = tokenIssuer({model, idkey, getData, jwtSecret});
       await issueToken(entity, done.bind(this));
     });
   }
@@ -81,14 +81,14 @@ module.exports = (app, logger) => {
         return done(error);
       }
 
-      const [id, auth_count] = str.split(',').map((x) => parseInt(x));
+      const [id, auth_count] = str.split(',').map((x) => isNaN(x) ? x : parseInt(x));
 
       if (!id) {
         const error = new Error('Incorrect login');
         error.name = 'IncorrectCredentialsError';
         return done(error);
       }
-      const entity = await model.find({where: {id}});
+      const entity = await model.find({where: {[idkey]: id}});
       if (!entity) {
         const error = new Error('Incorrect login');
         error.name = 'IncorrectCredentialsError';
@@ -103,12 +103,12 @@ module.exports = (app, logger) => {
       // remove old refresh token
       await redisClient.hdelAsync(namespace, str);
 
-      const issueToken = tokenIssuer({model, getData, jwtSecret});
+      const issueToken = tokenIssuer({model, idkey, getData, jwtSecret});
       await issueToken(entity, done.bind(this));
     });
   }
 
-  function jwtStrategyFactory({model, secretOrKey}) {
+  function jwtStrategyFactory({model, idkey, secretOrKey}) {
     return new JwtStrategy({
       secretOrKey,
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -117,7 +117,7 @@ module.exports = (app, logger) => {
         ExtractJwt.fromBodyField('access_token'),
       ])
     }, async (jwtPayload, done) => {
-      const entity = await model.find({where: {id: jwtPayload.sub}});
+      const entity = await model.find({where: {[idkey]: jwtPayload.sub}});
       if (!entity) {
         return done(null, false);
       }
@@ -136,7 +136,7 @@ module.exports = (app, logger) => {
     oauth2Server.exchange(passwordExchanger(opts));
     oauth2Server.exchange(refreshTokenExchanger(opts));
     oauth2Server.issueToken = tokenIssuer(opts);
-    passport.use(name, jwtStrategyFactory({model: opts.model, secretOrKey: opts.jwtSecret}));
+    passport.use(name, jwtStrategyFactory({model: opts.model, idkey: opts.idkey, secretOrKey: opts.jwtSecret}));
     return oauth2Server;
   };
 };

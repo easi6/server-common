@@ -2,10 +2,9 @@
 import {DataTypes} from 'sequelize';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import moment from 'moment'
 
 const mixins = {
-  authMixin: locales => (identifier: Object, opts: Object={}) => ({
+  authMixin: (locales: Array<string>) => (identifier: Object, opts: Object={}) => ({
     [identifier.column]: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -132,7 +131,7 @@ const mixins = {
     }
   }),
 
-  i18nMixin: locales => (name: string, makePure: boolean=false, type: Function=DataTypes.STRING) => (
+  i18nMixin: (locales: Array<string>) => (name: string, makePure: boolean=false, type: Function=DataTypes.STRING) => (
     locales.reduce((acc, locale) => ({
       ...acc,
       [`${name}_${locale}`]: {
