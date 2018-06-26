@@ -46,7 +46,7 @@ module.exports = (app, logger) => {
     };
   }
 
-  function passwordExchanger({model, idkey, getData, jwtSecret}) {
+  function passwordExchanger({model, idkey, getData, jwtSecret, opts}) {
     return oauth2orize.exchange.password(async (client, username, password, done) => {
       let entity;
       try {
@@ -74,12 +74,12 @@ module.exports = (app, logger) => {
         return done(error);
       }
       await entity.updateAttributes({auth_count: entity.auth_count + 1});
-      const issueToken = tokenIssuer({model, idkey, getData, jwtSecret});
+      const issueToken = tokenIssuer({model, idkey, getData, jwtSecret, opts});
       await issueToken(entity, done.bind(this));
     });
   }
 
-  function refreshTokenExchanger({model, idkey, getData, jwtSecret}) {
+  function refreshTokenExchanger({model, idkey, getData, jwtSecret, opts}) {
     return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       const namespace = `${model.name}_refresh_token`;
       logger.log('refreshTokenExchanger', {namespace, refreshToken});
@@ -113,7 +113,7 @@ module.exports = (app, logger) => {
       // remove old refresh token
       await redisClient.hdelAsync(namespace, str);
 
-      const issueToken = tokenIssuer({model, idkey, getData, jwtSecret});
+      const issueToken = tokenIssuer({model, idkey, getData, jwtSecret, opts});
       await issueToken(entity, done.bind(this));
     });
   }
