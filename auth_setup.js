@@ -6,6 +6,7 @@ import oauth2orize from 'oauth2orize';
 import redis from 'redis';
 import Promise from 'bluebird';
 import crypto from 'crypto';
+import _ from 'lodash';
 
 Promise.promisifyAll(redis.RedisClient.prototype);
 const redisClient = redis.createClient(process.env.REDIS_URL || {...config.redis, password: config.redis.pass});
@@ -16,7 +17,7 @@ module.exports = (app, logger) => {
     logger = console;
   }
   /* functors */
-  function tokenIssuer({model, idkey, getData, jwtSecret}) {
+  function tokenIssuer({model, idkey, getData, jwtSecret, opts}) {
     return async (entity, done) => {
       const payload = {
         sub: entity[idkey],
@@ -26,10 +27,19 @@ module.exports = (app, logger) => {
       const accessToken = jwt.sign(payload, jwtSecret, {expiresIn: '1800s'});
       const data = getData(entity);
 
+      opts = _.defaultsDeep(opts, {
+        refreshTokenExpire: 60*60*3
+      });
+
       // renew refresh token
       const namespace = `${model.name}_refresh_token`;
       const refreshToken = (await crypto.randomBytes(16)).toString('hex');
-      await redisClient.setexAsync(`${namespace}_${refreshToken}`, 60 * 60 * 3, `${entity[idkey]},${entity.auth_count}`);
+      if (opts.refreshTokenExpire) {
+        await redisClient.setexAsync(`${namespace}_${refreshToken}`, opts.refreshTokenExpire, `${entity[idkey]},${entity.auth_count}`);
+      } else {
+        await redisClient.setAsync(`${namespace}_${refreshToken}`, `${entity[idkey]},${entity.auth_count}`);
+      }
+      
       logger.log('tokenIssuer generated token', {refreshToken, namespace, accessToken});
 
       return done(null, accessToken, refreshToken, data);
