@@ -24,12 +24,13 @@ module.exports = (app, logger) => {
         cnt: entity.auth_count,
       };
 
-      const accessToken = jwt.sign(payload, jwtSecret, {expiresIn: '1800s'});
-      const data = getData(entity);
-
       opts = _.defaultsDeep(opts, {
-        refreshTokenExpire: 60*60*3
+        refreshTokenExpire: 60*60*3,
+        accessTokenExpire: 60*60*24,
       });
+
+      const accessToken = jwt.sign(payload, jwtSecret, {expiresIn: (opts.accessTokenExpire+'s')});
+      const data = getData(entity);
 
       // renew refresh token
       const namespace = `${model.name}_refresh_token`;
