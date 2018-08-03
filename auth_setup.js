@@ -25,7 +25,7 @@ module.exports = (app, logger) => {
       };
 
       opts = _.defaultsDeep(opts, {
-        refreshTokenExpire: 60*60*3,
+        refreshTokenExpire: false, /* don't expire refresh token */
         accessTokenExpire: 60*60*24,
       });
 
