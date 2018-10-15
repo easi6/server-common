@@ -20,10 +20,18 @@ const mixins = {
         conn: false,
       },
     },
-    auth_count: { // used for jwt verification
-      type: DataTypes.INTEGER,
+    auth_count: { // used for jwt verification per app
+      type: opts.multiple_auth_count ? DataTypes.STRING(255) : DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: opts.multiple_auth_count ? '{}' : 0,
+      ...opts.multiple_auth_count ? {
+        get() {
+          return JSON.parse(this.getDataValue('auth_count') || 'null');
+        },
+        set(v) {
+          this.setDataValue('auth_count', JSON.stringify(v || null));
+        }
+      } : {},
       roles: {
         admin: true,
         user: false,
@@ -105,7 +113,11 @@ const mixins = {
 
     model.hook('beforeUpdate', 'changeAuthCount', (instance) => {
       if (instance.changed('password_hashed')) {
-        instance.auth_count += 1;
+        if (model.rawAttributes.auth_count.type instanceof DataTypes.INTEGER) {
+          instance.auth_count += 1;
+        } else {
+          instance.auth_count = _.reduce(instance.auth_count, (s, {v, k}) => s[k] = (v || 0) + 1, s, {});
+        }
       }
     });
   },
