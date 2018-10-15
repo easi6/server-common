@@ -19,10 +19,11 @@ module.exports = (app, logger) => {
   /* functors */
   function tokenIssuer({client, model, idkey, getData, jwtSecret, opts}) {
     return async (entity, done) => {
+      const multi_auth_count = _.get(opts, 'multi_auth_count', false);
       const payload = {
         sub: entity[idkey],
-        cnt: opts.multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count,
-        ...opts.multi_auth_count ? {app: _.get(client, 'user.id')} : {},
+        cnt: multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count,
+        ...(multi_auth_count ? {app: _.get(client, 'user.id')} : {}),
       };
 
       opts = _.defaultsDeep(opts, {
@@ -37,9 +38,9 @@ module.exports = (app, logger) => {
       const namespace = `${model.name}_refresh_token`;
       const refreshToken = (await crypto.randomBytes(16)).toString('hex');
       if (opts.refreshTokenExpire) {
-        await redisClient.setexAsync(`${namespace}_${refreshToken}`, opts.refreshTokenExpire, `${entity[idkey]},${opts.multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count}`);
+        await redisClient.setexAsync(`${namespace}_${refreshToken}`, opts.refreshTokenExpire, `${entity[idkey]},${multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count}`);
       } else {
-        await redisClient.setAsync(`${namespace}_${refreshToken}`, `${entity[idkey]},${opts.multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count}`);
+        await redisClient.setAsync(`${namespace}_${refreshToken}`, `${entity[idkey]},${multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count}`);
       }
       
       logger.log('tokenIssuer generated token', {refreshToken, namespace, accessToken});
@@ -75,7 +76,7 @@ module.exports = (app, logger) => {
         logger.error('compare password error', {message: error.message, stack: error.stack});
         return done(error);
       }
-      if (opts.multi_auth_count) {
+      if (_.get(opts, 'multi_auth_count', false)) {
         const clientName = _.get(client, 'user.id');
         await entity.updateAttributes({auth_count: {...entity.auth_count, [clientName]: _.get(entity.auth_count, clientName, 0) + 1}});
       } else {
@@ -112,7 +113,7 @@ module.exports = (app, logger) => {
         return done(error);
       }
 
-      if (opts.multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] !== auth_count : entity.auth_count !== auth_count) {
+      if (_.get(opts, 'multi_auth_count', false) ? entity.auth_count[_.get(client, 'user.id')] !== auth_count : entity.auth_count !== auth_count) {
         const error = new Error('Incorrect auth_count');
         return done(error);
       }
