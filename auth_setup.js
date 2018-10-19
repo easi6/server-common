@@ -38,9 +38,9 @@ module.exports = (app, logger) => {
       const namespace = `${model.name}_refresh_token`;
       const refreshToken = (await crypto.randomBytes(16)).toString('hex');
       if (opts.refreshTokenExpire) {
-        await redisClient.setexAsync(`${namespace}_${refreshToken}`, opts.refreshTokenExpire, `${entity[idkey]},${multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count}`);
+        await redisClient.setexAsync(`${namespace}_${refreshToken}`, opts.refreshTokenExpire, `${entity[idkey]},${multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count}`);
       } else {
-        await redisClient.setAsync(`${namespace}_${refreshToken}`, `${entity[idkey]},${multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count}`);
+        await redisClient.setAsync(`${namespace}_${refreshToken}`, `${entity[idkey]},${multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count}`);
       }
       
       logger.log('tokenIssuer generated token', {refreshToken, namespace, accessToken});
@@ -113,7 +113,7 @@ module.exports = (app, logger) => {
         return done(error);
       }
 
-      if (_.get(opts, 'multi_auth_count', false) ? entity.auth_count[_.get(client, 'user.id')] !== auth_count : entity.auth_count !== auth_count) {
+      if (_.get(opts, 'multi_auth_count', false) ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) !== auth_count : entity.auth_count !== auth_count) {
         const error = new Error('Incorrect auth_count');
         return done(error);
       }
@@ -140,7 +140,7 @@ module.exports = (app, logger) => {
         return done(null, false);
       }
 
-      if (jwtPayload.app ? entity.auth_count[jwtPayload.app] !== jwtPayload.cnt : entity.auth_count !== jwtPayload.cnt) {
+      if (jwtPayload.app ? _.get(entity.auth_count, jwtPayload.app, 0) !== jwtPayload.cnt : entity.auth_count !== jwtPayload.cnt) {
         return done(null, false);
       }
 
