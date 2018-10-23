@@ -117,7 +117,7 @@ const mixins = {
         if (model.rawAttributes.auth_count.type instanceof DataTypes.INTEGER) {
           instance.auth_count += 1;
         } else {
-          instance.auth_count = _.reduce(instance.auth_count, (s, {v, k}) => (s[k] = (v || 0) + 1, s), {});
+          instance.auth_count = _.reduce(instance.auth_count, (s, v, k) => (s[k] = (v || 0) + 1, s), {});
         }
       }
     });
