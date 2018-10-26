@@ -33,13 +33,13 @@ const mixins = {
       defaultValue: opts.multiple_auth_count ? '{}' : 0,
       ...(opts.multiple_auth_count
         ? {
-            get() {
-              return JSON.parse(this.getDataValue('auth_count') || 'null');
-            },
-            set(v) {
-              this.setDataValue('auth_count', JSON.stringify(v || null));
-            },
-          }
+          get() {
+            return JSON.parse(this.getDataValue('auth_count') || 'null');
+          },
+          set(v) {
+            this.setDataValue('auth_count', JSON.stringify(v || null));
+          },
+        }
         : {}),
       roles: {
         admin: true,
@@ -49,43 +49,43 @@ const mixins = {
     },
     ...(opts.locale
       ? {
-          locale: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            defaultValue: opts.defaultLocale ? opts.defaultLocale : 'en',
-            validate: {
-              isIn: [locales],
-            },
+        locale: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: opts.defaultLocale ? opts.defaultLocale : 'en',
+          validate: {
+            isIn: [locales],
           },
-        }
+        },
+      }
       : {}),
     ...(opts.resettable
       ? {
-          old_reset_token: {
-            type: DataTypes.STRING, // for checking already password is changed with token
-            roles: {
-              admin: true,
-              user: false,
-              conn: false,
-            },
+        old_reset_token: {
+          type: DataTypes.STRING, // for checking already password is changed with token
+          roles: {
+            admin: true,
+            user: false,
+            conn: false,
           },
-          reset_token: {
-            type: DataTypes.STRING,
-            roles: {
-              admin: true,
-              user: false,
-              conn: false,
-            },
+        },
+        reset_token: {
+          type: DataTypes.STRING,
+          roles: {
+            admin: true,
+            user: false,
+            conn: false,
           },
-          reset_token_created_at: {
-            type: DataTypes.DATE,
-            roles: {
-              admin: true,
-              user: false,
-              conn: false,
-            },
+        },
+        reset_token_created_at: {
+          type: DataTypes.DATE,
+          roles: {
+            admin: true,
+            user: false,
+            conn: false,
           },
-        }
+        },
+      }
       : {}),
   }),
 

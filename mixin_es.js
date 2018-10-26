@@ -1,3 +1,4 @@
+// @flow
 import elasticsearch from 'elasticsearch';
 import config from 'config';
 import _ from 'lodash';
@@ -237,9 +238,9 @@ export default (model, opts) => {
             }` +
             (typeof v === 'string'
               ? v
-                  .split(/[\s-]+/)
-                  .map(s => escapeString(s))
-                  .join(' AND ')
+                .split(/[\s-]+/)
+                .map(s => escapeString(s))
+                .join(' AND ')
               : v) +
             `${q.wildcard === 'both' || q.wildcard === 'prefix' ? '*' : ''})`
           );
