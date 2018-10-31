@@ -4,6 +4,7 @@ import config from 'config';
 import _ from 'lodash';
 import Promise from 'bluebird';
 import { Model, DataTypes } from 'sequelize';
+import logger from '../../config/logger';
 
 let esClient;
 if (config.eshost) {
@@ -15,11 +16,11 @@ if (config.eshost) {
 
 export default (model, opts) => {
   if (!esClient) {
-    console.warn(
+    logger.warn(
       'config.eshost does not exist or esClient is not set. Model.esSearch will return empty array'
     );
     model.esSearch = (originalQuery, searchOpts) => {
-      console.warn(
+      logger.warn(
         'Since esClient is not set, this method just return empty array!'
       );
       if (searchOpts.paginate) {
