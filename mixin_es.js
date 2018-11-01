@@ -16,13 +16,9 @@ if (config.eshost) {
 
 export default (model, opts) => {
   if (!esClient) {
-    logger.warn(
-      'config.eshost does not exist or esClient is not set. Model.esSearch will return empty array'
-    );
+    logger.warn('config.eshost does not exist or esClient is not set. Model.esSearch will return empty array');
     model.esSearch = (originalQuery, searchOpts) => {
-      logger.warn(
-        'Since esClient is not set, this method just return empty array!'
-      );
+      logger.warn('Since esClient is not set, this method just return empty array!');
       if (searchOpts.paginate) {
         return Promise.resolve({ count: 0, rows: [] });
       }
@@ -108,10 +104,7 @@ export default (model, opts) => {
 
           const targetModel = association.target;
 
-          if (
-            association.associationType === 'HasMany' ||
-            association.associationType === 'BelongsTo'
-          ) {
+          if (association.associationType === 'HasMany' || association.associationType === 'BelongsTo') {
             const fname = association.accessors.get;
             model.hook(
               'afterUpdate',
@@ -121,21 +114,14 @@ export default (model, opts) => {
                   const { transaction } = opts;
                   const cb = () =>
                     instance[fname]().then(targets => {
-                      return Promise.map(
-                        _.castArray(targets),
-                        target => target.addES && target.addES()
-                      );
+                      return Promise.map(_.castArray(targets), target => target.addES && target.addES());
                     });
-                  transaction
-                    ? transaction.afterCommit(cb, true)
-                    : setTimeout(cb);
+                  transaction ? transaction.afterCommit(cb, true) : setTimeout(cb);
                 };
               })(fname)
             );
           } else {
-            throw new Error(
-              'only HasMany or BelongsTo relation target can be auto re-indexed'
-            );
+            throw new Error('only HasMany or BelongsTo relation target can be auto re-indexed');
           }
         })(association)
       );
@@ -160,10 +146,7 @@ export default (model, opts) => {
     });
   };
 
-  model._getESQuery = function(
-    originalQuery,
-    opts = { paginate: true, page: 1, limit: 20, operator: '$and' }
-  ) {
+  model._getESQuery = function(originalQuery, opts = { paginate: true, page: 1, limit: 20, operator: '$and' }) {
     originalQuery = _.reduce(
       originalQuery,
       (acc, v, k) => {
@@ -221,27 +204,19 @@ export default (model, opts) => {
       const key = Object.keys(queryObj)[0];
       if (key === '$or' || key === '$and') {
         const arr = queryObj[key];
-        return (
-          '(' +
-          arr
-            .map(q => obj2esquery(q))
-            .join(` ${key.replace('$', '').toUpperCase()} `) +
-          ')'
-        );
+        return '(' + arr.map(q => obj2esquery(q)).join(` ${key.replace('$', '').toUpperCase()} `) + ')';
       } else {
         const q = queryObj[key];
 
         if (q.type === 'text') {
           const v = q.value;
           return (
-            `(${key}: ${
-              q.wildcard === 'both' || q.wildcard === 'postfix' ? '*' : ''
-            }` +
+            `(${key}: ${q.wildcard === 'both' || q.wildcard === 'postfix' ? '*' : ''}` +
             (typeof v === 'string'
               ? v
-                .split(/[\s-]+/)
-                .map(s => escapeString(s))
-                .join(' AND ')
+                  .split(/[\s-]+/)
+                  .map(s => escapeString(s))
+                  .join(' AND ')
               : v) +
             `${q.wildcard === 'both' || q.wildcard === 'prefix' ? '*' : ''})`
           );
@@ -282,9 +257,7 @@ export default (model, opts) => {
               );
             }
           } else {
-            throw new Error(
-              'plain value with $or or $and operator is not supported'
-            );
+            throw new Error('plain value with $or or $and operator is not supported');
           }
           return { [key]: subQuery.map(s => convertQueryObj(s)) };
         } else {
@@ -301,15 +274,10 @@ export default (model, opts) => {
               value = { type: 'text', wildcard: 'both', ...value };
             } else if (value.type === 'range') {
               if (!(_.isArray(value.value) && value.value.length === 2)) {
-                throw new Error(
-                  'invalid search value. should be an array having length of 2'
-                );
+                throw new Error('invalid search value. should be an array having length of 2');
               }
             } else {
-              throw new Error(
-                'invalid search query type. only support term and range but got ' +
-                  value.type
-              );
+              throw new Error('invalid search query type. only support term and range but got ' + value.type);
             }
           }
           return { [key]: value };
@@ -317,18 +285,12 @@ export default (model, opts) => {
       }
 
       return {
-        $and: _.reduce(
-          queryObj,
-          (acc, v, k) => [...acc, convertQueryObj({ [k]: v })],
-          []
-        ),
+        $and: _.reduce(queryObj, (acc, v, k) => [...acc, convertQueryObj({ [k]: v })], []),
       };
     }
 
     if (!_.isEmpty(query)) {
-      const querystring = obj2esquery(
-        convertQueryObj({ [opts.operator]: query })
-      );
+      const querystring = obj2esquery(convertQueryObj({ [opts.operator]: query }));
       mustConditions.push({ query_string: { query: querystring } });
     }
 
@@ -368,20 +330,17 @@ export default (model, opts) => {
         size: searchOpts.limit,
       });
     }
-    return Promise.fromCallback(cb => esClient.search(searchParam, cb)).then(
-      result => {
-        const results = _.map(_.get(result, 'hits.hits') || [], '_source').map(
-          doc =>
-            // try to build an instance from doc
-            model.build(doc, { include: includeOptions })
-        );
+    return Promise.fromCallback(cb => esClient.search(searchParam, cb)).then(result => {
+      const results = _.map(_.get(result, 'hits.hits') || [], '_source').map(doc =>
+        // try to build an instance from doc
+        model.build(doc, { include: includeOptions })
+      );
 
-        if (searchOpts.paginate) {
-          return { count: result.hits.total, rows: results };
-        } else {
-          return results;
-        }
+      if (searchOpts.paginate) {
+        return { count: result.hits.total, rows: results };
+      } else {
+        return results;
       }
-    );
+    });
   };
 };

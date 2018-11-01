@@ -9,9 +9,7 @@ import crypto from 'crypto';
 import _ from 'lodash';
 
 Promise.promisifyAll(redis.RedisClient.prototype);
-const redisClient = redis.createClient(
-  process.env.REDIS_URL || { ...config.redis, password: config.redis.pass }
-);
+const redisClient = redis.createClient(process.env.REDIS_URL || { ...config.redis, password: config.redis.pass });
 
 module.exports = (app, logger) => {
   app.use(passport.initialize());
@@ -24,9 +22,7 @@ module.exports = (app, logger) => {
       const multi_auth_count = _.get(opts, 'multi_auth_count', false);
       const payload = {
         sub: entity[idkey],
-        cnt: multi_auth_count
-          ? entity.auth_count[_.get(client, 'user.id')]
-          : entity.auth_count,
+        cnt: multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count,
         ...(multi_auth_count ? { app: _.get(client, 'user.id') } : {}),
       };
 
@@ -48,18 +44,14 @@ module.exports = (app, logger) => {
           `${namespace}_${refreshToken}`,
           opts.refreshTokenExpire,
           `${entity[idkey]},${
-            multi_auth_count
-              ? _.get(entity.auth_count, _.get(client, 'user.id'), 0)
-              : entity.auth_count
+            multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count
           }`
         );
       } else {
         await redisClient.setAsync(
           `${namespace}_${refreshToken}`,
           `${entity[idkey]},${
-            multi_auth_count
-              ? _.get(entity.auth_count, _.get(client, 'user.id'), 0)
-              : entity.auth_count
+            multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count
           }`
         );
       }
@@ -75,116 +67,109 @@ module.exports = (app, logger) => {
   }
 
   function passwordExchanger({ model, idkey, getData, jwtSecret, opts }) {
-    return oauth2orize.exchange.password(
-      async (client, username, password, done) => {
-        let entity;
-        try {
-          entity = await model.find({ where: { [idkey]: username } });
-        } catch (error) {
-          logger.error('model find error', {
-            message: error.message,
-            stack: error.stack,
-          });
-          return done(error);
-        }
+    return oauth2orize.exchange.password(async (client, username, password, done) => {
+      let entity;
+      try {
+        entity = await model.find({ where: { [idkey]: username } });
+      } catch (error) {
+        logger.error('model find error', {
+          message: error.message,
+          stack: error.stack,
+        });
+        return done(error);
+      }
 
-        if (!entity) {
-          const error = new Error('Incorrect login');
+      if (!entity) {
+        const error = new Error('Incorrect login');
+        error.name = 'IncorrectCredentialsError';
+        return done(error);
+      }
+
+      try {
+        const match = await entity.comparePassword(password);
+        if (!match) {
+          const error = new Error('Incorrect password');
           error.name = 'IncorrectCredentialsError';
           return done(error);
         }
-
-        try {
-          const match = await entity.comparePassword(password);
-          if (!match) {
-            const error = new Error('Incorrect password');
-            error.name = 'IncorrectCredentialsError';
-            return done(error);
-          }
-        } catch (error) {
-          logger.error('compare password error', {
-            message: error.message,
-            stack: error.stack,
-          });
-          return done(error);
-        }
-        if (_.get(opts, 'multi_auth_count', false)) {
-          const clientName = _.get(client, 'user.id');
-          await entity.updateAttributes({
-            auth_count: {
-              ...entity.auth_count,
-              [clientName]: _.get(entity.auth_count, clientName, 0) + 1,
-            },
-          });
-        } else {
-          await entity.updateAttributes({ auth_count: entity.auth_count + 1 });
-        }
-        const issueToken = tokenIssuer({
-          client,
-          model,
-          idkey,
-          getData,
-          jwtSecret,
-          opts,
+      } catch (error) {
+        logger.error('compare password error', {
+          message: error.message,
+          stack: error.stack,
         });
-        await issueToken(entity, done.bind(this));
+        return done(error);
       }
-    );
+      if (_.get(opts, 'multi_auth_count', false)) {
+        const clientName = _.get(client, 'user.id');
+        await entity.updateAttributes({
+          auth_count: {
+            ...entity.auth_count,
+            [clientName]: _.get(entity.auth_count, clientName, 0) + 1,
+          },
+        });
+      } else {
+        await entity.updateAttributes({ auth_count: entity.auth_count + 1 });
+      }
+      const issueToken = tokenIssuer({
+        client,
+        model,
+        idkey,
+        getData,
+        jwtSecret,
+        opts,
+      });
+      await issueToken(entity, done.bind(this));
+    });
   }
 
   function refreshTokenExchanger({ model, idkey, getData, jwtSecret, opts }) {
-    return oauth2orize.exchange.refreshToken(
-      async (client, refreshToken, done) => {
-        const namespace = `${model.name}_refresh_token`;
-        logger.log('refreshTokenExchanger', { namespace, refreshToken });
-        const str = await redisClient.getAsync(`${namespace}_${refreshToken}`);
+    return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
+      const namespace = `${model.name}_refresh_token`;
+      logger.log('refreshTokenExchanger', { namespace, refreshToken });
+      const str = await redisClient.getAsync(`${namespace}_${refreshToken}`);
 
-        if (str === null) {
-          const error = new Error('Expired refresh token');
-          error.name = 'IncorrectCredentialsError';
-          return done(error);
-        }
-
-        const [id, auth_count] = str
-          .split(',')
-          .map(x => (isNaN(x) ? x : parseInt(x)));
-
-        if (!id) {
-          const error = new Error('Incorrect login');
-          error.name = 'IncorrectCredentialsError';
-          return done(error);
-        }
-        const entity = await model.find({ where: { [idkey]: id } });
-        if (!entity) {
-          const error = new Error('Incorrect login');
-          error.name = 'IncorrectCredentialsError';
-          return done(error);
-        }
-
-        if (
-          _.get(opts, 'multi_auth_count', false)
-            ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) !==
-              auth_count
-            : entity.auth_count !== auth_count
-        ) {
-          const error = new Error('Incorrect auth_count');
-          return done(error);
-        }
-
-        // remove old refresh token
-        await redisClient.delAsync(`${namespace}_${refreshToken}`);
-
-        const issueToken = tokenIssuer({
-          client,
-          model,
-          idkey,
-          getData,
-          jwtSecret,
-          opts,
-        });
-        await issueToken(entity, done.bind(this));
+      if (str === null) {
+        const error = new Error('Expired refresh token');
+        error.name = 'IncorrectCredentialsError';
+        return done(error);
       }
-    );
+
+      const [id, auth_count] = str.split(',').map(x => (isNaN(x) ? x : parseInt(x)));
+
+      if (!id) {
+        const error = new Error('Incorrect login');
+        error.name = 'IncorrectCredentialsError';
+        return done(error);
+      }
+      const entity = await model.find({ where: { [idkey]: id } });
+      if (!entity) {
+        const error = new Error('Incorrect login');
+        error.name = 'IncorrectCredentialsError';
+        return done(error);
+      }
+
+      if (
+        _.get(opts, 'multi_auth_count', false)
+          ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) !== auth_count
+          : entity.auth_count !== auth_count
+      ) {
+        const error = new Error('Incorrect auth_count');
+        return done(error);
+      }
+
+      // remove old refresh token
+      await redisClient.delAsync(`${namespace}_${refreshToken}`);
+
+      const issueToken = tokenIssuer({
+        client,
+        model,
+        idkey,
+        getData,
+        jwtSecret,
+        opts,
+      });
+      await issueToken(entity, done.bind(this));
+    });
   }
 
   function jwtStrategyFactory({ model, idkey, secretOrKey }) {

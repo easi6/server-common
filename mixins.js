@@ -5,10 +5,7 @@ import crypto from 'crypto';
 import _ from 'lodash';
 
 const mixins = {
-  authMixin: (locales: Array<string>) => (
-    identifier: Object,
-    opts: Object = {}
-  ) => ({
+  authMixin: (locales: Array<string>) => (identifier: Object, opts: Object = {}) => ({
     [identifier.column]: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -26,20 +23,18 @@ const mixins = {
     },
     auth_count: {
       // used for jwt verification per app
-      type: opts.multiple_auth_count
-        ? DataTypes.STRING(255)
-        : DataTypes.INTEGER,
+      type: opts.multiple_auth_count ? DataTypes.STRING(255) : DataTypes.INTEGER,
       allowNull: false,
       defaultValue: opts.multiple_auth_count ? '{}' : 0,
       ...(opts.multiple_auth_count
         ? {
-          get() {
-            return JSON.parse(this.getDataValue('auth_count') || 'null');
-          },
-          set(v) {
-            this.setDataValue('auth_count', JSON.stringify(v || null));
-          },
-        }
+            get() {
+              return JSON.parse(this.getDataValue('auth_count') || 'null');
+            },
+            set(v) {
+              this.setDataValue('auth_count', JSON.stringify(v || null));
+            },
+          }
         : {}),
       roles: {
         admin: true,
@@ -49,43 +44,43 @@ const mixins = {
     },
     ...(opts.locale
       ? {
-        locale: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          defaultValue: opts.defaultLocale ? opts.defaultLocale : 'en',
-          validate: {
-            isIn: [locales],
+          locale: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: opts.defaultLocale ? opts.defaultLocale : 'en',
+            validate: {
+              isIn: [locales],
+            },
           },
-        },
-      }
+        }
       : {}),
     ...(opts.resettable
       ? {
-        old_reset_token: {
-          type: DataTypes.STRING, // for checking already password is changed with token
-          roles: {
-            admin: true,
-            user: false,
-            conn: false,
+          old_reset_token: {
+            type: DataTypes.STRING, // for checking already password is changed with token
+            roles: {
+              admin: true,
+              user: false,
+              conn: false,
+            },
           },
-        },
-        reset_token: {
-          type: DataTypes.STRING,
-          roles: {
-            admin: true,
-            user: false,
-            conn: false,
+          reset_token: {
+            type: DataTypes.STRING,
+            roles: {
+              admin: true,
+              user: false,
+              conn: false,
+            },
           },
-        },
-        reset_token_created_at: {
-          type: DataTypes.DATE,
-          roles: {
-            admin: true,
-            user: false,
-            conn: false,
+          reset_token_created_at: {
+            type: DataTypes.DATE,
+            roles: {
+              admin: true,
+              user: false,
+              conn: false,
+            },
           },
-        },
-      }
+        }
       : {}),
   }),
 
@@ -106,11 +101,7 @@ const mixins = {
         );
       };
 
-      model.prototype.checkAndResetPassword = function(
-        resetToken,
-        newPassword,
-        opts = {}
-      ) {
+      model.prototype.checkAndResetPassword = function(resetToken, newPassword, opts = {}) {
         if (this.reset_token && this.reset_token === resetToken) {
           return this._resetPassword(newPassword, opts);
         }
@@ -132,10 +123,7 @@ const mixins = {
         } else {
           resetToken = (await crypto.randomBytes(16)).toString('hex'); // 32 digits hex string
         }
-        return this.updateAttributes(
-          { reset_token: resetToken, reset_token_created_at: new Date() },
-          opts
-        );
+        return this.updateAttributes({ reset_token: resetToken, reset_token_created_at: new Date() }, opts);
       };
     }
 
@@ -144,11 +132,7 @@ const mixins = {
         if (model.rawAttributes.auth_count.type instanceof DataTypes.INTEGER) {
           instance.auth_count += 1;
         } else {
-          instance.auth_count = _.reduce(
-            instance.auth_count,
-            (s, v, k) => ((s[k] = (v || 0) + 1), s),
-            {}
-          );
+          instance.auth_count = _.reduce(instance.auth_count, (s, v, k) => ((s[k] = (v || 0) + 1), s), {});
         }
       }
     });
@@ -175,11 +159,7 @@ const mixins = {
     },
   }),
 
-  i18nMixin: (locales: Array<string>) => (
-    name: string,
-    makePure: boolean = false,
-    type: Function = DataTypes.STRING
-  ) =>
+  i18nMixin: (locales: Array<string>) => (name: string, makePure: boolean = false, type: Function = DataTypes.STRING) =>
     locales.reduce(
       (acc, locale) => ({
         ...acc,
