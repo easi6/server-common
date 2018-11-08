@@ -196,7 +196,7 @@ module.exports = (app, logger) => {
           return done(null, false);
         }
 
-        return done(null, entity);
+        return done(null, entity, jwtPayload);
       }
     );
   }
