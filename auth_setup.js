@@ -17,12 +17,17 @@ module.exports = (app, logger) => {
     logger = console;
   }
   /* functors */
-  function tokenIssuer({ client, model, idkey, getData, jwtSecret, opts }) {
-    return async (entity, done) => {
+  function tokenIssuer({ client: originalClient, model, idkey, getData, jwtSecret, opts }) {
+    return async (entity, client, done) => {
+      if (!done) {
+        done = client;
+        client = originalClient;
+      }
+
       const multi_auth_count = _.get(opts, 'multi_auth_count', false);
       const payload = {
         sub: entity[idkey],
-        cnt: multi_auth_count ? entity.auth_count[_.get(client, 'user.id')] : entity.auth_count,
+        cnt: multi_auth_count ? _.get(entity, `auth_count[${_.get(client, 'user.id')}]`, 0) : entity.auth_count,
         ...(multi_auth_count ? { app: _.get(client, 'user.id') } : {}),
       };
 
