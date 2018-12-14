@@ -1,4 +1,3 @@
-// @flow
 import elasticsearch from 'elasticsearch';
 import config from 'config';
 import _ from 'lodash';
@@ -97,7 +96,7 @@ export default (model, opts) => {
 
   // opts.propagateUpdate에 등록된 모델이 association에 있는 애들이면 현재 모델이 업데이트 됐을때 해당 모델에 대한 인덱스를 다시 수행
   opts.propagateUpdate &&
-    _.castArray(opts.propagateUpdate).forEach((targetName: string) => {
+    _.castArray(opts.propagateUpdate).forEach((targetName) => {
       _.forEach(model.associations, association =>
         (function(association) {
           if (association.target.name !== targetName) return;

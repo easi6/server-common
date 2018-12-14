@@ -1,4 +1,3 @@
-// @flow
 
 import _ from 'lodash';
 import util from 'util';
@@ -8,7 +7,7 @@ import * as Sentry from '@sentry/node';
 const isProd = process.env.NODE_ENV === 'production';
 const commitHash = process.env.COMMIT_HASH;
 
-const initialize = (opts: {debug: ?boolean, enabled: ?boolean, dsn: ?string, release: ?string} = {}) => {
+const initialize = (opts = {}) => {
   const initOpts = _.defaults(opts, {
     debug: !isProd,
     enabled: isProd,
@@ -17,7 +16,7 @@ const initialize = (opts: {debug: ?boolean, enabled: ?boolean, dsn: ?string, rel
   Sentry.init(initOpts);
 };
 
-const captureException = (err: Exception) => {
+const captureException = (err) => {
   Sentry.captureException(err);
 };
 

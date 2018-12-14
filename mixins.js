@@ -1,11 +1,10 @@
-// @flow
 import { DataTypes } from 'sequelize';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import _ from 'lodash';
 
 const mixins = {
-  authMixin: (locales: Array<string>) => (identifier: Object, opts: Object = {}) => ({
+  authMixin: (locales) => (identifier, opts = {}) => ({
     [identifier.column]: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -159,7 +158,7 @@ const mixins = {
     },
   }),
 
-  i18nMixin: (locales: Array<string>) => (name: string, makePure: boolean = false, type: Function = DataTypes.STRING) =>
+  i18nMixin: (locales) => (name, makePure = false, type = DataTypes.STRING) =>
     locales.reduce(
       (acc, locale) => ({
         ...acc,
