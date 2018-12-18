@@ -7,6 +7,7 @@ import redis from 'redis';
 import Promise from 'bluebird';
 import crypto from 'crypto';
 import _ from 'lodash';
+import CrashReportUtil from 'lib/common/sentry_util';
 
 Promise.promisifyAll(redis.RedisClient.prototype);
 const redisClient = redis.createClient(process.env.REDIS_URL || { ...config.redis, password: config.redis.pass });
@@ -15,6 +16,9 @@ module.exports = (app, logger) => {
   app.use(passport.initialize());
   if (!logger) {
     logger = console;
+  }
+  if (!logger.verbose) {
+    logger.verbose = logger.log
   }
   /* functors */
   function tokenIssuer({ client: originalClient, model, idkey, getData, jwtSecret, opts }) {
@@ -61,9 +65,8 @@ module.exports = (app, logger) => {
         );
       }
 
-      logger.log('tokenIssuer generated token', {
+      logger.verbose(`tokenIssuer generated token, client: ${JSON.stringify(client)}`, {
         refreshToken,
-        namespace,
         accessToken,
       });
 
@@ -130,7 +133,6 @@ module.exports = (app, logger) => {
   function refreshTokenExchanger({ model, idkey, getData, jwtSecret, opts }) {
     return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       const namespace = `${model.name}_refresh_token`;
-      logger.log('refreshTokenExchanger', { namespace, refreshToken });
       const str = await redisClient.getAsync(`${namespace}_${refreshToken}`);
 
       if (str === null) {
@@ -158,8 +160,10 @@ module.exports = (app, logger) => {
           ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) !== auth_count
           : entity.auth_count !== auth_count
       ) {
-        const error = new Error('Incorrect auth_count');
-        return done(error);
+        logger.error(`userId: ${id}, refresh: ${refreshToken}, client: ${JSON.stringify(client)}, entity.auth_count: ${JSON.stringify(entity.auth_count)}, auth_count: ${auth_count}`);
+        CrashReportUtil.captureException(new Error('error incorrect_auth_count'));
+        // const error = new Error('Incorrect auth_count');
+        // return done(error);
       }
 
       // remove old refresh token
