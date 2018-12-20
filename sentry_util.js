@@ -7,7 +7,7 @@ import * as Sentry from '@sentry/node';
 const isProd = process.env.NODE_ENV === 'production';
 const commitHash = process.env.COMMIT_HASH;
 
-const initialize = (opts = {}) => {
+export const initialize = (opts = {}) => {
   const initOpts = _.defaults(opts, {
     debug: !isProd,
     enabled: isProd,
@@ -16,11 +16,11 @@ const initialize = (opts = {}) => {
   Sentry.init(initOpts);
 };
 
-const captureException = (err) => {
+export const captureException = (err) => {
   Sentry.captureException(err);
 };
 
-const BreadcrumbTransport = winston.transports.BreadcrumbTransport = function (options) {
+export const BreadcrumbTransport = winston.transports.BreadcrumbTransport = function (options) {
   //
   // Name this logger
   //
@@ -55,9 +55,10 @@ BreadcrumbTransport.prototype.log = function (level, msg, meta, callback) {
   callback(null, true);
 };
 
-
-export default {
+export const CrashReportUtil = {
   initialize,
   captureException,
   BreadcrumbTransport,
 };
+
+export default CrashReportUtil;
