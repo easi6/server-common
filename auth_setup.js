@@ -18,7 +18,7 @@ module.exports = (app, logger) => {
     logger = console;
   }
   if (!logger.verbose) {
-    logger.verbose = logger.log
+    logger.verbose = logger.log;
   }
   /* functors */
   function tokenIssuer({ client: originalClient, model, idkey, getData, jwtSecret, opts }) {
@@ -160,7 +160,11 @@ module.exports = (app, logger) => {
           ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) !== auth_count
           : entity.auth_count !== auth_count
       ) {
-        logger.error(`userId: ${id}, refresh: ${refreshToken}, client: ${JSON.stringify(client)}, entity.auth_count: ${JSON.stringify(entity.auth_count)}, auth_count: ${auth_count}`);
+        logger.error(
+          `userId: ${id}, refresh: ${refreshToken}, client: ${JSON.stringify(
+            client
+          )}, entity.auth_count: ${JSON.stringify(entity.auth_count)}, auth_count: ${auth_count}`
+        );
         CrashReportUtil.captureException(new Error('error incorrect_auth_count'));
         // const error = new Error('Incorrect auth_count');
         // return done(error);

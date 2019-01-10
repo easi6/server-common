@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 import util from 'util';
 import winston from 'winston';
@@ -16,11 +15,11 @@ export const initialize = (opts = {}) => {
   Sentry.init(initOpts);
 };
 
-export const captureException = (err) => {
+export const captureException = err => {
   Sentry.captureException(err);
 };
 
-export const BreadcrumbTransport = winston.transports.BreadcrumbTransport = function (options) {
+export const BreadcrumbTransport = (winston.transports.BreadcrumbTransport = function(options) {
   //
   // Name this logger
   //
@@ -34,7 +33,7 @@ export const BreadcrumbTransport = winston.transports.BreadcrumbTransport = func
   //
   // Configure your storage backing as you see fit
   //
-};
+});
 
 //
 // Inherit from `winston.Transport` so you can take advantage
@@ -42,7 +41,7 @@ export const BreadcrumbTransport = winston.transports.BreadcrumbTransport = func
 //
 util.inherits(BreadcrumbTransport, winston.Transport);
 
-BreadcrumbTransport.prototype.log = function (level, msg, meta, callback) {
+BreadcrumbTransport.prototype.log = function(level, msg, meta, callback) {
   Sentry.addBreadcrumb({
     level,
     message: msg,

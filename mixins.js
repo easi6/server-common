@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import _ from 'lodash';
 
 const mixins = {
-  authMixin: (locales) => (identifier, opts = {}) => ({
+  authMixin: locales => (identifier, opts = {}) => ({
     [identifier.column]: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -158,7 +158,7 @@ const mixins = {
     },
   }),
 
-  i18nMixin: (locales) => (name, makePure = false, type = DataTypes.STRING) =>
+  i18nMixin: locales => (name, makePure = false, type = DataTypes.STRING) =>
     locales.reduce(
       (acc, locale) => ({
         ...acc,
