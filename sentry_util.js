@@ -45,7 +45,14 @@ BreadcrumbTransport.prototype.log = function(level, msg, meta, callback) {
   Sentry.addBreadcrumb({
     level,
     message: msg,
-    data: meta,
+    data: _.reduce(meta, ((accum, value, key) => {
+      if (typeof value === 'string') {
+        accum[key] = value;
+      } else {
+        accum[key] = JSON.stringify(value, null, 2);
+      }
+      return accum;
+    }), {}),
   });
   //
   // Store this message and metadata, maybe use some custom logic
