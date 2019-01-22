@@ -1,7 +1,8 @@
+import * as Sentry from '@sentry/node';
 import _ from 'lodash';
 import util from 'util';
+// @ts-ignore
 import winston from 'winston';
-import * as Sentry from '@sentry/node';
 
 const isProd = process.env.NODE_ENV === 'production';
 const commitHash = process.env.COMMIT_HASH;
@@ -15,11 +16,18 @@ export const initialize = (opts = {}) => {
   Sentry.init(initOpts);
 };
 
-export const captureException = err => {
+export const captureException = (err: any, locale: string, clientIp?: string, user?: {id: number, email: string}) => {
+  Sentry.configureScope((scope: any) => {
+    scope.setTag('locale', locale);
+    scope.setUser({
+      ..._.pick(user, ['id', 'email']),
+      ip_address: clientIp,
+    });
+  });
   Sentry.captureException(err);
 };
 
-export const BreadcrumbTransport = (winston.transports.BreadcrumbTransport = function(options) {
+export const BreadcrumbTransport = (winston.transports.BreadcrumbTransport = function(options: any) {
   //
   // Name this logger
   //
@@ -41,11 +49,11 @@ export const BreadcrumbTransport = (winston.transports.BreadcrumbTransport = fun
 //
 util.inherits(BreadcrumbTransport, winston.Transport);
 
-BreadcrumbTransport.prototype.log = function(level, msg, meta, callback) {
+BreadcrumbTransport.prototype.log = (level: Sentry.Severity, msg: string, meta: any, callback: (arg1: any, arg2: boolean) => void) => {
   Sentry.addBreadcrumb({
     level,
     message: msg,
-    data: _.reduce(meta, ((accum, value, key) => {
+    data: _.reduce(meta, ((accum: any, value, key) => {
       if (typeof value === 'string') {
         accum[key] = value;
       } else {
