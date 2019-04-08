@@ -268,7 +268,6 @@ export const finishCouponUse = async ({
 };
 
 export const checkCouponAvail = async ({
-  rentalNumber,
   carType,
   productType,
   region,
@@ -281,7 +280,6 @@ export const checkCouponAvail = async ({
   code,
   skipCheck,
 }: {
-  rentalNumber: number;
   carType: number;
   productType: number;
   region: string;
