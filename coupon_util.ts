@@ -11,6 +11,8 @@ import * as messages from '../proto_gen/coupon_pb';
 const couponServiceConfig: any = config.has('coupon_service') ? config.get('coupon_service') : {};
 const { serviceHost = 'localhost:6565' } = couponServiceConfig;
 
+const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
+
 export const createPromotion = async ({
   code,
   title,
@@ -46,7 +48,6 @@ export const createPromotion = async ({
   valid_from: Date;
   valid_until: Date;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
   // @ts-ignore
   const request = new messages.CreatePromotionRequest();
   request.setCode(code);
@@ -106,8 +107,6 @@ export const getAvailCoupons = async ({
   timezone: number;
   riderId: string;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // stuffing request
   // @ts-ignore
   const request = new messages.AvailCouponRequest();
@@ -141,8 +140,6 @@ export const issueCouponFromPromotion = async ({
   code: string;
   riderId: string;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // @ts-ignore
   const request = new messages.IssuePromotionCouponRequest();
   request.setCode(code);
@@ -165,8 +162,6 @@ export const registerCouponOrPromotion = async ({
   code: string;
   riderId: string;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // @ts-ignore
   const request = new messages.IssuePromotionCouponRequest();
   request.setCode(code);
@@ -202,8 +197,6 @@ export const getMyCoupons = async ({
   page: number;
   limit: number;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   const validAfterMoment = moment(validAfter).isValid() ? moment(validAfter) : moment();
 
   // @ts-ignore
@@ -230,8 +223,6 @@ export const getMyCoupons = async ({
 };
 
 export const startCouponUse = async ({ riderId, code }: { riderId: string; code: string }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // @ts-ignore
   const request = new messages.StartCouponUseRequest();
   request.setUserId(riderId);
@@ -259,8 +250,6 @@ export const finishCouponUse = async ({
   discountedPrice: number;
   rentalNumber: string;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // @ts-ignore
   const request = new messages.FinishCouponUseRequest();
   request.setUserId(riderId);
@@ -305,8 +294,6 @@ export const checkCouponAvail = async ({
   code: string;
   skipCheck: boolean;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // @ts-ignore
   const request = new messages.CheckCouponAvailRequest();
   request.setCarType(carType);
@@ -333,8 +320,6 @@ export const checkCouponAvail = async ({
 };
 
 export const getCouponDetail = async ({ code }: { code: string }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // @ts-ignore
   const request = new messages.CouponDetailRequest();
   request.setCode(code);
@@ -359,8 +344,6 @@ export const getCouponDetail = async ({ code }: { code: string }): Promise<any> 
 };
 
 export const cancelCouponUse = async ({ riderId, code }: { riderId: string; code: string }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // @ts-ignore
   const request = new messages.CancelCouponUseRequest();
   request.setUserId(riderId);
@@ -382,7 +365,6 @@ export const getMyCouponCount = async ({
   riderId: string;
   validAfter: Date | Moment;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
   const validAfterMoment = moment(validAfter).isValid() ? moment(validAfter) : moment();
 
   // @ts-ignore
