@@ -335,6 +335,7 @@ export const getCouponDetail = async ({ code }: { code: string }): Promise<any> 
       'amount',
       'currency',
       'validUntil',
+      'hiredOnly',
     ]);
   } catch (e) {
     logger.error('getCouponDetailFailed', e);
