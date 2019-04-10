@@ -383,6 +383,37 @@ export const registerCouponOrPromotion = async ({
   }
 };
 
+export const registerCoupon = async ({
+  code, // promotion code
+  riderId,
+}: {
+  code: string;
+  riderId: string;
+}): Promise<any> => {
+  // @ts-ignore
+  const request = new messages.RegisterCouponRequest();
+  request.setCode(code);
+  request.setUserId(riderId);
+
+  try {
+    // @ts-ignore
+    const response: messages.CouponDetail = await Bluebird.fromCallback(cb =>
+      client.registerCoupon(request, cb)
+    );
+    // @ts-ignore
+    return response.toObject();
+  } catch (e) {
+    logger.error('registerCouponOrPromotionFailed', e);
+    if (e.message.includes('issue count exceeded')) {
+      throw new Easi6Error('coupon_issue_count_exceeded');
+    } else if (e.message.includes('total count exceeded')) {
+      throw new Easi6Error('coupon_total_count_exceeded');
+    } else {
+      throw new Easi6Error('not_found', 'coupon');
+    }
+  }
+};
+
 export const getMyCoupons = async ({
   riderId,
   validAfter,
