@@ -11,8 +11,9 @@ import * as messages from '../proto_gen/coupon_pb';
 const couponServiceConfig: any = config.has('coupon_service') ? config.get('coupon_service') : {};
 const { serviceHost = 'localhost:6565' } = couponServiceConfig;
 
+const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
+
 export const listPromotions = async ({page, limit}: {page: number, limit: number}): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
   // @ts-ignore
   const request = new messages.ListPromotionRequest();
   request.setPage(page);
@@ -33,7 +34,6 @@ export const listPromotions = async ({page, limit}: {page: number, limit: number
 };
 
 export const getPromotionDetail = async ({id}: {id: number}): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
   // @ts-ignore
   const request = new messages.PromotionDetailRequest();
   request.setId(id);
@@ -84,7 +84,6 @@ export const createPromotion = async ({
   valid_from: Date;
   valid_until: Date;
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
   // @ts-ignore
   const request = new messages.CreatePromotionRequest();
   request.setCode(code);
@@ -161,7 +160,6 @@ export const updatePromotion = async ({
   valid_until: Date;
   enabled: boolean
 }): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
   // @ts-ignore
   const request = new messages.UpdatePromotionRequest();
   request.setId(id);
@@ -202,7 +200,6 @@ export const updatePromotion = async ({
 };
 
 export const listCoupons = async ({page, limit}: {page: number, limit: number}): Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
   // @ts-ignore
   const request = new messages.ListCouponRequest();
   request.setPage(page);
@@ -321,8 +318,6 @@ export const issueCoupon = async ({
   times : [[number, number]],
   valid: number
 }):  Promise<any> => {
-  const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
-
   // @ts-ignore
   const request = new messages.IssueCouponRequest();
   request.setUserId(user_id);
