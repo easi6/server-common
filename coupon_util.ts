@@ -2,18 +2,33 @@ import Bluebird from 'bluebird';
 import config from 'config';
 import grpc from 'grpc';
 import _ from 'lodash';
-import moment, { Moment } from 'moment';
+import moment, {Moment} from 'moment';
 import logger from '../../config/logger';
-import { Easi6Error } from '../err';
+import {Easi6Error} from '../err';
 import * as services from '../proto_gen/coupon_grpc_pb';
 import * as messages from '../proto_gen/coupon_pb';
 
 const couponServiceConfig: any = config.has('coupon_service') ? config.get('coupon_service') : {};
-const { serviceHost = 'localhost:6565' } = couponServiceConfig;
+const {serviceHost = 'localhost:6565'} = couponServiceConfig;
 
 const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
 
-export const listPromotions = async ({page, limit}: {page: number, limit: number}): Promise<any> => {
+function convertKey(obj: any) {
+  const keys = _.keys(obj);
+  const res: any = {};
+  _.forEach(keys, (key) => {
+    const matches = key.match(/(.*)List/) || key.match(/(.*)list/);
+    if (matches) {
+      res[matches[1]] = obj[key];
+      delete obj[key];
+    } else {
+      res[key] = obj[key];
+    }
+  });
+  return res;
+}
+
+export const listPromotions = async ({page, limit}: { page: number, limit: number }): Promise<any> => {
   // @ts-ignore
   const request = new messages.ListPromotionRequest();
   request.setPage(page);
@@ -26,14 +41,16 @@ export const listPromotions = async ({page, limit}: {page: number, limit: number
     );
     // @ts-ignore
     const promotionList: messages.PromotionDetailReply[] = response.getPromotionsList();
-    return { promotions: _.map(promotionList, promotion => promotion.toObject()), has_more: response.getHasMore() };
+    return {
+      promotions: _.map(promotionList, promotion => convertKey(promotion.toObject())), has_more: response.getHasMore()
+    };
   } catch (e) {
     logger.error('listPromotions failed', e);
-    return { promotions: [], has_more: false };
+    return {promotions: [], has_more: false};
   }
 };
 
-export const getPromotionDetail = async ({id}: {id: number}): Promise<any> => {
+export const getPromotionDetail = async ({id}: { id: number }): Promise<any> => {
   // @ts-ignore
   const request = new messages.PromotionDetailRequest();
   request.setId(id);
@@ -43,7 +60,7 @@ export const getPromotionDetail = async ({id}: {id: number}): Promise<any> => {
       client.getPromotionDetail(request, cb)
     );
     // @ts-ignore
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('getPromotionDetail failed', e);
   }
@@ -66,23 +83,25 @@ export const createPromotion = async ({
   times,
   valid_from,
   valid_until,
+  hired_only,
 }: {
-  code: string;
-  title: string;
-  description: string;
-  discount_type: number;
-  amount: number;
-  currency: string;
-  count_limit: number;
-  total_count: number;
-  count_check_policy: number;
-  regions: [string];
-  cities: [string];
-  car_types: [number];
-  product_types: [number];
-  times: [[number, number]];
-  valid_from: Date;
-  valid_until: Date;
+  code: string,
+  title: string,
+  description: string,
+  discount_type: number,
+  amount: number,
+  currency: string,
+  count_limit: number,
+  total_count: number,
+  count_check_policy: number,
+  regions: [string],
+  cities: [string],
+  car_types: [number],
+  product_types: [number],
+  times: [[number, number]],
+  valid_from: Date,
+  valid_until: Date,
+  hired_only: boolean,
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CreatePromotionRequest();
@@ -110,13 +129,14 @@ export const createPromotion = async ({
   );
   request.setValidFrom(moment(valid_from).format());
   request.setValidUntil(moment(valid_until).format());
+  request.setHiredOnly(hired_only);
 
   try {
     // @ts-ignore
     const response: messages.PromotionDetailReply = await Bluebird.fromCallback(cb =>
       client.createPromotion(request, cb)
     );
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('createPromotionFailed', e);
   }
@@ -142,40 +162,40 @@ export const updatePromotion = async ({
   valid_until,
   enabled,
 }: {
-  id: number;
-  title: string;
-  description: string;
-  discount_type: number;
-  amount: number;
-  currency: string;
-  count_limit: number;
-  total_count: number;
-  count_check_policy: number;
-  regions: [string];
-  cities: [string];
-  car_types: [number];
-  product_types: [number];
-  times: [[number, number]];
-  valid_from: Date;
-  valid_until: Date;
-  enabled: boolean
+  id: number,
+  title?: string,
+  description?: string,
+  discount_type?: number,
+  amount?: number,
+  currency?: string,
+  count_limit?: number,
+  total_count?: number,
+  count_check_policy?: number,
+  regions?: [string],
+  cities?: [string],
+  car_types?: [number],
+  product_types?: [number],
+  times?: [[number, number]],
+  valid_from?: Date,
+  valid_until?: Date,
+  enabled?: boolean,
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.UpdatePromotionRequest();
   request.setId(id);
-  request.setTitle(title);
-  request.setDescription(description);
-  request.setDiscountType(discount_type);
-  request.setAmount(amount);
-  request.setCurrency(currency);
-  request.setCountLimit(count_limit);
-  request.setTotalCount(total_count);
-  request.setCountCheckPolicy(count_check_policy);
-  request.setRegionsList(regions);
-  request.setCitiesList(cities);
-  request.setCarTypesList(car_types);
-  request.setProductTypesList(product_types);
-  request.setTimesList(
+  title != null && request.setTitle(title);
+  description != null && request.setDescription(description);
+  discount_type != null && request.setDiscountType(discount_type);
+  amount != null && request.setAmount(amount);
+  currency != null && request.setCurrency(currency);
+  count_limit != null && request.setCountLimit(count_limit);
+  total_count != null && request.setTotalCount(total_count);
+  count_check_policy != null && request.setCountCheckPolicy(count_check_policy);
+  regions != null && request.setRegionsList(regions);
+  cities != null && request.setCitiesList(cities);
+  car_types != null && request.setCarTypesList(car_types);
+  product_types != null && request.setProductTypesList(product_types);
+  times != null && request.setTimesList(
     _.map(times, timespan => {
       // @ts-ignore
       const t = new messages.Timespan();
@@ -184,22 +204,22 @@ export const updatePromotion = async ({
       return t;
     })
   );
-  request.setValidFrom(moment(valid_from).format());
-  request.setValidUntil(moment(valid_until).format());
-  request.setEnabled(enabled);
+  valid_from != null && request.setValidFrom(moment(valid_from).format());
+  valid_until != null && request.setValidUntil(moment(valid_until).format());
+  enabled != null && request.setEnabled(enabled);
 
   try {
     // @ts-ignore
     const response: messages.PromotionDetailReply = await Bluebird.fromCallback(cb =>
       client.updatePromotion(request, cb)
     );
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('updatePromotionFailed', e);
   }
 };
 
-export const listCoupons = async ({page, limit}: {page: number, limit: number}): Promise<any> => {
+export const listCoupons = async ({page, limit}: { page: number, limit: number }): Promise<any> => {
   // @ts-ignore
   const request = new messages.ListCouponRequest();
   request.setPage(page);
@@ -211,11 +231,11 @@ export const listCoupons = async ({page, limit}: {page: number, limit: number}):
       client.listCoupons(request, cb)
     );
     // @ts-ignore
-    const couponList : messages.CouponDetailReply[] = response.getCouponsList();
-    return { coupons: _.map(couponList, coupon => coupon.toObject()), has_more: response.getHasMore() };
+    const couponList: messages.CouponDetailReply[] = response.getCouponsList();
+    return {coupons: _.map(couponList, coupon => convertKey(coupon.toObject())), has_more: response.getHasMore()};
   } catch (e) {
     logger.error('listCoupons failed', e);
-    return { coupons: [], has_more: false };
+    return {coupons: [], has_more: false};
   }
 };
 
@@ -261,7 +281,7 @@ export const getAvailCoupons = async ({
     );
     // @ts-ignore
     const couponList: messages.CouponEntry[] = response.getCouponsList();
-    return _.map(couponList, coupon => _.omit(coupon.toObject(), ['id']));
+    return _.map(couponList, coupon => _.omit(convertKey(coupon.toObject()), ['id']));
   } catch (e) {
     logger.error('availCouponFailed', e);
   }
@@ -283,41 +303,41 @@ export const issueCouponFromPromotion = async ({
     // @ts-ignore
     const response: messages.CouponDetail = await Bluebird.fromCallback(cb => client.issuePromotionCoupon(request, cb));
     // @ts-ignore
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('issueCouponFromPromotionFailed', e);
   }
 };
 
 export const issueCoupon = async ({
-  user_id ,
-  title ,
-  description ,
-  code ,
-  discount_type ,
-  amount ,
-  currency ,
-  regions ,
-  cities ,
-  car_types ,
-  product_types ,
+  user_id,
+  title,
+  description,
+  code,
+  discount_type,
+  amount,
+  currency,
+  regions,
+  cities,
+  car_types,
+  product_types,
   times,
   valid
-} : {
-  user_id: string ,
-  title: string ,
-  description: string ,
-  code: string ,
-  discount_type: number ,
-  amount: number ,
-  currency: string ,
-  regions : [string],
-  cities : [string],
-  car_types : [number],
-  product_types : [number],
-  times : [[number, number]],
+}: {
+  user_id: string,
+  title: string,
+  description: string,
+  code: string,
+  discount_type: number,
+  amount: number,
+  currency: string,
+  regions: [string],
+  cities: [string],
+  car_types: [number],
+  product_types: [number],
+  times: [[number, number]],
   valid: number
-}):  Promise<any> => {
+}): Promise<any> => {
   // @ts-ignore
   const request = new messages.IssueCouponRequest();
   request.setUserId(user_id);
@@ -332,7 +352,7 @@ export const issueCoupon = async ({
   request.setCarTypesList(car_types);
   request.setProductTypesList(product_types);
   request.setTimesList(
-      _.map(times, timespan => {
+    _.map(times, timespan => {
       // @ts-ignore
       const t = new messages.Timespan();
       t.setBegin(timespan[0]);
@@ -346,7 +366,7 @@ export const issueCoupon = async ({
     // @ts-ignore
     const response: messages.CouponDetail = await Bluebird.fromCallback(cb => client.issueCoupon(request, cb));
     // @ts-ignore
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('issueCouponFailed', e);
   }
@@ -370,7 +390,7 @@ export const registerCouponOrPromotion = async ({
       client.registerCouponOrPromotion(request, cb)
     );
     // @ts-ignore
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('registerCouponOrPromotionFailed', e);
     if (e.message.includes('issue count exceeded')) {
@@ -442,7 +462,7 @@ export const getMyCoupons = async ({
     return {
       hasNext: response.getHasNext(),
       coupons: _.map(couponList, coupon =>
-        _.omit(coupon.toObject(), ['avail', 'id'] /* avail flag is meaningless here */)
+        _.omit(convertKey(coupon.toObject()), ['avail', 'id'] /* avail flag is meaningless here */)
       ),
     };
   } catch (e) {
@@ -450,7 +470,7 @@ export const getMyCoupons = async ({
   }
 };
 
-export const startCouponUse = async ({ riderId, code }: { riderId: string; code: string }): Promise<any> => {
+export const startCouponUse = async ({riderId, code}: { riderId: string; code: string }): Promise<any> => {
   // @ts-ignore
   const request = new messages.StartCouponUseRequest();
   request.setUserId(riderId);
@@ -459,7 +479,7 @@ export const startCouponUse = async ({ riderId, code }: { riderId: string; code:
   try {
     // @ts-ignore
     const response: messages.CouponEntry = await Bluebird.fromCallback(cb => client.startCouponUse(request, cb));
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('startCouponUseFailed', e);
   }
@@ -489,7 +509,7 @@ export const finishCouponUse = async ({
   try {
     // @ts-ignore
     const response: messages.CouponEntry = await Bluebird.fromCallback(cb => client.finishCouponUse(request, cb));
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('finishCouponUseFailed', e);
   }
@@ -545,7 +565,7 @@ export const checkCouponAvail = async ({
   }
 };
 
-export const getCouponDetail = async ({ code }: { code: string }): Promise<any> => {
+export const getCouponDetail = async ({code}: { code: string }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CouponDetailRequest();
   request.setCode(code);
@@ -570,7 +590,7 @@ export const getCouponDetail = async ({ code }: { code: string }): Promise<any> 
   }
 };
 
-export const cancelCouponUse = async ({ riderId, code }: { riderId: string; code: string }): Promise<any> => {
+export const cancelCouponUse = async ({riderId, code}: { riderId: string; code: string }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CancelCouponUseRequest();
   request.setUserId(riderId);
@@ -579,7 +599,7 @@ export const cancelCouponUse = async ({ riderId, code }: { riderId: string; code
   try {
     // @ts-ignore
     const response: messages.CouponEntry = await Bluebird.fromCallback(cb => client.cancelCouponUse(request, cb));
-    return response.toObject();
+    return convertKey(response.toObject());
   } catch (e) {
     logger.error('cancelCouponUseUseFailed', e);
   }
