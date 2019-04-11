@@ -42,11 +42,11 @@ export const listPromotions = async ({page, limit}: { page: number, limit: numbe
     // @ts-ignore
     const promotionList: messages.PromotionDetailReply[] = response.getPromotionsList();
     return {
-      promotions: _.map(promotionList, promotion => convertKey(promotion.toObject())), has_more: response.getHasMore()
+      promotions: _.map(promotionList, promotion => convertKey(promotion.toObject())), has_next: response.getHasNext()
     };
   } catch (e) {
     logger.error('listPromotions failed', e);
-    return {promotions: [], has_more: false};
+    return {promotions: [], has_next: false};
   }
 };
 
@@ -232,10 +232,10 @@ export const listCoupons = async ({page, limit}: { page: number, limit: number }
     );
     // @ts-ignore
     const couponList: messages.CouponDetailReply[] = response.getCouponsList();
-    return {coupons: _.map(couponList, coupon => convertKey(coupon.toObject())), has_more: response.getHasMore()};
+    return {coupons: _.map(couponList, coupon => convertKey(coupon.toObject())), has_next: response.getHasNext()};
   } catch (e) {
     logger.error('listCoupons failed', e);
-    return {coupons: [], has_more: false};
+    return {coupons: [], has_next: false};
   }
 };
 
@@ -573,20 +573,10 @@ export const getCouponDetail = async ({code}: { code: string }): Promise<any> =>
   try {
     // @ts-ignore
     const response: messages.CouponDetailReply = await Bluebird.fromCallback(cb => client.getCouponDetail(request, cb));
-    return _.pick(_.get(response.toObject(), 'coupon') as any, [
-      'title',
-      'description',
-      'imageUrl',
-      'status',
-      'code',
-      'discountType',
-      'amount',
-      'currency',
-      'validUntil',
-      'hiredOnly',
-    ]);
+    return {coupon: convertKey(response.getCoupon().toObject()),  logs: response.getLogsList().map((log: any) => log.toObject())};
   } catch (e) {
     logger.error('getCouponDetailFailed', e);
+    return {coupon: null, logs: []};
   }
 };
 
