@@ -161,6 +161,7 @@ export const updatePromotion = async ({
   valid_from,
   valid_until,
   enabled,
+  hired_only,
 }: {
   id: number,
   title?: string,
@@ -179,6 +180,7 @@ export const updatePromotion = async ({
   valid_from?: Date,
   valid_until?: Date,
   enabled?: boolean,
+  hired_only?: boolean,
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.UpdatePromotionRequest();
@@ -207,6 +209,7 @@ export const updatePromotion = async ({
   valid_from != null && request.setValidFrom(moment(valid_from).format());
   valid_until != null && request.setValidUntil(moment(valid_until).format());
   enabled != null && request.setEnabled(enabled);
+  hired_only != null && request.setHiredOnly(hired_only);
 
   try {
     // @ts-ignore
