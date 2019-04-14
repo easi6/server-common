@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node';
 import _ from 'lodash';
-import util from 'util';
+import util, { inspect } from 'util';
 // @ts-ignore
 import winston from 'winston';
 
@@ -16,7 +16,7 @@ export const initialize = (opts = {}) => {
   Sentry.init(initOpts);
 };
 
-export const captureException = (err: any, locale: string, clientIp?: string, user?: {id: number, email: string}) => {
+export const captureException = (err: any, locale: string, clientIp?: string, user?: { id: number; email: string }) => {
   Sentry.configureScope((scope: any) => {
     scope.setTag('locale', locale);
     scope.setUser({
@@ -49,18 +49,16 @@ export const BreadcrumbTransport = (winston.transports.BreadcrumbTransport = fun
 //
 util.inherits(BreadcrumbTransport, winston.Transport);
 
-BreadcrumbTransport.prototype.log = (level: Sentry.Severity, msg: string, meta: any, callback: (arg1: any, arg2: boolean) => void) => {
+BreadcrumbTransport.prototype.log = (
+  level: Sentry.Severity,
+  msg: string,
+  meta: any,
+  callback: (arg1: any, arg2: boolean) => void
+) => {
   Sentry.addBreadcrumb({
     level,
     message: msg,
-    data: _.reduce(meta, ((accum: any, value, key) => {
-      if (typeof value === 'string') {
-        accum[key] = value;
-      } else {
-        accum[key] = JSON.stringify(value, null, 2);
-      }
-      return accum;
-    }), {}),
+    data: inspect(meta),
   });
   //
   // Store this message and metadata, maybe use some custom logic
