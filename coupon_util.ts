@@ -325,7 +325,8 @@ export const issueCoupon = async ({
   car_types,
   product_types,
   times,
-  valid
+  valid_from,
+  valid_until,
 }: {
   user_id: string,
   title: string,
@@ -339,7 +340,8 @@ export const issueCoupon = async ({
   car_types: [number],
   product_types: [number],
   times: [[number, number]],
-  valid: number
+  valid_from?: Date|string,
+  valid_until?: Date|string,
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.IssueCouponRequest();
@@ -363,7 +365,8 @@ export const issueCoupon = async ({
       return t;
     })
   );
-  request.setValid(valid);
+  request.setValidFrom(moment(valid_from || 0).format());
+  request.setValidUntil(moment(valid_until || "9999-12-01T00:00:00+09:00").format());
 
   try {
     // @ts-ignore
