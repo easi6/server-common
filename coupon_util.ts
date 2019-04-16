@@ -26,10 +26,10 @@ function convertKey(obj: any) {
     }
   });
   if (res.validUntil) {
-    res.validUntil = moment(res.validUntil).format();
+    res.validUntil = moment(res.validUntil).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
   }
   if (res.validFrom) {
-    res.validFrom = moment(res.validFrom).format();
+    res.validFrom = moment(res.validFrom).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
   }
   return res;
 }
