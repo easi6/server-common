@@ -25,6 +25,12 @@ function convertKey(obj: any) {
       res[key] = obj[key];
     }
   });
+  if (res.validUntil) {
+    res.validUntil = moment(res.validUntil).format();
+  }
+  if (res.validFrom) {
+    res.validFrom = moment(res.validFrom).format();
+  }
   return res;
 }
 
