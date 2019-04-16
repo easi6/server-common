@@ -46,13 +46,13 @@ export const listPromotions = async ({page, limit}: { page: number, limit: numbe
       client.listPromotions(request, cb)
     );
     // @ts-ignore
-    const promotionList: messages.PromotionDetailReply[] = response.getPromotionsList();
+    const promotionList: messages.PromotionEntry[] = response.getPromotionsList();
     return {
-      promotions: _.map(promotionList, promotion => convertKey(promotion.toObject())), has_next: response.getHasNext()
+      promotions: _.map(promotionList, promotion => convertKey(promotion.toObject())), pagination: response.getPagination().toObject()
     };
   } catch (e) {
     logger.error('listPromotions failed', e);
-    return {promotions: [], has_next: false};
+    return {promotions: [], pagination: {size: 0, totalElements: 0, totalPages: 0, page}};
   }
 };
 
@@ -241,10 +241,10 @@ export const listCoupons = async ({page, limit}: { page: number, limit: number }
     );
     // @ts-ignore
     const couponList: messages.CouponDetailReply[] = response.getCouponsList();
-    return {coupons: _.map(couponList, coupon => convertKey(coupon.toObject())), has_next: response.getHasNext()};
+    return {coupons: _.map(couponList, coupon => convertKey(coupon.toObject())), pagination: response.getPagination().toObject()};
   } catch (e) {
     logger.error('listCoupons failed', e);
-    return {coupons: [], has_next: false};
+    return {coupons: [], pagination: {size: 0, totalElements: 0, totalPages: 0, page}};
   }
 };
 
