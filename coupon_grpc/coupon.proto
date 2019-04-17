@@ -1,0 +1,326 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "global.tada.coupon.protobuf";
+
+package coupon;
+
+service CouponServer {
+    rpc ListCoupons (ListCouponRequest) returns (ListCouponReply) {
+    }
+    rpc GetMyCoupons (ListCouponRequest) returns (ListCouponReply) {
+    }
+    rpc GetMyCouponCount (CouponCountRequest) returns (CouponCountReply) {
+    }
+    rpc IssueCoupon (IssueCouponRequest) returns (CouponDetail) {
+    }
+    rpc StartCouponUse (StartCouponUseRequest) returns (CouponEntry) {
+    }
+    rpc FinishCouponUse (FinishCouponUseRequest) returns (CouponEntry) {
+    }
+    rpc CancelCouponUse (CancelCouponUseRequest) returns (CouponEntry) {
+    }
+    rpc GetCouponDetail (CouponDetailRequest) returns (CouponDetailReply) {
+    }
+    rpc GetAvailCoupons (AvailCouponRequest) returns (ListAvailCouponReply) {
+    }
+    rpc CreatePromotion (CreatePromotionRequest) returns (PromotionDetailReply) {
+    }
+    rpc GetPromotionDetail (PromotionDetailRequest) returns (PromotionDetailReply) {
+    }
+    rpc ListPromotions (ListPromotionRequest) returns (ListPromotionReply) {
+    }
+    rpc IssuePromotionCoupon (IssuePromotionCouponRequest) returns (CouponDetail) {
+    }
+    rpc CheckCouponAvail (CheckCouponAvailRequest) returns (CheckCouponReply) {
+    }
+    rpc RegisterCouponOrPromotion (IssuePromotionCouponRequest) returns (CouponDetail) {
+    }
+    rpc UpdatePromotion (UpdatePromotionRequest) returns (PromotionDetailReply) {
+    }
+    rpc RegisterCoupon (RegisterCouponRequest) returns (CouponDetail) {
+    }
+}
+
+message Timespan {
+    int32 begin = 1;
+    int32 until = 2;
+}
+
+message IssueCouponRequest {
+    string user_id = 1;
+    string title = 2;
+    string description = 3;
+    string code = 4;
+    uint32 discount_type = 5;
+    double amount = 6;
+    string currency = 7;
+    repeated string regions = 8;
+    repeated string cities = 9;
+    repeated uint32 car_types = 10;
+    repeated uint32 product_types = 11;
+    repeated Timespan times = 12;
+    string valid_from = 13;
+    string valid_until = 14;
+    bool hired_only = 15;
+}
+
+message ListCouponRequest {
+    string user_id = 1;
+    repeated uint32 status = 2;
+    uint64 valid = 3;
+    uint32 page = 4;
+    uint32 limit = 5;
+}
+
+message CouponEntry {
+    uint64 id = 1;
+    string title = 2;
+    string code = 3;
+    uint32 status = 4;
+    string image_url = 5;
+    bool avail = 6;
+    string valid_until = 7;
+    uint32 discount_type = 8;
+    double amount = 9;
+    string currency = 10;
+    string valid_from = 11;
+}
+
+message CouponDetail {
+    uint64 id = 1;
+    string title = 2;
+    string description = 3;
+    string image_url = 4;
+    uint32 status = 5;
+    string code = 6;
+    uint32 discount_type = 7;
+    double amount = 8;
+    string currency = 9;
+    repeated string regions = 10;
+    repeated string cities = 11;
+    repeated uint32 car_types = 12;
+    repeated uint32 product_types = 13;
+    repeated Timespan times = 14;
+    bool hired_only = 15;
+    string valid_until = 16; // iso 8601
+    string user_id = 17;
+    string created_at = 18; // iso 8601
+    string updated_at = 19; // iso 8601
+    string valid_from = 20; // iso 8601
+}
+
+message CouponLogEntry {
+    uint64 id = 1;
+    double original_price = 2;
+    double discounted_price = 3;
+    string rental_number = 4;
+    uint64 coupon_id = 5;
+    string created_at = 6; // iso 8601
+    string updated_at = 7; // iso 8601
+}
+
+message ListCouponReply {
+    repeated CouponEntry coupons = 1;
+    oneof Page {
+        bool has_next = 2;
+        Pagination pagination = 3;
+    }
+}
+
+message Pagination {
+    uint32 size = 1;
+    uint64 total_elements = 2;
+    uint32 total_pages = 3;
+    uint32 page = 4;
+}
+
+message StartCouponUseRequest {
+    string user_id = 1;
+    string code = 2;
+}
+
+message FinishCouponUseRequest {
+    string user_id = 1;
+    string code = 2;
+    double original_price = 3;
+    double discounted_price = 4;
+    string rental_number = 5;
+}
+
+message CancelCouponUseRequest {
+    string user_id = 1;
+    string code = 2;
+}
+
+message CouponDetailRequest {
+    string code = 1;
+}
+
+message CouponDetailReply {
+    CouponDetail coupon = 1;
+    repeated CouponLogEntry logs = 2;
+}
+
+message ListAvailCouponReply {
+    repeated CouponEntry coupons = 1;
+}
+
+message AvailCouponRequest {
+    // rental
+    uint32 car_type = 1;
+    uint32 product_type = 2;
+    string region = 3;
+    string city = 4;
+    string datetime = 5;
+    double fare = 6;
+    string currency = 7;
+    uint32 timezone = 8;
+    string user_id = 9;
+}
+
+message CreatePromotionRequest {
+    string code = 1;
+    string title = 2;
+    string description = 3;
+    uint32 discount_type = 4;
+    double amount = 5;
+    string currency = 6;
+    uint32 count_limit = 7;
+    uint32 total_count = 8;
+    uint32 count_check_policy = 9;
+    repeated string regions = 10;
+    repeated string cities = 11;
+    repeated uint32 car_types = 12;
+    repeated uint32 product_types = 13;
+    repeated Timespan times = 14;
+    string valid_from = 15;
+    string valid_until = 16;
+    bool hired_only = 17;
+}
+
+message PromotionEntry {
+    uint64 id = 1;
+    string code = 2;
+    uint32 discount_type = 3;
+    double amount = 4;
+    string currency = 5;
+    uint32 count_limit = 6;
+    uint32 total_count = 7;
+    string title = 9;
+    repeated string regions = 11;
+    repeated string cities = 12;
+    repeated uint32 car_types = 13;
+    repeated uint32 product_types = 14;
+    string valid_from = 16;
+    string valid_until = 17;
+    bool enabled = 18;
+    string created_at = 19;
+    string updated_at = 20;
+}
+
+message PromotionDetailReply {
+    uint64 id = 1;
+    string code = 2;
+    uint32 discount_type = 3;
+    double amount = 4;
+    string currency = 5;
+    uint32 count_limit = 6;
+    uint32 total_count = 7;
+    uint32 count_check_policy = 8;
+    string title = 9;
+    string description = 10;
+    repeated string regions = 11;
+    repeated string cities = 12;
+    repeated uint32 car_types = 13;
+    repeated uint32 product_types = 14;
+    repeated Timespan times = 15;
+    bool hired_only = 16;
+    string valid_from = 17;
+    string valid_until = 18;
+    bool enabled = 19;
+    string created_at = 20;
+    string updated_at = 21;
+
+    // detail
+    uint32 issued_count = 22;
+    uint32 used_count = 23;
+}
+
+message ListPromotionReply {
+    repeated PromotionEntry promotions = 1;
+    oneof Page {
+        bool has_next = 2;
+        Pagination pagination = 3;
+    }
+}
+
+message PromotionDetailRequest {
+    uint64 id = 1;
+}
+
+message ListPromotionRequest {
+    uint64 page = 1;
+    uint64 limit = 2;
+}
+
+message IssuePromotionCouponRequest {
+    string code = 1;
+    string user_id = 2;
+}
+
+message CheckCouponAvailRequest {
+    // rental
+    uint32 car_type = 1;
+    uint32 product_type = 2;
+    string region = 3;
+    string city = 4;
+    string datetime = 5;
+    double fare = 6;
+    string currency = 7;
+    uint32 timezone = 8;
+    string user_id = 9;
+    string code = 10;
+    bool skip_validity_check = 11;
+}
+
+message CheckCouponReply {
+    bool applicable = 1;
+    double original_price = 2;
+    double discounted_price = 3;
+}
+
+message CouponCountRequest {
+    string user_id = 1;
+    uint64 valid = 2;
+}
+
+message CouponCountReply {
+    uint32 count = 1;
+}
+
+message UpdatePromotionRequest {
+    uint64 id = 1;
+    string title = 2;
+    string description = 3;
+    uint32 discount_type = 4;
+    double amount = 5;
+    string currency = 6;
+    uint32 count_limit = 7;
+    uint32 total_count = 8;
+    uint32 count_check_policy = 9;
+    repeated string regions = 10;
+    repeated string cities = 11;
+    repeated uint32 car_types = 12;
+    repeated uint32 product_types = 13;
+    bool hired_only = 14;
+    repeated Timespan times = 15;
+    string valid_from = 16;
+    string valid_until = 17;
+    bool enabled = 18;
+}
+
+message RegisterCouponRequest {
+    string user_id = 1;
+    string code = 2;
+}
