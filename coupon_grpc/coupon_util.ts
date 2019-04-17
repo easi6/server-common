@@ -3,10 +3,10 @@ import config from 'config';
 import grpc from 'grpc';
 import _ from 'lodash';
 import moment, {Moment} from 'moment';
-import logger from '../../config/logger';
-import {Easi6Error} from '../err';
-import * as services from '../proto_gen/coupon_grpc_pb';
-import * as messages from '../proto_gen/coupon_pb';
+import logger from '../../../config/logger';
+import {Easi6Error} from '../../err';
+import * as services from './coupon_grpc_pb';
+import * as messages from './coupon_pb';
 
 const couponServiceConfig: any = config.has('coupon_service') ? config.get('coupon_service') : {};
 const {serviceHost = 'localhost:6565'} = couponServiceConfig;
