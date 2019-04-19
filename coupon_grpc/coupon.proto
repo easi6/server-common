@@ -40,6 +40,8 @@ service CouponServer {
     }
     rpc RegisterCoupon (RegisterCouponRequest) returns (CouponDetail) {
     }
+    rpc CheckImplicitPromotion (CheckCouponAvailRequest) returns (CheckCouponReply) {
+    }
 }
 
 message Timespan {
@@ -197,6 +199,7 @@ message CreatePromotionRequest {
     string valid_from = 15;
     string valid_until = 16;
     bool hired_only = 17;
+    bool implicit = 18;
 }
 
 message PromotionEntry {
@@ -245,6 +248,8 @@ message PromotionDetailReply {
     // detail
     uint32 issued_count = 22;
     uint32 used_count = 23;
+
+    bool implicit = 24;
 }
 
 message ListPromotionReply {
@@ -282,12 +287,14 @@ message CheckCouponAvailRequest {
     string user_id = 9;
     string code = 10;
     bool skip_validity_check = 11;
+    string payment_method = 12;
 }
 
 message CheckCouponReply {
     bool applicable = 1;
     double original_price = 2;
     double discounted_price = 3;
+    string title = 4;
 }
 
 message CouponCountRequest {

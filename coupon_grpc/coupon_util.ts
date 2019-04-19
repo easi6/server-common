@@ -633,3 +633,55 @@ export const getMyCouponCount = async ({
     return 0;
   }
 };
+
+export const checkImplicitPromotion = async ({
+  carType,
+  productType,
+  region,
+  city,
+  fare,
+  currency,
+  datetime,
+  timezone,
+  riderId,
+  paymentMethod,
+}: {
+  carType: number,
+  productType: number,
+  region: string,
+  city: string,
+  fare: number,
+  currency: string,
+  datetime: Date | Moment,
+  timezone: number,
+  riderId: string,
+  paymentMethod: string,
+}): Promise<any> => {
+
+  // @ts-ignore
+  const request = new messages.CheckCouponAvailRequest();
+  request.setCarType(carType);
+  request.setProductType(productType);
+  request.setRegion(region);
+  request.setCity(city);
+  request.setDatetime(moment(datetime).format());
+  request.setFare(fare);
+  request.setCurrency(currency);
+  request.setTimezone(timezone);
+  request.setUserId(riderId);
+  request.setPaymentMethod(paymentMethod);
+
+  try {
+    // @ts-ignore
+    const response: messages.CheckCouponReply = await Bluebird.fromCallback(cb => client.checkImplicitPromotion(request, cb));
+    return response.toObject();
+  } catch (e) {
+    logger.error('checkImplicitPromotion', e);
+    return {
+      applicable: false,
+      originalPrice: 0,
+      discountedPrice: 0,
+      title: null
+    };
+  }
+};
