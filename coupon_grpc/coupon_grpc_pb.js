@@ -457,6 +457,17 @@ var CouponServerService = exports.CouponServerService = {
     responseSerialize: serialize_coupon_CouponDetail,
     responseDeserialize: deserialize_coupon_CouponDetail,
   },
+  checkImplicitPromotion: {
+    path: '/coupon.CouponServer/CheckImplicitPromotion',
+    requestStream: false,
+    responseStream: false,
+    requestType: coupon_pb.CheckCouponAvailRequest,
+    responseType: coupon_pb.CheckCouponReply,
+    requestSerialize: serialize_coupon_CheckCouponAvailRequest,
+    requestDeserialize: deserialize_coupon_CheckCouponAvailRequest,
+    responseSerialize: serialize_coupon_CheckCouponReply,
+    responseDeserialize: deserialize_coupon_CheckCouponReply,
+  },
 };
 
 exports.CouponServerClient = grpc.makeGenericClientConstructor(CouponServerService);

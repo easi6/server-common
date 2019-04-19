@@ -4583,7 +4583,8 @@ proto.coupon.CreatePromotionRequest.toObject = function(includeInstance, msg) {
     proto.coupon.Timespan.toObject, includeInstance),
     validFrom: jspb.Message.getFieldWithDefault(msg, 15, ""),
     validUntil: jspb.Message.getFieldWithDefault(msg, 16, ""),
-    hiredOnly: jspb.Message.getFieldWithDefault(msg, 17, false)
+    hiredOnly: jspb.Message.getFieldWithDefault(msg, 17, false),
+    implicit: jspb.Message.getFieldWithDefault(msg, 18, false)
   };
 
   if (includeInstance) {
@@ -4688,6 +4689,10 @@ proto.coupon.CreatePromotionRequest.deserializeBinaryFromReader = function(msg, 
     case 17:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setHiredOnly(value);
+      break;
+    case 18:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setImplicit(value);
       break;
     default:
       reader.skipField();
@@ -4835,6 +4840,13 @@ proto.coupon.CreatePromotionRequest.serializeBinaryToWriter = function(message, 
   if (f) {
     writer.writeBool(
       17,
+      f
+    );
+  }
+  f = message.getImplicit();
+  if (f) {
+    writer.writeBool(
+      18,
       f
     );
   }
@@ -5167,6 +5179,23 @@ proto.coupon.CreatePromotionRequest.prototype.getHiredOnly = function() {
 /** @param {boolean} value */
 proto.coupon.CreatePromotionRequest.prototype.setHiredOnly = function(value) {
   jspb.Message.setProto3BooleanField(this, 17, value);
+};
+
+
+/**
+ * optional bool implicit = 18;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.coupon.CreatePromotionRequest.prototype.getImplicit = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 18, false));
+};
+
+
+/** @param {boolean} value */
+proto.coupon.CreatePromotionRequest.prototype.setImplicit = function(value) {
+  jspb.Message.setProto3BooleanField(this, 18, value);
 };
 
 
@@ -5886,7 +5915,8 @@ proto.coupon.PromotionDetailReply.toObject = function(includeInstance, msg) {
     createdAt: jspb.Message.getFieldWithDefault(msg, 20, ""),
     updatedAt: jspb.Message.getFieldWithDefault(msg, 21, ""),
     issuedCount: jspb.Message.getFieldWithDefault(msg, 22, 0),
-    usedCount: jspb.Message.getFieldWithDefault(msg, 23, 0)
+    usedCount: jspb.Message.getFieldWithDefault(msg, 23, 0),
+    implicit: jspb.Message.getFieldWithDefault(msg, 24, false)
   };
 
   if (includeInstance) {
@@ -6015,6 +6045,10 @@ proto.coupon.PromotionDetailReply.deserializeBinaryFromReader = function(msg, re
     case 23:
       var value = /** @type {number} */ (reader.readUint32());
       msg.setUsedCount(value);
+      break;
+    case 24:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setImplicit(value);
       break;
     default:
       reader.skipField();
@@ -6204,6 +6238,13 @@ proto.coupon.PromotionDetailReply.serializeBinaryToWriter = function(message, wr
   if (f !== 0) {
     writer.writeUint32(
       23,
+      f
+    );
+  }
+  f = message.getImplicit();
+  if (f) {
+    writer.writeBool(
+      24,
       f
     );
   }
@@ -6628,6 +6669,23 @@ proto.coupon.PromotionDetailReply.prototype.getUsedCount = function() {
 /** @param {number} value */
 proto.coupon.PromotionDetailReply.prototype.setUsedCount = function(value) {
   jspb.Message.setProto3IntField(this, 23, value);
+};
+
+
+/**
+ * optional bool implicit = 24;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.coupon.PromotionDetailReply.prototype.getImplicit = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 24, false));
+};
+
+
+/** @param {boolean} value */
+proto.coupon.PromotionDetailReply.prototype.setImplicit = function(value) {
+  jspb.Message.setProto3BooleanField(this, 24, value);
 };
 
 
@@ -7449,7 +7507,8 @@ proto.coupon.CheckCouponAvailRequest.toObject = function(includeInstance, msg) {
     timezone: jspb.Message.getFieldWithDefault(msg, 8, 0),
     userId: jspb.Message.getFieldWithDefault(msg, 9, ""),
     code: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    skipValidityCheck: jspb.Message.getFieldWithDefault(msg, 11, false)
+    skipValidityCheck: jspb.Message.getFieldWithDefault(msg, 11, false),
+    paymentMethod: jspb.Message.getFieldWithDefault(msg, 12, "")
   };
 
   if (includeInstance) {
@@ -7529,6 +7588,10 @@ proto.coupon.CheckCouponAvailRequest.deserializeBinaryFromReader = function(msg,
     case 11:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setSkipValidityCheck(value);
+      break;
+    case 12:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPaymentMethod(value);
       break;
     default:
       reader.skipField();
@@ -7633,6 +7696,13 @@ proto.coupon.CheckCouponAvailRequest.serializeBinaryToWriter = function(message,
   if (f) {
     writer.writeBool(
       11,
+      f
+    );
+  }
+  f = message.getPaymentMethod();
+  if (f.length > 0) {
+    writer.writeString(
+      12,
       f
     );
   }
@@ -7806,6 +7876,21 @@ proto.coupon.CheckCouponAvailRequest.prototype.setSkipValidityCheck = function(v
 };
 
 
+/**
+ * optional string payment_method = 12;
+ * @return {string}
+ */
+proto.coupon.CheckCouponAvailRequest.prototype.getPaymentMethod = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.CheckCouponAvailRequest.prototype.setPaymentMethod = function(value) {
+  jspb.Message.setProto3StringField(this, 12, value);
+};
+
+
 
 /**
  * Generated by JsPbCodeGenerator.
@@ -7855,7 +7940,8 @@ proto.coupon.CheckCouponReply.toObject = function(includeInstance, msg) {
   var f, obj = {
     applicable: jspb.Message.getFieldWithDefault(msg, 1, false),
     originalPrice: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
-    discountedPrice: +jspb.Message.getFieldWithDefault(msg, 3, 0.0)
+    discountedPrice: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
+    title: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -7903,6 +7989,10 @@ proto.coupon.CheckCouponReply.deserializeBinaryFromReader = function(msg, reader
     case 3:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setDiscountedPrice(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setTitle(value);
       break;
     default:
       reader.skipField();
@@ -7954,6 +8044,13 @@ proto.coupon.CheckCouponReply.serializeBinaryToWriter = function(message, writer
       f
     );
   }
+  f = message.getTitle();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
 };
 
 
@@ -8001,6 +8098,21 @@ proto.coupon.CheckCouponReply.prototype.getDiscountedPrice = function() {
 /** @param {number} value */
 proto.coupon.CheckCouponReply.prototype.setDiscountedPrice = function(value) {
   jspb.Message.setProto3FloatField(this, 3, value);
+};
+
+
+/**
+ * optional string title = 4;
+ * @return {string}
+ */
+proto.coupon.CheckCouponReply.prototype.getTitle = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.CheckCouponReply.prototype.setTitle = function(value) {
+  jspb.Message.setProto3StringField(this, 4, value);
 };
 
 
