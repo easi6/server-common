@@ -333,6 +333,7 @@ export const issueCoupon = async ({
   times,
   valid_from,
   valid_until,
+  hired_only
 }: {
   user_id: string,
   title: string,
@@ -348,6 +349,7 @@ export const issueCoupon = async ({
   times: [[number, number]],
   valid_from?: Date|string,
   valid_until?: Date|string,
+  hired_only: boolean,
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.IssueCouponRequest();
@@ -373,6 +375,7 @@ export const issueCoupon = async ({
   );
   request.setValidFrom(moment(valid_from || 0).format());
   request.setValidUntil(moment(valid_until || "9999-12-01T00:00:00+09:00").format());
+  request.setHiredOnly(hired_only);
 
   try {
     // @ts-ignore
