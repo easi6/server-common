@@ -90,6 +90,8 @@ export const createPromotion = async ({
   valid_from,
   valid_until,
   hired_only,
+  implicit,
+  payment_methods,
 }: {
   code: string,
   title: string,
@@ -108,6 +110,8 @@ export const createPromotion = async ({
   valid_from: Date,
   valid_until: Date,
   hired_only: boolean,
+  implicit: boolean,
+  payment_methods: [string],
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CreatePromotionRequest();
@@ -136,6 +140,8 @@ export const createPromotion = async ({
   request.setValidFrom(moment(valid_from).format());
   request.setValidUntil(moment(valid_until).format());
   request.setHiredOnly(hired_only);
+  request.setImplicit(implicit);
+  request.setPaymentMethodsList(payment_methods);
 
   try {
     // @ts-ignore
@@ -168,6 +174,8 @@ export const updatePromotion = async ({
   valid_until,
   enabled,
   hired_only,
+  implicit,
+  payment_methods,
 }: {
   id: number,
   title?: string,
@@ -187,6 +195,8 @@ export const updatePromotion = async ({
   valid_until?: Date,
   enabled?: boolean,
   hired_only?: boolean,
+  implicit?: boolean,
+  payment_methods?: [string],
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.UpdatePromotionRequest();
@@ -216,6 +226,8 @@ export const updatePromotion = async ({
   valid_until != null && request.setValidUntil(moment(valid_until).format());
   enabled != null && request.setEnabled(enabled);
   hired_only != null && request.setHiredOnly(hired_only);
+  implicit != null && request.setImplicit(implicit);
+  payment_methods != null && request.setPaymentMethodsList(payment_methods);
 
   try {
     // @ts-ignore

@@ -200,6 +200,7 @@ message CreatePromotionRequest {
     string valid_until = 16;
     bool hired_only = 17;
     bool implicit = 18;
+    repeated string payment_methods = 19;
 }
 
 message PromotionEntry {
@@ -220,6 +221,7 @@ message PromotionEntry {
     bool enabled = 18;
     string created_at = 19;
     string updated_at = 20;
+    repeated string payment_methods = 21;
 }
 
 message PromotionDetailReply {
@@ -250,6 +252,7 @@ message PromotionDetailReply {
     uint32 used_count = 23;
 
     bool implicit = 24;
+    repeated string payment_methods = 25;
 }
 
 message ListPromotionReply {
@@ -325,6 +328,8 @@ message UpdatePromotionRequest {
     string valid_from = 16;
     string valid_until = 17;
     bool enabled = 18;
+    bool implicit = 19;
+    repeated string payment_methods = 20;
 }
 
 message RegisterCouponRequest {
