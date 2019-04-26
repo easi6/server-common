@@ -6,13 +6,9 @@ option java_package = "global.tada.coupon.protobuf";
 package coupon;
 
 service CouponServer {
-    rpc ListCoupons (ListCouponRequest) returns (ListCouponReply) {
-    }
     rpc GetMyCoupons (ListCouponRequest) returns (ListCouponReply) {
     }
     rpc GetMyCouponCount (CouponCountRequest) returns (CouponCountReply) {
-    }
-    rpc IssueCoupon (IssueCouponRequest) returns (CouponDetail) {
     }
     rpc StartCouponUse (StartCouponUseRequest) returns (CouponEntry) {
     }
@@ -24,21 +20,9 @@ service CouponServer {
     }
     rpc GetAvailCoupons (AvailCouponRequest) returns (ListAvailCouponReply) {
     }
-    rpc CreatePromotion (CreatePromotionRequest) returns (PromotionDetailReply) {
-    }
-    rpc GetPromotionDetail (PromotionDetailRequest) returns (PromotionDetailReply) {
-    }
-    rpc ListPromotions (ListPromotionRequest) returns (ListPromotionReply) {
-    }
-    rpc IssuePromotionCoupon (IssuePromotionCouponRequest) returns (CouponDetail) {
-    }
     rpc CheckCouponAvail (CheckCouponAvailRequest) returns (CheckCouponReply) {
     }
     rpc RegisterCouponOrPromotion (IssuePromotionCouponRequest) returns (CouponDetail) {
-    }
-    rpc UpdatePromotion (UpdatePromotionRequest) returns (PromotionDetailReply) {
-    }
-    rpc RegisterCoupon (RegisterCouponRequest) returns (CouponDetail) {
     }
     rpc CheckImplicitPromotion (CheckCouponAvailRequest) returns (CheckCouponReply) {
     }
@@ -47,24 +31,6 @@ service CouponServer {
 message Timespan {
     int32 begin = 1;
     int32 until = 2;
-}
-
-message IssueCouponRequest {
-    string user_id = 1;
-    string title = 2;
-    string description = 3;
-    string code = 4;
-    uint32 discount_type = 5;
-    double amount = 6;
-    string currency = 7;
-    repeated string regions = 8;
-    repeated string cities = 9;
-    repeated uint32 car_types = 10;
-    repeated uint32 product_types = 11;
-    repeated Timespan times = 12;
-    string valid_from = 13;
-    string valid_until = 14;
-    bool hired_only = 15;
 }
 
 message ListCouponRequest {
@@ -87,6 +53,7 @@ message CouponEntry {
     double amount = 9;
     string currency = 10;
     string valid_from = 11;
+    double max_amount = 12;
 }
 
 message CouponDetail {
@@ -110,6 +77,7 @@ message CouponDetail {
     string created_at = 18; // iso 8601
     string updated_at = 19; // iso 8601
     string valid_from = 20; // iso 8601
+    double max_amount = 21;
 }
 
 message CouponLogEntry {
@@ -181,28 +149,6 @@ message AvailCouponRequest {
     string user_id = 9;
 }
 
-message CreatePromotionRequest {
-    string code = 1;
-    string title = 2;
-    string description = 3;
-    uint32 discount_type = 4;
-    double amount = 5;
-    string currency = 6;
-    uint32 count_limit = 7;
-    uint32 total_count = 8;
-    uint32 count_check_policy = 9;
-    repeated string regions = 10;
-    repeated string cities = 11;
-    repeated uint32 car_types = 12;
-    repeated uint32 product_types = 13;
-    repeated Timespan times = 14;
-    string valid_from = 15;
-    string valid_until = 16;
-    bool hired_only = 17;
-    bool implicit = 18;
-    repeated string payment_methods = 19;
-}
-
 message PromotionEntry {
     uint64 id = 1;
     string code = 2;
@@ -222,54 +168,7 @@ message PromotionEntry {
     string created_at = 19;
     string updated_at = 20;
     repeated string payment_methods = 21;
-}
-
-message PromotionDetailReply {
-    uint64 id = 1;
-    string code = 2;
-    uint32 discount_type = 3;
-    double amount = 4;
-    string currency = 5;
-    uint32 count_limit = 6;
-    uint32 total_count = 7;
-    uint32 count_check_policy = 8;
-    string title = 9;
-    string description = 10;
-    repeated string regions = 11;
-    repeated string cities = 12;
-    repeated uint32 car_types = 13;
-    repeated uint32 product_types = 14;
-    repeated Timespan times = 15;
-    bool hired_only = 16;
-    string valid_from = 17;
-    string valid_until = 18;
-    bool enabled = 19;
-    string created_at = 20;
-    string updated_at = 21;
-
-    // detail
-    uint32 issued_count = 22;
-    uint32 used_count = 23;
-
-    bool implicit = 24;
-    repeated string payment_methods = 25;
-}
-
-message ListPromotionReply {
-    repeated PromotionEntry promotions = 1;
-    oneof Page {
-        bool has_next = 2;
-        Pagination pagination = 3;
-    }
-}
-
-message PromotionDetailRequest {
-    uint64 id = 1;
-}
-
-message ListPromotionRequest {
-    uint64 page = 1;
-    uint64 limit = 2;
+    double max_amount = 22;
 }
 
 message IssuePromotionCouponRequest {
@@ -307,29 +206,6 @@ message CouponCountRequest {
 
 message CouponCountReply {
     uint32 count = 1;
-}
-
-message UpdatePromotionRequest {
-    uint64 id = 1;
-    string title = 2;
-    string description = 3;
-    uint32 discount_type = 4;
-    double amount = 5;
-    string currency = 6;
-    uint32 count_limit = 7;
-    uint32 total_count = 8;
-    uint32 count_check_policy = 9;
-    repeated string regions = 10;
-    repeated string cities = 11;
-    repeated uint32 car_types = 12;
-    repeated uint32 product_types = 13;
-    bool hired_only = 14;
-    repeated Timespan times = 15;
-    string valid_from = 16;
-    string valid_until = 17;
-    bool enabled = 18;
-    bool implicit = 19;
-    repeated string payment_methods = 20;
 }
 
 message RegisterCouponRequest {
