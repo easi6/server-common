@@ -114,17 +114,6 @@ function deserialize_coupon_CouponEntry(buffer_arg) {
   return coupon_pb.CouponEntry.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_coupon_CreatePromotionRequest(arg) {
-  if (!(arg instanceof coupon_pb.CreatePromotionRequest)) {
-    throw new Error('Expected argument of type coupon.CreatePromotionRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_coupon_CreatePromotionRequest(buffer_arg) {
-  return coupon_pb.CreatePromotionRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_coupon_FinishCouponUseRequest(arg) {
   if (!(arg instanceof coupon_pb.FinishCouponUseRequest)) {
     throw new Error('Expected argument of type coupon.FinishCouponUseRequest');
@@ -134,17 +123,6 @@ function serialize_coupon_FinishCouponUseRequest(arg) {
 
 function deserialize_coupon_FinishCouponUseRequest(buffer_arg) {
   return coupon_pb.FinishCouponUseRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_coupon_IssueCouponRequest(arg) {
-  if (!(arg instanceof coupon_pb.IssueCouponRequest)) {
-    throw new Error('Expected argument of type coupon.IssueCouponRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_coupon_IssueCouponRequest(buffer_arg) {
-  return coupon_pb.IssueCouponRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_coupon_IssuePromotionCouponRequest(arg) {
@@ -191,61 +169,6 @@ function deserialize_coupon_ListCouponRequest(buffer_arg) {
   return coupon_pb.ListCouponRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_coupon_ListPromotionReply(arg) {
-  if (!(arg instanceof coupon_pb.ListPromotionReply)) {
-    throw new Error('Expected argument of type coupon.ListPromotionReply');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_coupon_ListPromotionReply(buffer_arg) {
-  return coupon_pb.ListPromotionReply.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_coupon_ListPromotionRequest(arg) {
-  if (!(arg instanceof coupon_pb.ListPromotionRequest)) {
-    throw new Error('Expected argument of type coupon.ListPromotionRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_coupon_ListPromotionRequest(buffer_arg) {
-  return coupon_pb.ListPromotionRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_coupon_PromotionDetailReply(arg) {
-  if (!(arg instanceof coupon_pb.PromotionDetailReply)) {
-    throw new Error('Expected argument of type coupon.PromotionDetailReply');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_coupon_PromotionDetailReply(buffer_arg) {
-  return coupon_pb.PromotionDetailReply.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_coupon_PromotionDetailRequest(arg) {
-  if (!(arg instanceof coupon_pb.PromotionDetailRequest)) {
-    throw new Error('Expected argument of type coupon.PromotionDetailRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_coupon_PromotionDetailRequest(buffer_arg) {
-  return coupon_pb.PromotionDetailRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_coupon_RegisterCouponRequest(arg) {
-  if (!(arg instanceof coupon_pb.RegisterCouponRequest)) {
-    throw new Error('Expected argument of type coupon.RegisterCouponRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_coupon_RegisterCouponRequest(buffer_arg) {
-  return coupon_pb.RegisterCouponRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_coupon_StartCouponUseRequest(arg) {
   if (!(arg instanceof coupon_pb.StartCouponUseRequest)) {
     throw new Error('Expected argument of type coupon.StartCouponUseRequest');
@@ -257,30 +180,8 @@ function deserialize_coupon_StartCouponUseRequest(buffer_arg) {
   return coupon_pb.StartCouponUseRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_coupon_UpdatePromotionRequest(arg) {
-  if (!(arg instanceof coupon_pb.UpdatePromotionRequest)) {
-    throw new Error('Expected argument of type coupon.UpdatePromotionRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_coupon_UpdatePromotionRequest(buffer_arg) {
-  return coupon_pb.UpdatePromotionRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 
 var CouponServerService = exports.CouponServerService = {
-  listCoupons: {
-    path: '/coupon.CouponServer/ListCoupons',
-    requestStream: false,
-    responseStream: false,
-    requestType: coupon_pb.ListCouponRequest,
-    responseType: coupon_pb.ListCouponReply,
-    requestSerialize: serialize_coupon_ListCouponRequest,
-    requestDeserialize: deserialize_coupon_ListCouponRequest,
-    responseSerialize: serialize_coupon_ListCouponReply,
-    responseDeserialize: deserialize_coupon_ListCouponReply,
-  },
   getMyCoupons: {
     path: '/coupon.CouponServer/GetMyCoupons',
     requestStream: false,
@@ -302,17 +203,6 @@ var CouponServerService = exports.CouponServerService = {
     requestDeserialize: deserialize_coupon_CouponCountRequest,
     responseSerialize: serialize_coupon_CouponCountReply,
     responseDeserialize: deserialize_coupon_CouponCountReply,
-  },
-  issueCoupon: {
-    path: '/coupon.CouponServer/IssueCoupon',
-    requestStream: false,
-    responseStream: false,
-    requestType: coupon_pb.IssueCouponRequest,
-    responseType: coupon_pb.CouponDetail,
-    requestSerialize: serialize_coupon_IssueCouponRequest,
-    requestDeserialize: deserialize_coupon_IssueCouponRequest,
-    responseSerialize: serialize_coupon_CouponDetail,
-    responseDeserialize: deserialize_coupon_CouponDetail,
   },
   startCouponUse: {
     path: '/coupon.CouponServer/StartCouponUse',
@@ -369,50 +259,6 @@ var CouponServerService = exports.CouponServerService = {
     responseSerialize: serialize_coupon_ListAvailCouponReply,
     responseDeserialize: deserialize_coupon_ListAvailCouponReply,
   },
-  createPromotion: {
-    path: '/coupon.CouponServer/CreatePromotion',
-    requestStream: false,
-    responseStream: false,
-    requestType: coupon_pb.CreatePromotionRequest,
-    responseType: coupon_pb.PromotionDetailReply,
-    requestSerialize: serialize_coupon_CreatePromotionRequest,
-    requestDeserialize: deserialize_coupon_CreatePromotionRequest,
-    responseSerialize: serialize_coupon_PromotionDetailReply,
-    responseDeserialize: deserialize_coupon_PromotionDetailReply,
-  },
-  getPromotionDetail: {
-    path: '/coupon.CouponServer/GetPromotionDetail',
-    requestStream: false,
-    responseStream: false,
-    requestType: coupon_pb.PromotionDetailRequest,
-    responseType: coupon_pb.PromotionDetailReply,
-    requestSerialize: serialize_coupon_PromotionDetailRequest,
-    requestDeserialize: deserialize_coupon_PromotionDetailRequest,
-    responseSerialize: serialize_coupon_PromotionDetailReply,
-    responseDeserialize: deserialize_coupon_PromotionDetailReply,
-  },
-  listPromotions: {
-    path: '/coupon.CouponServer/ListPromotions',
-    requestStream: false,
-    responseStream: false,
-    requestType: coupon_pb.ListPromotionRequest,
-    responseType: coupon_pb.ListPromotionReply,
-    requestSerialize: serialize_coupon_ListPromotionRequest,
-    requestDeserialize: deserialize_coupon_ListPromotionRequest,
-    responseSerialize: serialize_coupon_ListPromotionReply,
-    responseDeserialize: deserialize_coupon_ListPromotionReply,
-  },
-  issuePromotionCoupon: {
-    path: '/coupon.CouponServer/IssuePromotionCoupon',
-    requestStream: false,
-    responseStream: false,
-    requestType: coupon_pb.IssuePromotionCouponRequest,
-    responseType: coupon_pb.CouponDetail,
-    requestSerialize: serialize_coupon_IssuePromotionCouponRequest,
-    requestDeserialize: deserialize_coupon_IssuePromotionCouponRequest,
-    responseSerialize: serialize_coupon_CouponDetail,
-    responseDeserialize: deserialize_coupon_CouponDetail,
-  },
   checkCouponAvail: {
     path: '/coupon.CouponServer/CheckCouponAvail',
     requestStream: false,
@@ -432,28 +278,6 @@ var CouponServerService = exports.CouponServerService = {
     responseType: coupon_pb.CouponDetail,
     requestSerialize: serialize_coupon_IssuePromotionCouponRequest,
     requestDeserialize: deserialize_coupon_IssuePromotionCouponRequest,
-    responseSerialize: serialize_coupon_CouponDetail,
-    responseDeserialize: deserialize_coupon_CouponDetail,
-  },
-  updatePromotion: {
-    path: '/coupon.CouponServer/UpdatePromotion',
-    requestStream: false,
-    responseStream: false,
-    requestType: coupon_pb.UpdatePromotionRequest,
-    responseType: coupon_pb.PromotionDetailReply,
-    requestSerialize: serialize_coupon_UpdatePromotionRequest,
-    requestDeserialize: deserialize_coupon_UpdatePromotionRequest,
-    responseSerialize: serialize_coupon_PromotionDetailReply,
-    responseDeserialize: deserialize_coupon_PromotionDetailReply,
-  },
-  registerCoupon: {
-    path: '/coupon.CouponServer/RegisterCoupon',
-    requestStream: false,
-    responseStream: false,
-    requestType: coupon_pb.RegisterCouponRequest,
-    responseType: coupon_pb.CouponDetail,
-    requestSerialize: serialize_coupon_RegisterCouponRequest,
-    requestDeserialize: deserialize_coupon_RegisterCouponRequest,
     responseSerialize: serialize_coupon_CouponDetail,
     responseDeserialize: deserialize_coupon_CouponDetail,
   },
