@@ -19,6 +19,7 @@ const mixins = {
         user: false,
         conn: false,
       },
+      ...opts.password_hashed
     },
     auth_count: {
       // used for jwt verification per app
