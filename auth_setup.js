@@ -21,7 +21,7 @@ module.exports = (app, logger) => {
     logger.verbose = logger.log;
   }
   /* functors */
-  function tokenIssuer({ client: originalClient, model, idkey, getData, jwtSecret, opts }) {
+  function tokenIssuer_legacy({ client: originalClient, model, idkey, getData, jwtSecret, opts }) {
     return async (entity, client, done) => {
       if (!done) {
         done = client;
@@ -74,7 +74,20 @@ module.exports = (app, logger) => {
     };
   }
 
-  function passwordExchanger({ model, idkey, getData, jwtSecret, opts }) {
+  const tokenIssuer_uuid_proxy = uuidGrantAccessToken => ({ client: originalClient, model, idkey, getData }) => {
+    return async (entity, client, done) => {
+      if (!done) {
+        done = client;
+        client = originalClient;
+      }
+      const data = getData(entity);
+      uuidGrantAccessToken({uuid: entity.uuid, appId: client.user.id}).then(({access_token, refresh_token}) =>
+        done(null, access_token, refresh_token, data)
+      ).catch((err) => done(err));
+    };
+  };
+
+  function passwordExchanger({ model, idkey, getData, jwtSecret, tokenIssuer, opts }) {
     return oauth2orize.exchange.password(async (client, username, password, done) => {
       let entity;
       try {
@@ -130,8 +143,20 @@ module.exports = (app, logger) => {
     });
   }
 
-  function refreshTokenExchanger({ model, idkey, getData, jwtSecret, opts }) {
+  function refreshTokenExchanger({ model, idkey, getData, jwtSecret, externalAccountService, opts }) {
     return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
+      if (externalAccountService) {
+        return externalAccountService.refreshTokenGrantAccessToken({
+          refreshToken,
+          appId: client.user.id,
+        }).then(({access_token, refresh_token}) => {
+          return done(null, access_token, refresh_token);
+        }).catch((err) => {
+          return done(err);
+        })
+      }
+
+      /* legacy logic */
       const namespace = `${model.name}_refresh_token`;
       const str = await redisClient.getAsync(`${namespace}_${refreshToken}`);
 
@@ -173,7 +198,7 @@ module.exports = (app, logger) => {
       // remove old refresh token
       await redisClient.delAsync(`${namespace}_${refreshToken}`);
 
-      const issueToken = tokenIssuer({
+      const issueToken = tokenIssuer_legacy({
         client,
         model,
         idkey,
@@ -217,9 +242,19 @@ module.exports = (app, logger) => {
   return opts => {
     const oauth2Server = oauth2orize.createServer();
     const name = opts.strategyName;
-    oauth2Server.exchange(passwordExchanger(opts));
+    // select token issuer
+    let tokenIssuer;
+    if (opts.externalAccountService) {
+      tokenIssuer = tokenIssuer_uuid_proxy(opts.externalAccountService.uuidGrantAccessToken);
+      oauth2Server.issueToken = () => {throw new Error("cannot call issueToken when use externalAccountService")}
+    } else {
+      tokenIssuer = tokenIssuer_legacy;
+      oauth2Server.issueToken = tokenIssuer(opts);
+    }
+
+    oauth2Server.exchange(passwordExchanger({...opts, tokenIssuer}));
     oauth2Server.exchange(refreshTokenExchanger(opts));
-    oauth2Server.issueToken = tokenIssuer(opts);
+
     passport.use(
       name,
       jwtStrategyFactory({
