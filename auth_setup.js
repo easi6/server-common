@@ -145,7 +145,7 @@ module.exports = (app, logger) => {
 
   function refreshTokenExchanger({ model, idkey, getData, jwtSecret, externalAccountService, opts }) {
     return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
-      if (externalAccountService) {
+      if (externalAccountService && refreshToken.length > 32 /* new token format is longer than length of 32 */) {
         return externalAccountService.refreshTokenGrantAccessToken({
           refreshToken,
           appId: client.user.id,
@@ -198,15 +198,25 @@ module.exports = (app, logger) => {
       // remove old refresh token
       await redisClient.delAsync(`${namespace}_${refreshToken}`);
 
-      const issueToken = tokenIssuer_legacy({
-        client,
-        model,
-        idkey,
-        getData,
-        jwtSecret,
-        opts,
-      });
-      await issueToken(entity, done.bind(this));
+      if (externalAccountService) {
+        const issueToken = tokenIssuer_uuid_proxy(externalAccountService.uuidGrantAccessToken)({
+          client,
+          model,
+          idkey,
+          getData,
+        });
+        await issueToken(entity, done.bind(this));
+      } else {
+        const issueToken = tokenIssuer_legacy({
+          client,
+          model,
+          idkey,
+          getData,
+          jwtSecret,
+          opts,
+        });
+        await issueToken(entity, done.bind(this));
+      }
     });
   }
 
