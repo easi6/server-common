@@ -19,7 +19,7 @@ export const accountSvcRequest = request.defaults({
   json: true,
 });
 
-export const getAuthorization = (authHeader: object) => {
+export const getAuthorization = (authHeader: string | string[]) => {
   // repsonse example
   /*
   {
