@@ -14,6 +14,12 @@ const accountSvcHttpConfig = _.pick(
       },
   ['protocol', 'hostname', 'port', 'pathname']
 );
+
+const basicUserRider = _.get(config, "account_service.basicAuth.rider.name");
+const basicPasswordRider = _.get(config, "account_service.basicAuth.rider.secret");
+const basicUserDriver = _.get(config, "account_service.basicAuth.driver.name");
+const basicPasswordDriver = _.get(config, "account_service.basicAuth.driver.secret");
+
 export const accountSvcRequest = request.defaults({
   baseUrl: URL.format(accountSvcHttpConfig),
   json: true,
@@ -81,11 +87,11 @@ export const signup = (signupDto: {
   let basicUser;
   let basicPassword;
   if (signupDto.isRider) {
-    basicUser = 'tada-rider-app';
-    basicPassword = 'tada-rider-app-secret12345';
+    basicUser = basicUserRider;
+    basicPassword = basicPasswordRider;
   } else {
-    basicUser = 'tada-driver-app';
-    basicPassword = 'tada-driver-app-secret12345';
+    basicUser = basicUserDriver;
+    basicPassword = basicPasswordDriver;
   }
 
   if (!signupDto.uuid) {
@@ -131,11 +137,11 @@ export const uuidGrantAccessToken = ({ uuid, appId }: { uuid: string; appId: str
   let basicPassword;
 
   if (appId === 'tada_customer_app') {
-    basicUser = 'tada-rider-app';
-    basicPassword = 'tada-rider-app-secret12345';
+    basicUser = basicUserRider;
+    basicPassword = basicPasswordRider;
   } else {
-    basicUser = 'tada-driver-app';
-    basicPassword = 'tada-driver-app-secret12345';
+    basicUser = basicUserDriver;
+    basicPassword = basicPasswordDriver;
   }
 
   return accountSvcRequest({
@@ -161,11 +167,11 @@ export const refreshTokenGrantAccessToken = ({ refreshToken, appId }: { refreshT
   let basicPassword;
 
   if (appId === 'tada_customer_app') {
-    basicUser = 'tada-rider-app';
-    basicPassword = 'tada-rider-app-secret12345';
+    basicUser = basicUserRider;
+    basicPassword = basicPasswordRider;
   } else {
-    basicUser = 'tada-driver-app';
-    basicPassword = 'tada-driver-app-secret12345';
+    basicUser = basicUserDriver;
+    basicPassword = basicPasswordDriver;
   }
 
   return accountSvcRequest({
