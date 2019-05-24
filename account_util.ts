@@ -73,6 +73,7 @@ export const signup = (signupDto: {
   uuid?: string;
 
   isRider: boolean;
+  authority?: string;
 
   // facebook account kit access token
   akfAccessToken: string;
@@ -123,7 +124,7 @@ export const signup = (signupDto: {
     },
     uri: '/v1/accounts',
     method: 'post',
-    body: { ...signupDto, authority: signupDto.isRider ? 'ROLE_INSECURE_USER' : 'ROLE_PRE_DRIVER' },
+    body: signupDto
   }).then(response => ({
     email: _.get(response, 'email'),
     oauth: { access_token: _.get(response, 'accessToken'), refresh_token: _.get(response, 'refreshToken') },
