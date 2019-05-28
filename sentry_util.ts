@@ -3,6 +3,7 @@ import _ from 'lodash';
 import util, { inspect } from 'util';
 // @ts-ignore
 import winston from 'winston';
+import logger from '../../config/logger';
 
 const isProd = process.env.NODE_ENV === 'production';
 const commitHash = process.env.COMMIT_HASH;
@@ -17,14 +18,18 @@ export const initialize = (opts = {}) => {
 };
 
 export const captureException = (err: any, locale: string, clientIp?: string, user?: { id: number; email: string }) => {
-  Sentry.configureScope((scope: any) => {
-    scope.setTag('locale', locale);
-    scope.setUser({
-      ..._.pick(user, ['id', 'email']),
-      ip_address: clientIp,
+  try {
+    Sentry.configureScope((scope: any) => {
+      scope.setTag('locale', locale);
+      scope.setUser({
+        ..._.pick(user, ['id', 'email']),
+        ip_address: clientIp,
+      });
     });
-  });
-  Sentry.captureException(err);
+    Sentry.captureException(err);
+  } catch (e) {
+    logger.error('SentryExceptionLog', e);
+  }
 };
 
 export const BreadcrumbTransport = (winston.transports.BreadcrumbTransport = function(options: any) {
