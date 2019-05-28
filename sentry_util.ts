@@ -3,7 +3,6 @@ import _ from 'lodash';
 import util, { inspect } from 'util';
 // @ts-ignore
 import winston from 'winston';
-import logger from '../../config/logger';
 
 const isProd = process.env.NODE_ENV === 'production';
 const commitHash = process.env.COMMIT_HASH;
@@ -28,7 +27,7 @@ export const captureException = (err: any, locale: string, clientIp?: string, us
     });
     Sentry.captureException(err);
   } catch (e) {
-    logger.error('SentryExceptionLog', e);
+    console.error(e.stack);
   }
 };
 
