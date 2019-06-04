@@ -3,6 +3,7 @@ import _ from 'lodash';
 import request from 'request-promise';
 import URL from 'url';
 import uuidv4 from 'uuid/v4';
+import jwt from 'jsonwebtoken';
 
 const accountSvcHttpConfig = _.pick(
   config.has('account_service')
@@ -173,6 +174,14 @@ export const refreshTokenGrantAccessToken = ({ refreshToken, appId }: { refreshT
   } else {
     basicUser = basicUserDriver;
     basicPassword = basicPasswordDriver;
+  }
+
+  const tokenDecoded = jwt.decode(refreshToken);
+  const clientId = _.get(tokenDecoded, 'client_id', basicUser);
+
+  if (clientId !== basicUser) {
+    basicUser = clientId;
+    basicPassword = _.get(config, ['basicAuth', clientId]);
   }
 
   return accountSvcRequest({
