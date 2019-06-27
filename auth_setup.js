@@ -8,6 +8,7 @@ import Promise from 'bluebird';
 import crypto from 'crypto';
 import _ from 'lodash';
 import CrashReportUtil from 'lib/common/sentry_util';
+import OAuth2Error from 'oauth2orize/lib/errors/oauth2error';
 
 Promise.promisifyAll(redis.RedisClient.prototype);
 const redisClient = redis.createClient(process.env.REDIS_URL || { ...config.redis, password: config.redis.pass });
@@ -81,9 +82,9 @@ module.exports = (app, logger) => {
         client = originalClient;
       }
       const data = getData(entity);
-      uuidGrantAccessToken({uuid: entity.uuid, appId: client.user.id}).then(({access_token, refresh_token}) =>
-        done(null, access_token, refresh_token, data)
-      ).catch((err) => done(err));
+      uuidGrantAccessToken({ uuid: entity.uuid, appId: client.user.id })
+        .then(({ access_token, refresh_token }) => done(null, access_token, refresh_token, data))
+        .catch(err => done(err));
     };
   };
 
@@ -146,15 +147,22 @@ module.exports = (app, logger) => {
   function refreshTokenExchanger({ model, idkey, getData, jwtSecret, externalAccountService, opts }) {
     return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       if (externalAccountService && refreshToken.length > 32 /* new token format is longer than length of 32 */) {
-        return externalAccountService.refreshTokenGrantAccessToken({
-          refreshToken,
-          appId: client.user.id,
-        }).then(({access_token, refresh_token}) => {
-          return done(null, access_token, refresh_token);
-        }).catch((err) => {
-          logger.error('!!!!!refresh err', err);
-          return done(err);
-        })
+        return externalAccountService
+          .refreshTokenGrantAccessToken({
+            refreshToken,
+            appId: client.user.id,
+          })
+          .then(({ access_token, refresh_token }) => {
+            return done(null, access_token, refresh_token);
+          })
+          .catch(err => {
+            return done(OAuth2Error(
+              _.get(err, 'error.error_description', 'auth error'),
+              _.get(err, 'error.error', 'invalid_token'),
+              _.get(err, 'options.uri', ''),
+              _.get(err, 'statusCode', 500)),
+            );
+          });
       }
 
       /* legacy logic */
@@ -257,13 +265,15 @@ module.exports = (app, logger) => {
     let tokenIssuer;
     if (opts.externalAccountService) {
       tokenIssuer = tokenIssuer_uuid_proxy(opts.externalAccountService.uuidGrantAccessToken);
-      oauth2Server.issueToken = () => {throw new Error("cannot call issueToken when use externalAccountService")}
+      oauth2Server.issueToken = () => {
+        throw new Error('cannot call issueToken when use externalAccountService');
+      };
     } else {
       tokenIssuer = tokenIssuer_legacy;
       oauth2Server.issueToken = tokenIssuer(opts);
     }
 
-    oauth2Server.exchange(passwordExchanger({...opts, tokenIssuer}));
+    oauth2Server.exchange(passwordExchanger({ ...opts, tokenIssuer }));
     oauth2Server.exchange(refreshTokenExchanger(opts));
 
     passport.use(
