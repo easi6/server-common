@@ -152,6 +152,7 @@ module.exports = (app, logger) => {
         }).then(({access_token, refresh_token}) => {
           return done(null, access_token, refresh_token);
         }).catch((err) => {
+          logger.error('!!!!!refresh err', err);
           return done(err);
         })
       }
