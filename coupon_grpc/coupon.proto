@@ -147,6 +147,10 @@ message AvailCouponRequest {
     string currency = 7;
     uint32 timezone = 8;
     string user_id = 9;
+    double pickup_latitude = 10;
+    double pickup_longitude = 11;
+    double dest_latitude = 12;
+    double dest_longitude = 13;
 }
 
 message PromotionEntry {
@@ -190,6 +194,10 @@ message CheckCouponAvailRequest {
     string code = 10;
     bool skip_validity_check = 11;
     string payment_method = 12;
+    double pickup_latitude = 13;
+    double pickup_longitude = 14;
+    double dest_latitude = 15;
+    double dest_longitude = 16;
 }
 
 message CheckCouponReply {
