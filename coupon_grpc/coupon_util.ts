@@ -44,6 +44,8 @@ export const getAvailCoupons = async ({
   datetime,
   timezone,
   riderId,
+  pickup,
+  dest,
 }: {
   carType: number;
   productType: number;
@@ -54,6 +56,8 @@ export const getAvailCoupons = async ({
   datetime: Date;
   timezone: number;
   riderId: string;
+  pickup: {latitude: number, longitude: number};
+  dest?: {latitude: number, longitude: number};
 }): Promise<any> => {
   // stuffing request
   // @ts-ignore
@@ -67,6 +71,12 @@ export const getAvailCoupons = async ({
   request.setDatetime(moment(datetime).format());
   request.setTimezone(timezone);
   request.setUserId(riderId);
+  request.setPickupLatitude(pickup.latitude);
+  request.setPickupLongitude(pickup.longitude);
+  if (dest && dest.latitude && dest.longitude) {
+    request.setDestLatitude(dest.latitude);
+    request.setDestLongitude(dest.longitude);
+  }
 
   try {
     // @ts-ignore
