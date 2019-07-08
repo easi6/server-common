@@ -3656,7 +3656,8 @@ proto.coupon.AvailCouponRequest.toObject = function(includeInstance, msg) {
     pickupLatitude: +jspb.Message.getFieldWithDefault(msg, 10, 0.0),
     pickupLongitude: +jspb.Message.getFieldWithDefault(msg, 11, 0.0),
     destLatitude: +jspb.Message.getFieldWithDefault(msg, 12, 0.0),
-    destLongitude: +jspb.Message.getFieldWithDefault(msg, 13, 0.0)
+    destLongitude: +jspb.Message.getFieldWithDefault(msg, 13, 0.0),
+    paymentMethod: jspb.Message.getFieldWithDefault(msg, 14, "")
   };
 
   if (includeInstance) {
@@ -3744,6 +3745,10 @@ proto.coupon.AvailCouponRequest.deserializeBinaryFromReader = function(msg, read
     case 13:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setDestLongitude(value);
+      break;
+    case 14:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPaymentMethod(value);
       break;
     default:
       reader.skipField();
@@ -3862,6 +3867,13 @@ proto.coupon.AvailCouponRequest.serializeBinaryToWriter = function(message, writ
   if (f !== 0.0) {
     writer.writeDouble(
       13,
+      f
+    );
+  }
+  f = message.getPaymentMethod();
+  if (f.length > 0) {
+    writer.writeString(
+      14,
       f
     );
   }
@@ -4060,6 +4072,21 @@ proto.coupon.AvailCouponRequest.prototype.getDestLongitude = function() {
 /** @param {number} value */
 proto.coupon.AvailCouponRequest.prototype.setDestLongitude = function(value) {
   jspb.Message.setProto3FloatField(this, 13, value);
+};
+
+
+/**
+ * optional string payment_method = 14;
+ * @return {string}
+ */
+proto.coupon.AvailCouponRequest.prototype.getPaymentMethod = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.AvailCouponRequest.prototype.setPaymentMethod = function(value) {
+  jspb.Message.setProto3StringField(this, 14, value);
 };
 
 

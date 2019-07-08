@@ -219,6 +219,7 @@ export const checkCouponAvail = async ({
   skipCheck,
   pickup,
   dest,
+  paymentMethod,
 }: {
   carType: number;
   productType: number;
@@ -231,8 +232,9 @@ export const checkCouponAvail = async ({
   riderId: string;
   code: string;
   skipCheck: boolean;
-  pickup: {latitude: number, longitude: number},
-  dest?: {latitude: number, longitude: number},
+  pickup: {latitude: number, longitude: number};
+  dest?: {latitude: number, longitude: number};
+  paymentMethod: string;
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CheckCouponAvailRequest();
@@ -249,6 +251,7 @@ export const checkCouponAvail = async ({
   request.setSkipValidityCheck(skipCheck);
   request.setPickupLatitude(pickup.latitude);
   request.setPickupLongitude(pickup.longitude);
+  request.setPaymentMethod(paymentMethod);
 
   if (dest && dest.latitude && dest.longitude) {
     request.setDestLatitude(dest.latitude);

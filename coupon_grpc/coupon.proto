@@ -151,6 +151,7 @@ message AvailCouponRequest {
     double pickup_longitude = 11;
     double dest_latitude = 12;
     double dest_longitude = 13;
+    string payment_method = 14;
 }
 
 message PromotionEntry {
