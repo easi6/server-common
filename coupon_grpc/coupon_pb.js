@@ -28,7 +28,6 @@ goog.exportSymbol('proto.coupon.ListAvailCouponReply', null, global);
 goog.exportSymbol('proto.coupon.ListCouponReply', null, global);
 goog.exportSymbol('proto.coupon.ListCouponRequest', null, global);
 goog.exportSymbol('proto.coupon.Pagination', null, global);
-goog.exportSymbol('proto.coupon.PromotionDetailReply', null, global);
 goog.exportSymbol('proto.coupon.PromotionEntry', null, global);
 goog.exportSymbol('proto.coupon.RegisterCouponRequest', null, global);
 goog.exportSymbol('proto.coupon.StartCouponUseRequest', null, global);
@@ -3653,7 +3652,12 @@ proto.coupon.AvailCouponRequest.toObject = function(includeInstance, msg) {
     fare: +jspb.Message.getFieldWithDefault(msg, 6, 0.0),
     currency: jspb.Message.getFieldWithDefault(msg, 7, ""),
     timezone: jspb.Message.getFieldWithDefault(msg, 8, 0),
-    userId: jspb.Message.getFieldWithDefault(msg, 9, "")
+    userId: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    pickupLatitude: +jspb.Message.getFieldWithDefault(msg, 10, 0.0),
+    pickupLongitude: +jspb.Message.getFieldWithDefault(msg, 11, 0.0),
+    destLatitude: +jspb.Message.getFieldWithDefault(msg, 12, 0.0),
+    destLongitude: +jspb.Message.getFieldWithDefault(msg, 13, 0.0),
+    paymentMethod: jspb.Message.getFieldWithDefault(msg, 14, "")
   };
 
   if (includeInstance) {
@@ -3725,6 +3729,26 @@ proto.coupon.AvailCouponRequest.deserializeBinaryFromReader = function(msg, read
     case 9:
       var value = /** @type {string} */ (reader.readString());
       msg.setUserId(value);
+      break;
+    case 10:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setPickupLatitude(value);
+      break;
+    case 11:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setPickupLongitude(value);
+      break;
+    case 12:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setDestLatitude(value);
+      break;
+    case 13:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setDestLongitude(value);
+      break;
+    case 14:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPaymentMethod(value);
       break;
     default:
       reader.skipField();
@@ -3815,6 +3839,41 @@ proto.coupon.AvailCouponRequest.serializeBinaryToWriter = function(message, writ
   if (f.length > 0) {
     writer.writeString(
       9,
+      f
+    );
+  }
+  f = message.getPickupLatitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      10,
+      f
+    );
+  }
+  f = message.getPickupLongitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      11,
+      f
+    );
+  }
+  f = message.getDestLatitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      12,
+      f
+    );
+  }
+  f = message.getDestLongitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      13,
+      f
+    );
+  }
+  f = message.getPaymentMethod();
+  if (f.length > 0) {
+    writer.writeString(
+      14,
       f
     );
   }
@@ -3953,6 +4012,81 @@ proto.coupon.AvailCouponRequest.prototype.getUserId = function() {
 /** @param {string} value */
 proto.coupon.AvailCouponRequest.prototype.setUserId = function(value) {
   jspb.Message.setProto3StringField(this, 9, value);
+};
+
+
+/**
+ * optional double pickup_latitude = 10;
+ * @return {number}
+ */
+proto.coupon.AvailCouponRequest.prototype.getPickupLatitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 10, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.AvailCouponRequest.prototype.setPickupLatitude = function(value) {
+  jspb.Message.setProto3FloatField(this, 10, value);
+};
+
+
+/**
+ * optional double pickup_longitude = 11;
+ * @return {number}
+ */
+proto.coupon.AvailCouponRequest.prototype.getPickupLongitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 11, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.AvailCouponRequest.prototype.setPickupLongitude = function(value) {
+  jspb.Message.setProto3FloatField(this, 11, value);
+};
+
+
+/**
+ * optional double dest_latitude = 12;
+ * @return {number}
+ */
+proto.coupon.AvailCouponRequest.prototype.getDestLatitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 12, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.AvailCouponRequest.prototype.setDestLatitude = function(value) {
+  jspb.Message.setProto3FloatField(this, 12, value);
+};
+
+
+/**
+ * optional double dest_longitude = 13;
+ * @return {number}
+ */
+proto.coupon.AvailCouponRequest.prototype.getDestLongitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 13, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.AvailCouponRequest.prototype.setDestLongitude = function(value) {
+  jspb.Message.setProto3FloatField(this, 13, value);
+};
+
+
+/**
+ * optional string payment_method = 14;
+ * @return {string}
+ */
+proto.coupon.AvailCouponRequest.prototype.getPaymentMethod = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.AvailCouponRequest.prototype.setPaymentMethod = function(value) {
+  jspb.Message.setProto3StringField(this, 14, value);
 };
 
 
@@ -4674,925 +4808,6 @@ proto.coupon.PromotionEntry.prototype.setMaxAmount = function(value) {
  * @extends {jspb.Message}
  * @constructor
  */
-proto.coupon.PromotionDetailReply = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.coupon.PromotionDetailReply.repeatedFields_, null);
-};
-goog.inherits(proto.coupon.PromotionDetailReply, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
-  proto.coupon.PromotionDetailReply.displayName = 'proto.coupon.PromotionDetailReply';
-}
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.coupon.PromotionDetailReply.repeatedFields_ = [11,12,13,14,15,25];
-
-
-
-if (jspb.Message.GENERATE_TO_OBJECT) {
-/**
- * Creates an object representation of this proto suitable for use in Soy templates.
- * Field names that are reserved in JavaScript and will be renamed to pb_name.
- * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
- * For the list of reserved names please see:
- *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
- * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
- *     for transitional soy proto support: http://goto/soy-param-migration
- * @return {!Object}
- */
-proto.coupon.PromotionDetailReply.prototype.toObject = function(opt_includeInstance) {
-  return proto.coupon.PromotionDetailReply.toObject(opt_includeInstance, this);
-};
-
-
-/**
- * Static version of the {@see toObject} method.
- * @param {boolean|undefined} includeInstance Whether to include the JSPB
- *     instance for transitional soy proto support:
- *     http://goto/soy-param-migration
- * @param {!proto.coupon.PromotionDetailReply} msg The msg instance to transform.
- * @return {!Object}
- * @suppress {unusedLocalVariables} f is only used for nested messages
- */
-proto.coupon.PromotionDetailReply.toObject = function(includeInstance, msg) {
-  var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    code: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    discountType: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    amount: +jspb.Message.getFieldWithDefault(msg, 4, 0.0),
-    currency: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    countLimit: jspb.Message.getFieldWithDefault(msg, 6, 0),
-    totalCount: jspb.Message.getFieldWithDefault(msg, 7, 0),
-    countCheckPolicy: jspb.Message.getFieldWithDefault(msg, 8, 0),
-    title: jspb.Message.getFieldWithDefault(msg, 9, ""),
-    description: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    regionsList: jspb.Message.getRepeatedField(msg, 11),
-    citiesList: jspb.Message.getRepeatedField(msg, 12),
-    carTypesList: jspb.Message.getRepeatedField(msg, 13),
-    productTypesList: jspb.Message.getRepeatedField(msg, 14),
-    timesList: jspb.Message.toObjectList(msg.getTimesList(),
-    proto.coupon.Timespan.toObject, includeInstance),
-    hiredOnly: jspb.Message.getFieldWithDefault(msg, 16, false),
-    validFrom: jspb.Message.getFieldWithDefault(msg, 17, ""),
-    validUntil: jspb.Message.getFieldWithDefault(msg, 18, ""),
-    enabled: jspb.Message.getFieldWithDefault(msg, 19, false),
-    createdAt: jspb.Message.getFieldWithDefault(msg, 20, ""),
-    updatedAt: jspb.Message.getFieldWithDefault(msg, 21, ""),
-    issuedCount: jspb.Message.getFieldWithDefault(msg, 22, 0),
-    usedCount: jspb.Message.getFieldWithDefault(msg, 23, 0),
-    implicit: jspb.Message.getFieldWithDefault(msg, 24, false),
-    paymentMethodsList: jspb.Message.getRepeatedField(msg, 25),
-    maxAmount: +jspb.Message.getFieldWithDefault(msg, 26, 0.0)
-  };
-
-  if (includeInstance) {
-    obj.$jspbMessageInstance = msg;
-  }
-  return obj;
-};
-}
-
-
-/**
- * Deserializes binary data (in protobuf wire format).
- * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.coupon.PromotionDetailReply}
- */
-proto.coupon.PromotionDetailReply.deserializeBinary = function(bytes) {
-  var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.coupon.PromotionDetailReply;
-  return proto.coupon.PromotionDetailReply.deserializeBinaryFromReader(msg, reader);
-};
-
-
-/**
- * Deserializes binary data (in protobuf wire format) from the
- * given reader into the given message object.
- * @param {!proto.coupon.PromotionDetailReply} msg The message object to deserialize into.
- * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.coupon.PromotionDetailReply}
- */
-proto.coupon.PromotionDetailReply.deserializeBinaryFromReader = function(msg, reader) {
-  while (reader.nextField()) {
-    if (reader.isEndGroup()) {
-      break;
-    }
-    var field = reader.getFieldNumber();
-    switch (field) {
-    case 1:
-      var value = /** @type {number} */ (reader.readUint64());
-      msg.setId(value);
-      break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setCode(value);
-      break;
-    case 3:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setDiscountType(value);
-      break;
-    case 4:
-      var value = /** @type {number} */ (reader.readDouble());
-      msg.setAmount(value);
-      break;
-    case 5:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setCurrency(value);
-      break;
-    case 6:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setCountLimit(value);
-      break;
-    case 7:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setTotalCount(value);
-      break;
-    case 8:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setCountCheckPolicy(value);
-      break;
-    case 9:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setTitle(value);
-      break;
-    case 10:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setDescription(value);
-      break;
-    case 11:
-      var value = /** @type {string} */ (reader.readString());
-      msg.addRegions(value);
-      break;
-    case 12:
-      var value = /** @type {string} */ (reader.readString());
-      msg.addCities(value);
-      break;
-    case 13:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setCarTypesList(value);
-      break;
-    case 14:
-      var value = /** @type {!Array<number>} */ (reader.readPackedUint32());
-      msg.setProductTypesList(value);
-      break;
-    case 15:
-      var value = new proto.coupon.Timespan;
-      reader.readMessage(value,proto.coupon.Timespan.deserializeBinaryFromReader);
-      msg.addTimes(value);
-      break;
-    case 16:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setHiredOnly(value);
-      break;
-    case 17:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setValidFrom(value);
-      break;
-    case 18:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setValidUntil(value);
-      break;
-    case 19:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setEnabled(value);
-      break;
-    case 20:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setCreatedAt(value);
-      break;
-    case 21:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setUpdatedAt(value);
-      break;
-    case 22:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setIssuedCount(value);
-      break;
-    case 23:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setUsedCount(value);
-      break;
-    case 24:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setImplicit(value);
-      break;
-    case 25:
-      var value = /** @type {string} */ (reader.readString());
-      msg.addPaymentMethods(value);
-      break;
-    case 26:
-      var value = /** @type {number} */ (reader.readDouble());
-      msg.setMaxAmount(value);
-      break;
-    default:
-      reader.skipField();
-      break;
-    }
-  }
-  return msg;
-};
-
-
-/**
- * Serializes the message to binary data (in protobuf wire format).
- * @return {!Uint8Array}
- */
-proto.coupon.PromotionDetailReply.prototype.serializeBinary = function() {
-  var writer = new jspb.BinaryWriter();
-  proto.coupon.PromotionDetailReply.serializeBinaryToWriter(this, writer);
-  return writer.getResultBuffer();
-};
-
-
-/**
- * Serializes the given message to binary data (in protobuf wire
- * format), writing to the given BinaryWriter.
- * @param {!proto.coupon.PromotionDetailReply} message
- * @param {!jspb.BinaryWriter} writer
- * @suppress {unusedLocalVariables} f is only used for nested messages
- */
-proto.coupon.PromotionDetailReply.serializeBinaryToWriter = function(message, writer) {
-  var f = undefined;
-  f = message.getId();
-  if (f !== 0) {
-    writer.writeUint64(
-      1,
-      f
-    );
-  }
-  f = message.getCode();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
-  f = message.getDiscountType();
-  if (f !== 0) {
-    writer.writeUint32(
-      3,
-      f
-    );
-  }
-  f = message.getAmount();
-  if (f !== 0.0) {
-    writer.writeDouble(
-      4,
-      f
-    );
-  }
-  f = message.getCurrency();
-  if (f.length > 0) {
-    writer.writeString(
-      5,
-      f
-    );
-  }
-  f = message.getCountLimit();
-  if (f !== 0) {
-    writer.writeUint32(
-      6,
-      f
-    );
-  }
-  f = message.getTotalCount();
-  if (f !== 0) {
-    writer.writeUint32(
-      7,
-      f
-    );
-  }
-  f = message.getCountCheckPolicy();
-  if (f !== 0) {
-    writer.writeUint32(
-      8,
-      f
-    );
-  }
-  f = message.getTitle();
-  if (f.length > 0) {
-    writer.writeString(
-      9,
-      f
-    );
-  }
-  f = message.getDescription();
-  if (f.length > 0) {
-    writer.writeString(
-      10,
-      f
-    );
-  }
-  f = message.getRegionsList();
-  if (f.length > 0) {
-    writer.writeRepeatedString(
-      11,
-      f
-    );
-  }
-  f = message.getCitiesList();
-  if (f.length > 0) {
-    writer.writeRepeatedString(
-      12,
-      f
-    );
-  }
-  f = message.getCarTypesList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
-      13,
-      f
-    );
-  }
-  f = message.getProductTypesList();
-  if (f.length > 0) {
-    writer.writePackedUint32(
-      14,
-      f
-    );
-  }
-  f = message.getTimesList();
-  if (f.length > 0) {
-    writer.writeRepeatedMessage(
-      15,
-      f,
-      proto.coupon.Timespan.serializeBinaryToWriter
-    );
-  }
-  f = message.getHiredOnly();
-  if (f) {
-    writer.writeBool(
-      16,
-      f
-    );
-  }
-  f = message.getValidFrom();
-  if (f.length > 0) {
-    writer.writeString(
-      17,
-      f
-    );
-  }
-  f = message.getValidUntil();
-  if (f.length > 0) {
-    writer.writeString(
-      18,
-      f
-    );
-  }
-  f = message.getEnabled();
-  if (f) {
-    writer.writeBool(
-      19,
-      f
-    );
-  }
-  f = message.getCreatedAt();
-  if (f.length > 0) {
-    writer.writeString(
-      20,
-      f
-    );
-  }
-  f = message.getUpdatedAt();
-  if (f.length > 0) {
-    writer.writeString(
-      21,
-      f
-    );
-  }
-  f = message.getIssuedCount();
-  if (f !== 0) {
-    writer.writeUint32(
-      22,
-      f
-    );
-  }
-  f = message.getUsedCount();
-  if (f !== 0) {
-    writer.writeUint32(
-      23,
-      f
-    );
-  }
-  f = message.getImplicit();
-  if (f) {
-    writer.writeBool(
-      24,
-      f
-    );
-  }
-  f = message.getPaymentMethodsList();
-  if (f.length > 0) {
-    writer.writeRepeatedString(
-      25,
-      f
-    );
-  }
-  f = message.getMaxAmount();
-  if (f !== 0.0) {
-    writer.writeDouble(
-      26,
-      f
-    );
-  }
-};
-
-
-/**
- * optional uint64 id = 1;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setId = function(value) {
-  jspb.Message.setProto3IntField(this, 1, value);
-};
-
-
-/**
- * optional string code = 2;
- * @return {string}
- */
-proto.coupon.PromotionDetailReply.prototype.getCode = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/** @param {string} value */
-proto.coupon.PromotionDetailReply.prototype.setCode = function(value) {
-  jspb.Message.setProto3StringField(this, 2, value);
-};
-
-
-/**
- * optional uint32 discount_type = 3;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getDiscountType = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setDiscountType = function(value) {
-  jspb.Message.setProto3IntField(this, 3, value);
-};
-
-
-/**
- * optional double amount = 4;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getAmount = function() {
-  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 4, 0.0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setAmount = function(value) {
-  jspb.Message.setProto3FloatField(this, 4, value);
-};
-
-
-/**
- * optional string currency = 5;
- * @return {string}
- */
-proto.coupon.PromotionDetailReply.prototype.getCurrency = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
-};
-
-
-/** @param {string} value */
-proto.coupon.PromotionDetailReply.prototype.setCurrency = function(value) {
-  jspb.Message.setProto3StringField(this, 5, value);
-};
-
-
-/**
- * optional uint32 count_limit = 6;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getCountLimit = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setCountLimit = function(value) {
-  jspb.Message.setProto3IntField(this, 6, value);
-};
-
-
-/**
- * optional uint32 total_count = 7;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getTotalCount = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setTotalCount = function(value) {
-  jspb.Message.setProto3IntField(this, 7, value);
-};
-
-
-/**
- * optional uint32 count_check_policy = 8;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getCountCheckPolicy = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setCountCheckPolicy = function(value) {
-  jspb.Message.setProto3IntField(this, 8, value);
-};
-
-
-/**
- * optional string title = 9;
- * @return {string}
- */
-proto.coupon.PromotionDetailReply.prototype.getTitle = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
-};
-
-
-/** @param {string} value */
-proto.coupon.PromotionDetailReply.prototype.setTitle = function(value) {
-  jspb.Message.setProto3StringField(this, 9, value);
-};
-
-
-/**
- * optional string description = 10;
- * @return {string}
- */
-proto.coupon.PromotionDetailReply.prototype.getDescription = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
-};
-
-
-/** @param {string} value */
-proto.coupon.PromotionDetailReply.prototype.setDescription = function(value) {
-  jspb.Message.setProto3StringField(this, 10, value);
-};
-
-
-/**
- * repeated string regions = 11;
- * @return {!Array<string>}
- */
-proto.coupon.PromotionDetailReply.prototype.getRegionsList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 11));
-};
-
-
-/** @param {!Array<string>} value */
-proto.coupon.PromotionDetailReply.prototype.setRegionsList = function(value) {
-  jspb.Message.setField(this, 11, value || []);
-};
-
-
-/**
- * @param {string} value
- * @param {number=} opt_index
- */
-proto.coupon.PromotionDetailReply.prototype.addRegions = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 11, value, opt_index);
-};
-
-
-proto.coupon.PromotionDetailReply.prototype.clearRegionsList = function() {
-  this.setRegionsList([]);
-};
-
-
-/**
- * repeated string cities = 12;
- * @return {!Array<string>}
- */
-proto.coupon.PromotionDetailReply.prototype.getCitiesList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 12));
-};
-
-
-/** @param {!Array<string>} value */
-proto.coupon.PromotionDetailReply.prototype.setCitiesList = function(value) {
-  jspb.Message.setField(this, 12, value || []);
-};
-
-
-/**
- * @param {string} value
- * @param {number=} opt_index
- */
-proto.coupon.PromotionDetailReply.prototype.addCities = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 12, value, opt_index);
-};
-
-
-proto.coupon.PromotionDetailReply.prototype.clearCitiesList = function() {
-  this.setCitiesList([]);
-};
-
-
-/**
- * repeated uint32 car_types = 13;
- * @return {!Array<number>}
- */
-proto.coupon.PromotionDetailReply.prototype.getCarTypesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 13));
-};
-
-
-/** @param {!Array<number>} value */
-proto.coupon.PromotionDetailReply.prototype.setCarTypesList = function(value) {
-  jspb.Message.setField(this, 13, value || []);
-};
-
-
-/**
- * @param {number} value
- * @param {number=} opt_index
- */
-proto.coupon.PromotionDetailReply.prototype.addCarTypes = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 13, value, opt_index);
-};
-
-
-proto.coupon.PromotionDetailReply.prototype.clearCarTypesList = function() {
-  this.setCarTypesList([]);
-};
-
-
-/**
- * repeated uint32 product_types = 14;
- * @return {!Array<number>}
- */
-proto.coupon.PromotionDetailReply.prototype.getProductTypesList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 14));
-};
-
-
-/** @param {!Array<number>} value */
-proto.coupon.PromotionDetailReply.prototype.setProductTypesList = function(value) {
-  jspb.Message.setField(this, 14, value || []);
-};
-
-
-/**
- * @param {number} value
- * @param {number=} opt_index
- */
-proto.coupon.PromotionDetailReply.prototype.addProductTypes = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 14, value, opt_index);
-};
-
-
-proto.coupon.PromotionDetailReply.prototype.clearProductTypesList = function() {
-  this.setProductTypesList([]);
-};
-
-
-/**
- * repeated Timespan times = 15;
- * @return {!Array<!proto.coupon.Timespan>}
- */
-proto.coupon.PromotionDetailReply.prototype.getTimesList = function() {
-  return /** @type{!Array<!proto.coupon.Timespan>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.coupon.Timespan, 15));
-};
-
-
-/** @param {!Array<!proto.coupon.Timespan>} value */
-proto.coupon.PromotionDetailReply.prototype.setTimesList = function(value) {
-  jspb.Message.setRepeatedWrapperField(this, 15, value);
-};
-
-
-/**
- * @param {!proto.coupon.Timespan=} opt_value
- * @param {number=} opt_index
- * @return {!proto.coupon.Timespan}
- */
-proto.coupon.PromotionDetailReply.prototype.addTimes = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 15, opt_value, proto.coupon.Timespan, opt_index);
-};
-
-
-proto.coupon.PromotionDetailReply.prototype.clearTimesList = function() {
-  this.setTimesList([]);
-};
-
-
-/**
- * optional bool hired_only = 16;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.coupon.PromotionDetailReply.prototype.getHiredOnly = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 16, false));
-};
-
-
-/** @param {boolean} value */
-proto.coupon.PromotionDetailReply.prototype.setHiredOnly = function(value) {
-  jspb.Message.setProto3BooleanField(this, 16, value);
-};
-
-
-/**
- * optional string valid_from = 17;
- * @return {string}
- */
-proto.coupon.PromotionDetailReply.prototype.getValidFrom = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
-};
-
-
-/** @param {string} value */
-proto.coupon.PromotionDetailReply.prototype.setValidFrom = function(value) {
-  jspb.Message.setProto3StringField(this, 17, value);
-};
-
-
-/**
- * optional string valid_until = 18;
- * @return {string}
- */
-proto.coupon.PromotionDetailReply.prototype.getValidUntil = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 18, ""));
-};
-
-
-/** @param {string} value */
-proto.coupon.PromotionDetailReply.prototype.setValidUntil = function(value) {
-  jspb.Message.setProto3StringField(this, 18, value);
-};
-
-
-/**
- * optional bool enabled = 19;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.coupon.PromotionDetailReply.prototype.getEnabled = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 19, false));
-};
-
-
-/** @param {boolean} value */
-proto.coupon.PromotionDetailReply.prototype.setEnabled = function(value) {
-  jspb.Message.setProto3BooleanField(this, 19, value);
-};
-
-
-/**
- * optional string created_at = 20;
- * @return {string}
- */
-proto.coupon.PromotionDetailReply.prototype.getCreatedAt = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 20, ""));
-};
-
-
-/** @param {string} value */
-proto.coupon.PromotionDetailReply.prototype.setCreatedAt = function(value) {
-  jspb.Message.setProto3StringField(this, 20, value);
-};
-
-
-/**
- * optional string updated_at = 21;
- * @return {string}
- */
-proto.coupon.PromotionDetailReply.prototype.getUpdatedAt = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 21, ""));
-};
-
-
-/** @param {string} value */
-proto.coupon.PromotionDetailReply.prototype.setUpdatedAt = function(value) {
-  jspb.Message.setProto3StringField(this, 21, value);
-};
-
-
-/**
- * optional uint32 issued_count = 22;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getIssuedCount = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 22, 0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setIssuedCount = function(value) {
-  jspb.Message.setProto3IntField(this, 22, value);
-};
-
-
-/**
- * optional uint32 used_count = 23;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getUsedCount = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 23, 0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setUsedCount = function(value) {
-  jspb.Message.setProto3IntField(this, 23, value);
-};
-
-
-/**
- * optional bool implicit = 24;
- * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
- * You should avoid comparisons like {@code val === true/false} in those cases.
- * @return {boolean}
- */
-proto.coupon.PromotionDetailReply.prototype.getImplicit = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 24, false));
-};
-
-
-/** @param {boolean} value */
-proto.coupon.PromotionDetailReply.prototype.setImplicit = function(value) {
-  jspb.Message.setProto3BooleanField(this, 24, value);
-};
-
-
-/**
- * repeated string payment_methods = 25;
- * @return {!Array<string>}
- */
-proto.coupon.PromotionDetailReply.prototype.getPaymentMethodsList = function() {
-  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 25));
-};
-
-
-/** @param {!Array<string>} value */
-proto.coupon.PromotionDetailReply.prototype.setPaymentMethodsList = function(value) {
-  jspb.Message.setField(this, 25, value || []);
-};
-
-
-/**
- * @param {string} value
- * @param {number=} opt_index
- */
-proto.coupon.PromotionDetailReply.prototype.addPaymentMethods = function(value, opt_index) {
-  jspb.Message.addToRepeatedField(this, 25, value, opt_index);
-};
-
-
-proto.coupon.PromotionDetailReply.prototype.clearPaymentMethodsList = function() {
-  this.setPaymentMethodsList([]);
-};
-
-
-/**
- * optional double max_amount = 26;
- * @return {number}
- */
-proto.coupon.PromotionDetailReply.prototype.getMaxAmount = function() {
-  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 26, 0.0));
-};
-
-
-/** @param {number} value */
-proto.coupon.PromotionDetailReply.prototype.setMaxAmount = function(value) {
-  jspb.Message.setProto3FloatField(this, 26, value);
-};
-
-
-
-/**
- * Generated by JsPbCodeGenerator.
- * @param {Array=} opt_data Optional initial data array, typically from a
- * server response, or constructed directly in Javascript. The array is used
- * in place and becomes part of the constructed object. It is not cloned.
- * If no data is provided, the constructed object will be empty, but still
- * valid.
- * @extends {jspb.Message}
- * @constructor
- */
 proto.coupon.IssuePromotionCouponRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
@@ -5809,7 +5024,11 @@ proto.coupon.CheckCouponAvailRequest.toObject = function(includeInstance, msg) {
     userId: jspb.Message.getFieldWithDefault(msg, 9, ""),
     code: jspb.Message.getFieldWithDefault(msg, 10, ""),
     skipValidityCheck: jspb.Message.getFieldWithDefault(msg, 11, false),
-    paymentMethod: jspb.Message.getFieldWithDefault(msg, 12, "")
+    paymentMethod: jspb.Message.getFieldWithDefault(msg, 12, ""),
+    pickupLatitude: +jspb.Message.getFieldWithDefault(msg, 13, 0.0),
+    pickupLongitude: +jspb.Message.getFieldWithDefault(msg, 14, 0.0),
+    destLatitude: +jspb.Message.getFieldWithDefault(msg, 15, 0.0),
+    destLongitude: +jspb.Message.getFieldWithDefault(msg, 16, 0.0)
   };
 
   if (includeInstance) {
@@ -5893,6 +5112,22 @@ proto.coupon.CheckCouponAvailRequest.deserializeBinaryFromReader = function(msg,
     case 12:
       var value = /** @type {string} */ (reader.readString());
       msg.setPaymentMethod(value);
+      break;
+    case 13:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setPickupLatitude(value);
+      break;
+    case 14:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setPickupLongitude(value);
+      break;
+    case 15:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setDestLatitude(value);
+      break;
+    case 16:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setDestLongitude(value);
       break;
     default:
       reader.skipField();
@@ -6004,6 +5239,34 @@ proto.coupon.CheckCouponAvailRequest.serializeBinaryToWriter = function(message,
   if (f.length > 0) {
     writer.writeString(
       12,
+      f
+    );
+  }
+  f = message.getPickupLatitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      13,
+      f
+    );
+  }
+  f = message.getPickupLongitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      14,
+      f
+    );
+  }
+  f = message.getDestLatitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      15,
+      f
+    );
+  }
+  f = message.getDestLongitude();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      16,
       f
     );
   }
@@ -6189,6 +5452,66 @@ proto.coupon.CheckCouponAvailRequest.prototype.getPaymentMethod = function() {
 /** @param {string} value */
 proto.coupon.CheckCouponAvailRequest.prototype.setPaymentMethod = function(value) {
   jspb.Message.setProto3StringField(this, 12, value);
+};
+
+
+/**
+ * optional double pickup_latitude = 13;
+ * @return {number}
+ */
+proto.coupon.CheckCouponAvailRequest.prototype.getPickupLatitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 13, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.CheckCouponAvailRequest.prototype.setPickupLatitude = function(value) {
+  jspb.Message.setProto3FloatField(this, 13, value);
+};
+
+
+/**
+ * optional double pickup_longitude = 14;
+ * @return {number}
+ */
+proto.coupon.CheckCouponAvailRequest.prototype.getPickupLongitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 14, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.CheckCouponAvailRequest.prototype.setPickupLongitude = function(value) {
+  jspb.Message.setProto3FloatField(this, 14, value);
+};
+
+
+/**
+ * optional double dest_latitude = 15;
+ * @return {number}
+ */
+proto.coupon.CheckCouponAvailRequest.prototype.getDestLatitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 15, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.CheckCouponAvailRequest.prototype.setDestLatitude = function(value) {
+  jspb.Message.setProto3FloatField(this, 15, value);
+};
+
+
+/**
+ * optional double dest_longitude = 16;
+ * @return {number}
+ */
+proto.coupon.CheckCouponAvailRequest.prototype.getDestLongitude = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 16, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.CheckCouponAvailRequest.prototype.setDestLongitude = function(value) {
+  jspb.Message.setProto3FloatField(this, 16, value);
 };
 
 

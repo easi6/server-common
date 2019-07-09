@@ -44,6 +44,9 @@ export const getAvailCoupons = async ({
   datetime,
   timezone,
   riderId,
+  pickup,
+  dest,
+  paymentMethod,
 }: {
   carType: number;
   productType: number;
@@ -54,6 +57,9 @@ export const getAvailCoupons = async ({
   datetime: Date;
   timezone: number;
   riderId: string;
+  pickup: {latitude: number, longitude: number};
+  dest?: {latitude: number, longitude: number};
+  paymentMethod?: string;
 }): Promise<any> => {
   // stuffing request
   // @ts-ignore
@@ -67,6 +73,15 @@ export const getAvailCoupons = async ({
   request.setDatetime(moment(datetime).format());
   request.setTimezone(timezone);
   request.setUserId(riderId);
+  request.setPickupLatitude(pickup.latitude);
+  request.setPickupLongitude(pickup.longitude);
+  if (paymentMethod) {
+    request.setPaymentMethod(paymentMethod);
+  }
+  if (dest && dest.latitude && dest.longitude) {
+    request.setDestLatitude(dest.latitude);
+    request.setDestLongitude(dest.longitude);
+  }
 
   try {
     // @ts-ignore
@@ -207,6 +222,9 @@ export const checkCouponAvail = async ({
   riderId,
   code,
   skipCheck,
+  pickup,
+  dest,
+  paymentMethod,
 }: {
   carType: number;
   productType: number;
@@ -219,6 +237,9 @@ export const checkCouponAvail = async ({
   riderId: string;
   code: string;
   skipCheck: boolean;
+  pickup: {latitude: number, longitude: number};
+  dest?: {latitude: number, longitude: number};
+  paymentMethod?: string;
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CheckCouponAvailRequest();
@@ -233,6 +254,15 @@ export const checkCouponAvail = async ({
   request.setUserId(riderId);
   request.setCode(code); // coupon code
   request.setSkipValidityCheck(skipCheck);
+  request.setPickupLatitude(pickup.latitude);
+  request.setPickupLongitude(pickup.longitude);
+  if (paymentMethod) {
+    request.setPaymentMethod(paymentMethod);
+  }
+  if (dest && dest.latitude && dest.longitude) {
+    request.setDestLatitude(dest.latitude);
+    request.setDestLongitude(dest.longitude);
+  }
 
   try {
     // @ts-ignore
@@ -310,6 +340,8 @@ export const checkImplicitPromotion = async ({
   timezone,
   riderId,
   paymentMethod,
+  pickup,
+  dest,
 }: {
   carType: number,
   productType: number,
@@ -321,6 +353,8 @@ export const checkImplicitPromotion = async ({
   timezone: number,
   riderId: string,
   paymentMethod: string,
+  pickup: {latitude: number, longitude: number},
+  dest?: {latitude: number, longitude: number},
 }): Promise<any> => {
 
   // @ts-ignore
@@ -335,6 +369,12 @@ export const checkImplicitPromotion = async ({
   request.setTimezone(timezone);
   request.setUserId(riderId);
   request.setPaymentMethod(paymentMethod);
+  request.setPickupLatitude(pickup.latitude);
+  request.setPickupLongitude(pickup.longitude);
+  if (dest && dest.latitude && dest.longitude) {
+    request.setDestLatitude(dest.latitude);
+    request.setDestLongitude(dest.longitude);
+  }
 
   try {
     // @ts-ignore
