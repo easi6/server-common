@@ -206,6 +206,7 @@ message CheckCouponReply {
     double original_price = 2;
     double discounted_price = 3;
     string title = 4;
+    repeated string payment_methods = 5;
 }
 
 message CouponCountRequest {
