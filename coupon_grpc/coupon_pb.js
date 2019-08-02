@@ -5527,12 +5527,19 @@ proto.coupon.CheckCouponAvailRequest.prototype.setDestLongitude = function(value
  * @constructor
  */
 proto.coupon.CheckCouponReply = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.coupon.CheckCouponReply.repeatedFields_, null);
 };
 goog.inherits(proto.coupon.CheckCouponReply, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   proto.coupon.CheckCouponReply.displayName = 'proto.coupon.CheckCouponReply';
 }
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.coupon.CheckCouponReply.repeatedFields_ = [5];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -5565,7 +5572,8 @@ proto.coupon.CheckCouponReply.toObject = function(includeInstance, msg) {
     applicable: jspb.Message.getFieldWithDefault(msg, 1, false),
     originalPrice: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
     discountedPrice: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
-    title: jspb.Message.getFieldWithDefault(msg, 4, "")
+    title: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    paymentMethodsList: jspb.Message.getRepeatedField(msg, 5)
   };
 
   if (includeInstance) {
@@ -5617,6 +5625,10 @@ proto.coupon.CheckCouponReply.deserializeBinaryFromReader = function(msg, reader
     case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setTitle(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addPaymentMethods(value);
       break;
     default:
       reader.skipField();
@@ -5672,6 +5684,13 @@ proto.coupon.CheckCouponReply.serializeBinaryToWriter = function(message, writer
   if (f.length > 0) {
     writer.writeString(
       4,
+      f
+    );
+  }
+  f = message.getPaymentMethodsList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      5,
       f
     );
   }
@@ -5737,6 +5756,35 @@ proto.coupon.CheckCouponReply.prototype.getTitle = function() {
 /** @param {string} value */
 proto.coupon.CheckCouponReply.prototype.setTitle = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * repeated string payment_methods = 5;
+ * @return {!Array<string>}
+ */
+proto.coupon.CheckCouponReply.prototype.getPaymentMethodsList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 5));
+};
+
+
+/** @param {!Array<string>} value */
+proto.coupon.CheckCouponReply.prototype.setPaymentMethodsList = function(value) {
+  jspb.Message.setField(this, 5, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ */
+proto.coupon.CheckCouponReply.prototype.addPaymentMethods = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 5, value, opt_index);
+};
+
+
+proto.coupon.CheckCouponReply.prototype.clearPaymentMethodsList = function() {
+  this.setPaymentMethodsList([]);
 };
 
 
