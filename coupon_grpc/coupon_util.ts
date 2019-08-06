@@ -119,11 +119,11 @@ export const registerCouponOrPromotion = async ({
     return convertKey(response.toObject());
   } catch (e) {
     // backward compat.
-    if (e.code == grpc.status.NOT_FOUND) {
+    if (e.code === grpc.status.NOT_FOUND) {
       throw new Easi6Error("coupon_not_found");
     }
     // extract error code
-    let errorCode = _.first(e.metadata && e.metadata.get("code") || []);
+    const errorCode = _.first(e.metadata && e.metadata.get("code") || []);
     throw new Easi6Error(errorCode && ("coupon_"+errorCode) || "coupon_invalid_code");
   }
 };
