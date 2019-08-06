@@ -118,14 +118,13 @@ export const registerCouponOrPromotion = async ({
     // @ts-ignore
     return convertKey(response.toObject());
   } catch (e) {
-    logger.error('registerCouponOrPromotionFailed', e);
-    if (e.message.includes('issue count exceeded')) {
-      throw new Easi6Error('coupon_issue_count_exceeded');
-    } else if (e.message.includes('total count exceeded')) {
-      throw new Easi6Error('coupon_total_count_exceeded');
-    } else {
-      throw new Easi6Error('not_found', 'coupon');
+    // backward compat.
+    if (e.code == grpc.status.NOT_FOUND) {
+      throw new Easi6Error("coupon_not_found");
     }
+    // extract error code
+    let errorCode = _.first(e.metadata && e.metadata.get("code") || []);
+    throw new Easi6Error(errorCode && ("coupon_"+errorCode) || "coupon_invalid_code");
   }
 };
 
