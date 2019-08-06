@@ -120,7 +120,7 @@ export const registerCouponOrPromotion = async ({
   } catch (e) {
     // backward compat.
     if (e.code == grpc.status.NOT_FOUND) {
-      throw new Easi6Error("not_found");
+      throw new Easi6Error("coupon_not_found");
     }
     // extract error code
     let errorCode = _.first(e.metadata && e.metadata.get("code") || []);
