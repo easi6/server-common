@@ -274,6 +274,13 @@ export const checkCouponAvail = async ({
     logger.verbose('checkCouponAvail response', res);
     return res;
   } catch (e) {
+    // extract error code
+    const errorCode = _.first(e.metadata && e.metadata.get("code") || []);
+    if (errorCode === 'price_exceeded') {
+      const price = _.first(e.metadata.get('price')) || 0;
+      throw new Easi6Error('coupon_price_exceeded', price);
+    }
+
     logger.error('checkCouponAvailFailed', e);
   }
 };
