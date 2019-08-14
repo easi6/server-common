@@ -77,7 +77,7 @@ export const signup = (signupDto: {
   authority?: string;
 
   // facebook account kit access token
-  akfAccessToken: string;
+  akfAccessToken?: string;
 
   // facebook or google auth use case these fields
   provider?: string;
