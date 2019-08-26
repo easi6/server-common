@@ -16,7 +16,7 @@ export const initialize = (opts = {}) => {
   Sentry.init(initOpts);
 };
 
-export const captureException = (err: any, locale: string, clientIp?: string, user?: { id: number; email: string }) => {
+export const captureException = (err: any, locale: string, clientIp?: string, user?: any) => {
   try {
     Sentry.configureScope((scope: any) => {
       scope.setTag('locale', locale);
@@ -31,6 +31,7 @@ export const captureException = (err: any, locale: string, clientIp?: string, us
   }
 };
 
+// @ts-ignore
 export const BreadcrumbTransport = (winston.transports.BreadcrumbTransport = function(options: any) {
   //
   // Name this logger
