@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node';
+import * as Integrations from '@sentry/integrations';
 import _ from 'lodash';
 import util, { inspect } from 'util';
 // @ts-ignore
@@ -12,6 +13,7 @@ export const initialize = (opts = {}) => {
     debug: !isProd,
     enabled: isProd,
     release: commitHash,
+    integrations: [new Integrations.ExtraErrorData(), new Integrations.RewriteFrames({ root: global.__rootdir__ })],
   });
   Sentry.init(initOpts);
 };
