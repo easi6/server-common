@@ -22,10 +22,12 @@ export const captureException = (err: any, locale: string, clientIp?: string, us
   try {
     Sentry.configureScope((scope: any) => {
       scope.setTag('locale', locale);
-      scope.setUser({
-        ..._.pick(user, ['id', 'email']),
-        ip_address: clientIp,
-      });
+      if (user || clientIp) {
+        scope.setUser({
+          ..._.pick(user, ['id', 'email']),
+          ip_address: clientIp,
+        });
+      }
     });
     Sentry.captureException(err);
   } catch (e) {
