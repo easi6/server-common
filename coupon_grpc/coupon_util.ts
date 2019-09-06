@@ -353,6 +353,7 @@ export const checkImplicitPromotion = async ({
   timezone,
   riderId,
   paymentMethod,
+  issuer,
   pickup,
   dest,
 }: {
@@ -366,6 +367,7 @@ export const checkImplicitPromotion = async ({
   timezone: number;
   riderId: string;
   paymentMethod: string;
+  issuer: string;
   pickup: { latitude: number; longitude: number };
   dest?: { latitude: number; longitude: number };
 }): Promise<any> => {
@@ -381,6 +383,7 @@ export const checkImplicitPromotion = async ({
   request.setTimezone(timezone);
   request.setUserId(riderId);
   request.setPaymentMethod(paymentMethod);
+  request.setIssuer(issuer);
   request.setPickupLatitude(pickup.latitude);
   request.setPickupLongitude(pickup.longitude);
   if (dest && dest.latitude && dest.longitude) {

@@ -6,26 +6,16 @@ option java_package = "global.tada.coupon.protobuf";
 package coupon;
 
 service CouponServer {
-    rpc GetMyCoupons (ListCouponRequest) returns (ListCouponReply) {
-    }
-    rpc GetMyCouponCount (CouponCountRequest) returns (CouponCountReply) {
-    }
-    rpc StartCouponUse (StartCouponUseRequest) returns (CouponEntry) {
-    }
-    rpc FinishCouponUse (FinishCouponUseRequest) returns (CouponEntry) {
-    }
-    rpc CancelCouponUse (CancelCouponUseRequest) returns (CouponEntry) {
-    }
-    rpc GetCouponDetail (CouponDetailRequest) returns (CouponDetailReply) {
-    }
-    rpc GetAvailCoupons (AvailCouponRequest) returns (ListAvailCouponReply) {
-    }
-    rpc CheckCouponAvail (CheckCouponAvailRequest) returns (CheckCouponReply) {
-    }
-    rpc RegisterCouponOrPromotion (IssuePromotionCouponRequest) returns (CouponDetail) {
-    }
-    rpc CheckImplicitPromotion (CheckCouponAvailRequest) returns (CheckCouponReply) {
-    }
+    rpc GetMyCoupons (ListCouponRequest) returns (ListCouponReply);
+    rpc GetMyCouponCount (CouponCountRequest) returns (CouponCountReply);
+    rpc StartCouponUse (StartCouponUseRequest) returns (CouponEntry);
+    rpc FinishCouponUse (FinishCouponUseRequest) returns (CouponEntry);
+    rpc CancelCouponUse (CancelCouponUseRequest) returns (CouponEntry);
+    rpc GetCouponDetail (CouponDetailRequest) returns (CouponDetailReply);
+    rpc GetAvailCoupons (AvailCouponRequest) returns (ListAvailCouponReply);
+    rpc CheckCouponAvail (CheckCouponAvailRequest) returns (CheckCouponReply);
+    rpc RegisterCouponOrPromotion (IssuePromotionCouponRequest) returns (CouponDetail);
+    rpc CheckImplicitPromotion (CheckCouponAvailRequest) returns (CheckCouponReply);
 }
 
 message Timespan {
@@ -199,6 +189,7 @@ message CheckCouponAvailRequest {
     double pickup_longitude = 14;
     double dest_latitude = 15;
     double dest_longitude = 16;
+    string issuer = 17;
 }
 
 message CheckCouponReply {

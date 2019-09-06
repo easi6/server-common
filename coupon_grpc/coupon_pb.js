@@ -5028,7 +5028,8 @@ proto.coupon.CheckCouponAvailRequest.toObject = function(includeInstance, msg) {
     pickupLatitude: +jspb.Message.getFieldWithDefault(msg, 13, 0.0),
     pickupLongitude: +jspb.Message.getFieldWithDefault(msg, 14, 0.0),
     destLatitude: +jspb.Message.getFieldWithDefault(msg, 15, 0.0),
-    destLongitude: +jspb.Message.getFieldWithDefault(msg, 16, 0.0)
+    destLongitude: +jspb.Message.getFieldWithDefault(msg, 16, 0.0),
+    issuer: jspb.Message.getFieldWithDefault(msg, 17, "")
   };
 
   if (includeInstance) {
@@ -5128,6 +5129,10 @@ proto.coupon.CheckCouponAvailRequest.deserializeBinaryFromReader = function(msg,
     case 16:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setDestLongitude(value);
+      break;
+    case 17:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setIssuer(value);
       break;
     default:
       reader.skipField();
@@ -5267,6 +5272,13 @@ proto.coupon.CheckCouponAvailRequest.serializeBinaryToWriter = function(message,
   if (f !== 0.0) {
     writer.writeDouble(
       16,
+      f
+    );
+  }
+  f = message.getIssuer();
+  if (f.length > 0) {
+    writer.writeString(
+      17,
       f
     );
   }
@@ -5512,6 +5524,21 @@ proto.coupon.CheckCouponAvailRequest.prototype.getDestLongitude = function() {
 /** @param {number} value */
 proto.coupon.CheckCouponAvailRequest.prototype.setDestLongitude = function(value) {
   jspb.Message.setProto3FloatField(this, 16, value);
+};
+
+
+/**
+ * optional string issuer = 17;
+ * @return {string}
+ */
+proto.coupon.CheckCouponAvailRequest.prototype.getIssuer = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.CheckCouponAvailRequest.prototype.setIssuer = function(value) {
+  jspb.Message.setProto3StringField(this, 17, value);
 };
 
 
