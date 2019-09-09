@@ -228,6 +228,7 @@ export const checkCouponAvail = async ({
   pickup,
   dest,
   paymentMethod,
+  issuer,
 }: {
   carType: number;
   productType: number;
@@ -243,6 +244,7 @@ export const checkCouponAvail = async ({
   pickup: { latitude: number; longitude: number };
   dest?: { latitude: number; longitude: number };
   paymentMethod?: string;
+  issuer?: string;
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CheckCouponAvailRequest();
@@ -262,6 +264,7 @@ export const checkCouponAvail = async ({
   if (paymentMethod) {
     request.setPaymentMethod(paymentMethod);
   }
+  request.setIssuer(issuer);
   if (dest && dest.latitude && dest.longitude) {
     request.setDestLatitude(dest.latitude);
     request.setDestLongitude(dest.longitude);
