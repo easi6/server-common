@@ -282,6 +282,10 @@ export const checkCouponAvail = async ({
     if (errorCode === 'price_exceeded') {
       const price = _.first(e.metadata.get('price')) || 0;
       throw new Easi6Error('coupon_price_exceeded', price);
+    } else if (errorCode === 'min_amount') {
+      const minAmount = _.first(e.metadata.get('minAmount')) || 0;
+      const couponCurrency = _.first(e.metadata.get('currency')) || 0;
+      throw new Easi6Error('coupon_min_amount', minAmount, couponCurrency);
     }
 
     logger.error('checkCouponAvailFailed', e);
