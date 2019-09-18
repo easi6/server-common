@@ -284,8 +284,11 @@ export const checkCouponAvail = async ({
       throw new Easi6Error('coupon_price_exceeded', price);
     } else if (errorCode === 'min_amount') {
       const minAmount = _.first(e.metadata.get('minAmount')) || 0;
-      const couponCurrency = _.first(e.metadata.get('currency')) || 0;
+      const couponCurrency = _.first(e.metadata.get('currency')) || '';
       throw new Easi6Error('coupon_min_amount', minAmount, couponCurrency);
+    } else if (errorCode === 'invalid_issuer') {
+      const promotionIssuer = _.first(e.metadata.get('issuer')) || '';
+      throw new Easi6Error('coupon_invalid_issuer', promotionIssuer);
     }
 
     logger.error('checkCouponAvailFailed', e);
