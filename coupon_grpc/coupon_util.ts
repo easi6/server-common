@@ -290,8 +290,8 @@ export const checkCouponAvail = async ({
       const promotionIssuer = _.first(e.metadata.get('issuer')) || '';
       throw new Easi6Error('coupon_invalid_issuer', promotionIssuer);
     }
-
     logger.error('checkCouponAvailFailed', e);
+    throw new Easi6Error((errorCode && 'coupon_' + errorCode) || 'coupon_invalid_code');
   }
 };
 
