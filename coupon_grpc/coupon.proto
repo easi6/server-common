@@ -12,6 +12,7 @@ service CouponServer {
     rpc FinishCouponUse (FinishCouponUseRequest) returns (CouponEntry);
     rpc CancelCouponUse (CancelCouponUseRequest) returns (CouponEntry);
     rpc GetCouponDetail (CouponDetailRequest) returns (CouponDetailReply);
+    rpc GetCouponWithReceiptEmailDetail (CouponDetailRequest) returns (CouponWithReceiptEmailReply);
     rpc GetAvailCoupons (AvailCouponRequest) returns (ListAvailCouponReply);
     rpc CheckCouponAvail (CheckCouponAvailRequest) returns (CheckCouponReply);
     rpc RegisterCouponOrPromotion (IssuePromotionCouponRequest) returns (CouponDetail);
@@ -120,6 +121,11 @@ message CouponDetailRequest {
 message CouponDetailReply {
     CouponDetail coupon = 1;
     repeated CouponLogEntry logs = 2;
+}
+
+message CouponWithReceiptEmailReply {
+    CouponDetail coupon = 1;
+    string receipt_email = 2;
 }
 
 message ListAvailCouponReply {

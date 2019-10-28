@@ -306,6 +306,24 @@ export const getCouponDetail = async ({ code }: { code: string }): Promise<any> 
   }
 };
 
+export const getCouponWithReceiptEmailDetail = async ({ code }: { code: string }): Promise<any> => {
+  // @ts-ignore
+  const request = new messages.CouponDetailRequest();
+  request.setCode(code);
+
+  try {
+    // @ts-ignore
+    const response: messages.CouponWithReceiptEmailReply = await Bluebird.fromCallback(cb => client.getCouponWithReceiptEmailDetail(request, cb));
+    return {
+      coupon: convertKey(response.getCoupon().toObject()),
+      receiptEmail: response.getReceiptEmail().toString(),
+    };
+  } catch (e) {
+    logger.error('getCouponWithReceiptEmailDetail', e);
+    return { coupon: null, receiptEmail: null };
+  }
+};
+
 export const cancelCouponUse = async ({ riderId, code }: { riderId: string; code: string }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CancelCouponUseRequest();
