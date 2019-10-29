@@ -12,7 +12,7 @@ service CouponServer {
     rpc FinishCouponUse (FinishCouponUseRequest) returns (CouponEntry);
     rpc CancelCouponUse (CancelCouponUseRequest) returns (CouponEntry);
     rpc GetCouponDetail (CouponDetailRequest) returns (CouponDetailReply);
-    rpc GetCouponWithReceiptEmailDetail (CouponDetailRequest) returns (CouponWithReceiptEmailReply);
+    rpc GetCouponWithPromotionDetail (CouponDetailRequest) returns (CouponWithPromotionReply);
     rpc GetAvailCoupons (AvailCouponRequest) returns (ListAvailCouponReply);
     rpc CheckCouponAvail (CheckCouponAvailRequest) returns (CheckCouponReply);
     rpc RegisterCouponOrPromotion (IssuePromotionCouponRequest) returns (CouponDetail);
@@ -123,9 +123,9 @@ message CouponDetailReply {
     repeated CouponLogEntry logs = 2;
 }
 
-message CouponWithReceiptEmailReply {
+message CouponWithPromotionReply {
     CouponDetail coupon = 1;
-    string receipt_email = 2;
+    PromotionEntry promotion = 2;
 }
 
 message ListAvailCouponReply {
@@ -170,6 +170,7 @@ message PromotionEntry {
     string updated_at = 20;
     repeated string payment_methods = 21;
     double max_amount = 22;
+    string receipt_email = 23;
 }
 
 message IssuePromotionCouponRequest {

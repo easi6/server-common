@@ -114,15 +114,15 @@ function deserialize_coupon_CouponEntry(buffer_arg) {
   return coupon_pb.CouponEntry.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_coupon_CouponWithReceiptEmailReply(arg) {
-  if (!(arg instanceof coupon_pb.CouponWithReceiptEmailReply)) {
-    throw new Error('Expected argument of type coupon.CouponWithReceiptEmailReply');
+function serialize_coupon_CouponWithPromotionReply(arg) {
+  if (!(arg instanceof coupon_pb.CouponWithPromotionReply)) {
+    throw new Error('Expected argument of type coupon.CouponWithPromotionReply');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_coupon_CouponWithReceiptEmailReply(buffer_arg) {
-  return coupon_pb.CouponWithReceiptEmailReply.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_coupon_CouponWithPromotionReply(buffer_arg) {
+  return coupon_pb.CouponWithPromotionReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_coupon_FinishCouponUseRequest(arg) {
@@ -259,16 +259,16 @@ var CouponServerService = exports.CouponServerService = {
     responseSerialize: serialize_coupon_CouponDetailReply,
     responseDeserialize: deserialize_coupon_CouponDetailReply,
   },
-  getCouponWithReceiptEmailDetail: {
-    path: '/coupon.CouponServer/GetCouponWithReceiptEmailDetail',
+  getCouponWithPromotionDetail: {
+    path: '/coupon.CouponServer/GetCouponWithPromotionDetail',
     requestStream: false,
     responseStream: false,
     requestType: coupon_pb.CouponDetailRequest,
-    responseType: coupon_pb.CouponWithReceiptEmailReply,
+    responseType: coupon_pb.CouponWithPromotionReply,
     requestSerialize: serialize_coupon_CouponDetailRequest,
     requestDeserialize: deserialize_coupon_CouponDetailRequest,
-    responseSerialize: serialize_coupon_CouponWithReceiptEmailReply,
-    responseDeserialize: deserialize_coupon_CouponWithReceiptEmailReply,
+    responseSerialize: serialize_coupon_CouponWithPromotionReply,
+    responseDeserialize: deserialize_coupon_CouponWithPromotionReply,
   },
   getAvailCoupons: {
     path: '/coupon.CouponServer/GetAvailCoupons',
