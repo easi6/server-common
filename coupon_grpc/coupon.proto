@@ -45,6 +45,7 @@ message CouponEntry {
     string currency = 10;
     string valid_from = 11;
     double max_amount = 12;
+    int64 promotion_id = 13;
 }
 
 message CouponDetail {

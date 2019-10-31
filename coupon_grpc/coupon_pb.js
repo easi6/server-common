@@ -531,7 +531,8 @@ proto.coupon.CouponEntry.toObject = function(includeInstance, msg) {
     amount: +jspb.Message.getFieldWithDefault(msg, 9, 0.0),
     currency: jspb.Message.getFieldWithDefault(msg, 10, ""),
     validFrom: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    maxAmount: +jspb.Message.getFieldWithDefault(msg, 12, 0.0)
+    maxAmount: +jspb.Message.getFieldWithDefault(msg, 12, 0.0),
+    promotionId: jspb.Message.getFieldWithDefault(msg, 13, 0)
   };
 
   if (includeInstance) {
@@ -615,6 +616,10 @@ proto.coupon.CouponEntry.deserializeBinaryFromReader = function(msg, reader) {
     case 12:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setMaxAmount(value);
+      break;
+    case 13:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setPromotionId(value);
       break;
     default:
       reader.skipField();
@@ -726,6 +731,13 @@ proto.coupon.CouponEntry.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0.0) {
     writer.writeDouble(
       12,
+      f
+    );
+  }
+  f = message.getPromotionId();
+  if (f !== 0) {
+    writer.writeInt64(
+      13,
       f
     );
   }
@@ -911,6 +923,21 @@ proto.coupon.CouponEntry.prototype.getMaxAmount = function() {
 /** @param {number} value */
 proto.coupon.CouponEntry.prototype.setMaxAmount = function(value) {
   jspb.Message.setProto3FloatField(this, 12, value);
+};
+
+
+/**
+ * optional int64 promotion_id = 13;
+ * @return {number}
+ */
+proto.coupon.CouponEntry.prototype.getPromotionId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 13, 0));
+};
+
+
+/** @param {number} value */
+proto.coupon.CouponEntry.prototype.setPromotionId = function(value) {
+  jspb.Message.setProto3IntField(this, 13, value);
 };
 
 
