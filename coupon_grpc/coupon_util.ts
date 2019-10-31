@@ -323,11 +323,11 @@ export const getCouponWithPromotionDetail = async ({ code }: { code: string }): 
     const response: messages.CouponWithPromotionReply = await Bluebird.fromCallback(cb => client.getCouponWithPromotionDetail(request, cb));
     return {
       coupon: convertKey(response.getCoupon().toObject()),
-      promotion: convertKey(response.getPromotion().toObject()),
+      promotion: (response.hasPromotion() ? convertKey(response.getPromotion().toObject()) : null),
     };
   } catch (e) {
-    logger.error('getCouponWithReceiptEmailDetail', e);
-    return { coupon: null, receiptEmail: null };
+    logger.error('getCouponWithPromotionDetail', e);
+    return { coupon: null, promotion: null };
   }
 };
 
