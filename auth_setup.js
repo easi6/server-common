@@ -52,18 +52,18 @@ module.exports = (app, logger) => {
       const refreshToken = (await crypto.randomBytes(16)).toString('hex');
       if (opts.refreshTokenExpire) {
         await redisClient.setexAsync(
-            `${namespace}_${refreshToken}`,
-            opts.refreshTokenExpire,
-            `${entity[idkey]},${
-                multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count
-                }`
+          `${namespace}_${refreshToken}`,
+          opts.refreshTokenExpire,
+          `${entity[idkey]},${
+            multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count
+          }`
         );
       } else {
         await redisClient.setAsync(
-            `${namespace}_${refreshToken}`,
-            `${entity[idkey]},${
-                multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count
-                }`
+          `${namespace}_${refreshToken}`,
+          `${entity[idkey]},${
+            multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count
+          }`
         );
       }
 
@@ -84,8 +84,8 @@ module.exports = (app, logger) => {
       }
       const data = getData(entity);
       uuidGrantAccessToken({ uuid: entity.uuid, appId: client.user.id })
-          .then(({ access_token, refresh_token }) => done(null, access_token, refresh_token, data))
-          .catch(err => done(err));
+        .then(({ access_token, refresh_token }) => done(null, access_token, refresh_token, data))
+        .catch(err => done(err));
     };
   };
 
@@ -176,21 +176,21 @@ module.exports = (app, logger) => {
     return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       if (externalAccountService && refreshToken.length > 32 /* new token format is longer than length of 32 */) {
         return externalAccountService
-            .refreshTokenGrantAccessToken({
-              refreshToken,
-              appId: client.user.id,
-            })
-            .then(({ access_token, refresh_token }) => {
-              return done(null, access_token, refresh_token);
-            })
-            .catch(err => {
-              return done(OAuth2Error(
-                  _.get(err, 'error.error_description', 'auth error'),
-                  _.get(err, 'error.error', 'invalid_token'),
-                  _.get(err, 'options.uri', ''),
-                  _.get(err, 'statusCode', 500)),
-              );
-            });
+          .refreshTokenGrantAccessToken({
+            refreshToken,
+            appId: client.user.id,
+          })
+          .then(({ access_token, refresh_token }) => {
+            return done(null, access_token, refresh_token);
+          })
+          .catch(err => {
+            return done(OAuth2Error(
+                _.get(err, 'error.error_description', 'auth error'),
+                _.get(err, 'error.error', 'invalid_token'),
+                _.get(err, 'options.uri', ''),
+                _.get(err, 'statusCode', 500)),
+            );
+          });
       }
 
       /* legacy logic */
@@ -218,14 +218,14 @@ module.exports = (app, logger) => {
       }
 
       if (
-          _.get(opts, 'multi_auth_count', false)
-              ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) !== auth_count
-              : entity.auth_count !== auth_count
+        _.get(opts, 'multi_auth_count', false)
+          ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) !== auth_count
+          : entity.auth_count !== auth_count
       ) {
         logger.error(
-            `userId: ${id}, refresh: ${refreshToken}, client: ${JSON.stringify(
-                client
-            )}, entity.auth_count: ${JSON.stringify(entity.auth_count)}, auth_count: ${auth_count}`
+          `userId: ${id}, refresh: ${refreshToken}, client: ${JSON.stringify(
+            client
+          )}, entity.auth_count: ${JSON.stringify(entity.auth_count)}, auth_count: ${auth_count}`
         );
         CrashReportUtil.captureException(new Error('error incorrect_auth_count'));
         // const error = new Error('Incorrect auth_count');
@@ -259,30 +259,30 @@ module.exports = (app, logger) => {
 
   function jwtStrategyFactory({ model, idkey, secretOrKey }) {
     return new JwtStrategy(
-        {
-          secretOrKey,
-          jwtFromRequest: ExtractJwt.fromExtractors([
-            ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ExtractJwt.fromUrlQueryParameter('access_token'),
-            ExtractJwt.fromBodyField('access_token'),
-          ]),
-        },
-        async (jwtPayload, done) => {
-          const entity = await model.find({ where: { [idkey]: jwtPayload.sub } });
-          if (!entity) {
-            return done(null, false);
-          }
-
-          if (
-              jwtPayload.app
-                  ? _.get(entity.auth_count, jwtPayload.app, 0) !== jwtPayload.cnt
-                  : entity.auth_count !== jwtPayload.cnt
-          ) {
-            return done(null, false);
-          }
-
-          return done(null, entity, jwtPayload);
+      {
+        secretOrKey,
+        jwtFromRequest: ExtractJwt.fromExtractors([
+          ExtractJwt.fromAuthHeaderAsBearerToken(),
+          ExtractJwt.fromUrlQueryParameter('access_token'),
+          ExtractJwt.fromBodyField('access_token'),
+        ]),
+      },
+      async (jwtPayload, done) => {
+        const entity = await model.find({ where: { [idkey]: jwtPayload.sub } });
+        if (!entity) {
+          return done(null, false);
         }
+
+        if (
+          jwtPayload.app
+            ? _.get(entity.auth_count, jwtPayload.app, 0) !== jwtPayload.cnt
+            : entity.auth_count !== jwtPayload.cnt
+        ) {
+          return done(null, false);
+        }
+
+        return done(null, entity, jwtPayload);
+      }
     );
   }
 
@@ -305,12 +305,12 @@ module.exports = (app, logger) => {
     oauth2Server.exchange(refreshTokenExchanger(opts));
 
     passport.use(
-        name,
-        jwtStrategyFactory({
-          model: opts.model,
-          idkey: opts.idkey,
-          secretOrKey: opts.jwtSecret,
-        })
+      name,
+      jwtStrategyFactory({
+        model: opts.model,
+        idkey: opts.idkey,
+        secretOrKey: opts.jwtSecret,
+      })
     );
     return oauth2Server;
   };
