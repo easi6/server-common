@@ -108,39 +108,38 @@ module.exports = (app, logger) => {
         return done(error);
       }
 
+      if (entity instanceof Admin) {
+
+        const isExistKey = await redisClient.existsAsync(`${model.name}_${username}_auth_fail_count`);
+        if (!isExistKey) {
+          await redisClient.setAsync(`${model.name}_${username}_auth_fail_count`, 0);
+        }
+
+        if (entity.blocked) {
+          const error = new Error('Blocked admin');
+          error.name = 'BlockedCredentialsError';
+          return done(error);
+        }
+      }
+
       try {
         const match = await entity.comparePassword(password);
 
-        let isExistKey = await redisClient.existsAsync(username + '_auth_fail_count');
-        if (!isExistKey) {
-          await redisClient.setAsync(username + '_auth_fail_count', 0)
-        }
-
         if (!match) {
-          let auth_fail_count = await redisClient.getAsync(username + '_auth_fail_count');
+          let auth_fail_count = await redisClient.getAsync(`${model.name}_${username}_auth_fail_count`);
           if (+auth_fail_count === 5) {
             if (entity instanceof Admin) {
               await entity.update({ blocked: true }, { where: { login: username }})
             }
           }
-          await redisClient.setAsync(username + '_auth_fail_count', parseInt(auth_fail_count)+1);
+          await redisClient.incrAsync(`${model.name}_${username}_auth_fail_count`);
           const error = new Error('Incorrect password');
           error.name = 'IncorrectCredentialsError';
           return done(error);
         }
 
-
-        if (entity instanceof Admin) {
-          const admin_block = await Admin.findOne({ where: { login: username}});
-          if (admin_block.blocked) {
-            const error = new Error(username + ' is blocked. Ask the administrator');
-            error.name = 'BlockedCredentialsError';
-            return done(error);
-          }
-
-          // success Login
-          await redisClient.setAsync(username + '_auth_fail_count', 0);
-        }
+        // success Login
+        await redisClient.setAsync(`${model.name}_${username}_auth_fail_count`, 0);
 
       } catch (error) {
         logger.error('compare password error', {
