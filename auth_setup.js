@@ -108,7 +108,10 @@ module.exports = (app, logger) => {
         return done(error);
       }
 
-      if (entity instanceof Admin) {
+      console.log("model.hasOwnProperty_blocked", model.fields.blocked);
+
+      // case Driver Admin
+      if (model.fields.blocked) {
         if (entity.blocked) {
           const error = new Error('Blocked admin');
           error.name = 'BlockedCredentialsError';
@@ -120,7 +123,8 @@ module.exports = (app, logger) => {
         const match = await entity.comparePassword(password);
 
         if (!match) {
-          if (entity instanceof Admin) {
+          // case Driver Admin
+          if (model.fields.blocked) {
             const isExistKey = await redisClient.existsAsync(`${model.name}_${username}_auth_fail_count`);
 
             (isExistKey)? await redisClient.incrAsync(`${model.name}_${username}_auth_fail_count`)
@@ -137,8 +141,9 @@ module.exports = (app, logger) => {
           return done(error);
         }
 
+        // case Driver Admin
         // Success Login, Remove Key
-        if (entity instanceof Admin) {
+        if (model.fields.blocked) {
           await redisClient.delAsync(`${model.name}_${username}_auth_fail_count`);
         }
 
