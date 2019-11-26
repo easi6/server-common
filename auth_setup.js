@@ -9,7 +9,6 @@ import crypto from 'crypto';
 import _ from 'lodash';
 import CrashReportUtil from 'lib/common/sentry_util';
 import OAuth2Error from 'oauth2orize/lib/errors/oauth2error';
-import Admin from 'app/models/admins';
 
 Promise.promisifyAll(redis.RedisClient.prototype);
 const redisClient = redis.createClient(process.env.REDIS_URL || { ...config.redis, password: config.redis.pass });
