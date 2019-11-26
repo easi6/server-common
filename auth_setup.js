@@ -108,8 +108,6 @@ module.exports = (app, logger) => {
         return done(error);
       }
 
-      console.log("model.hasOwnProperty_blocked", model.fields.blocked);
-
       // case Driver Admin
       if (model.fields.blocked) {
         if (entity.blocked) {
