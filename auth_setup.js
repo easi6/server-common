@@ -109,12 +109,6 @@ module.exports = (app, logger) => {
       }
 
       if (entity instanceof Admin) {
-
-        const isExistKey = await redisClient.existsAsync(`${model.name}_${username}_auth_fail_count`);
-        if (!isExistKey) {
-          await redisClient.setAsync(`${model.name}_${username}_auth_fail_count`, 0);
-        }
-
         if (entity.blocked) {
           const error = new Error('Blocked admin');
           error.name = 'BlockedCredentialsError';
@@ -126,20 +120,27 @@ module.exports = (app, logger) => {
         const match = await entity.comparePassword(password);
 
         if (!match) {
-          let auth_fail_count = await redisClient.getAsync(`${model.name}_${username}_auth_fail_count`);
-          if (+auth_fail_count === 5) {
-            if (entity instanceof Admin) {
+          if (entity instanceof Admin) {
+            const isExistKey = await redisClient.existsAsync(`${model.name}_${username}_auth_fail_count`);
+
+            (isExistKey)? await redisClient.incrAsync(`${model.name}_${username}_auth_fail_count`)
+                : await redisClient.setAsync(`${model.name}_${username}_auth_fail_count`, 1);
+
+            let auth_fail_count = await redisClient.getAsync(`${model.name}_${username}_auth_fail_count`);
+            if (+auth_fail_count === 5) {
               await entity.update({ blocked: true }, { where: { login: username }})
             }
           }
-          await redisClient.incrAsync(`${model.name}_${username}_auth_fail_count`);
+
           const error = new Error('Incorrect password');
           error.name = 'IncorrectCredentialsError';
           return done(error);
         }
 
-        // success Login
-        await redisClient.setAsync(`${model.name}_${username}_auth_fail_count`, 0);
+        // Success Login, Remove Key
+        if (entity instanceof Admin) {
+          await redisClient.delAsync(`${model.name}_${username}_auth_fail_count`);
+        }
 
       } catch (error) {
         logger.error('compare password error', {
