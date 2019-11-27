@@ -108,7 +108,7 @@ module.exports = (app, logger) => {
       }
 
       // case Driver Admin
-      if (model.fields.blocked) {
+      if (!_.isNil(model.fields.blocked)) {
         if (entity.blocked) {
           const error = new Error('Blocked admin');
           error.name = 'BlockedCredentialsError';
@@ -121,7 +121,7 @@ module.exports = (app, logger) => {
 
         if (!match) {
           // case Driver Admin
-          if (model.fields.blocked) {
+          if (!_.isNil(model.fields.blocked)) {
             const isExistKey = await redisClient.existsAsync(`${model.name}_${username}_auth_fail_count`);
 
             (isExistKey)? await redisClient.incrAsync(`${model.name}_${username}_auth_fail_count`)
@@ -140,7 +140,7 @@ module.exports = (app, logger) => {
 
         // case Driver Admin
         // Success Login, Remove Key
-        if (model.fields.blocked) {
+        if (!_.isNil(model.fields.blocked)) {
           await redisClient.delAsync(`${model.name}_${username}_auth_fail_count`);
         }
 
