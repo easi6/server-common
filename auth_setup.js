@@ -107,13 +107,43 @@ module.exports = (app, logger) => {
         return done(error);
       }
 
+      // case Driver Admin
+      if (!_.isNil(model.fields.blocked)) {
+        if (entity.blocked) {
+          const error = new Error('Blocked admin');
+          error.name = 'BlockedCredentialsError';
+          return done(error);
+        }
+      }
+
       try {
         const match = await entity.comparePassword(password);
+
         if (!match) {
+          // case Driver Admin
+          if (!_.isNil(model.fields.blocked)) {
+            const isExistKey = await redisClient.existsAsync(`${model.name}_${username}_auth_fail_count`);
+
+            (isExistKey)? await redisClient.incrAsync(`${model.name}_${username}_auth_fail_count`)
+                : await redisClient.setAsync(`${model.name}_${username}_auth_fail_count`, 1);
+
+            let auth_fail_count = await redisClient.getAsync(`${model.name}_${username}_auth_fail_count`);
+            if (+auth_fail_count === 5) {
+              await entity.update({ blocked: true }, { where: { login: username }})
+            }
+          }
+
           const error = new Error('Incorrect password');
           error.name = 'IncorrectCredentialsError';
           return done(error);
         }
+
+        // case Driver Admin
+        // Success Login, Remove Key
+        if (!_.isNil(model.fields.blocked)) {
+          await redisClient.delAsync(`${model.name}_${username}_auth_fail_count`);
+        }
+
       } catch (error) {
         logger.error('compare password error', {
           message: error.message,
