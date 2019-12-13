@@ -532,7 +532,8 @@ proto.coupon.CouponEntry.toObject = function(includeInstance, msg) {
     currency: jspb.Message.getFieldWithDefault(msg, 10, ""),
     validFrom: jspb.Message.getFieldWithDefault(msg, 11, ""),
     maxAmount: +jspb.Message.getFieldWithDefault(msg, 12, 0.0),
-    promotionId: jspb.Message.getFieldWithDefault(msg, 13, 0)
+    promotionId: jspb.Message.getFieldWithDefault(msg, 13, 0),
+    expired: jspb.Message.getFieldWithDefault(msg, 14, false)
   };
 
   if (includeInstance) {
@@ -620,6 +621,10 @@ proto.coupon.CouponEntry.deserializeBinaryFromReader = function(msg, reader) {
     case 13:
       var value = /** @type {number} */ (reader.readInt64());
       msg.setPromotionId(value);
+      break;
+    case 14:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setExpired(value);
       break;
     default:
       reader.skipField();
@@ -738,6 +743,13 @@ proto.coupon.CouponEntry.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0) {
     writer.writeInt64(
       13,
+      f
+    );
+  }
+  f = message.getExpired();
+  if (f) {
+    writer.writeBool(
+      14,
       f
     );
   }
@@ -938,6 +950,23 @@ proto.coupon.CouponEntry.prototype.getPromotionId = function() {
 /** @param {number} value */
 proto.coupon.CouponEntry.prototype.setPromotionId = function(value) {
   jspb.Message.setProto3IntField(this, 13, value);
+};
+
+
+/**
+ * optional bool expired = 14;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.coupon.CouponEntry.prototype.getExpired = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 14, false));
+};
+
+
+/** @param {boolean} value */
+proto.coupon.CouponEntry.prototype.setExpired = function(value) {
+  jspb.Message.setProto3BooleanField(this, 14, value);
 };
 
 

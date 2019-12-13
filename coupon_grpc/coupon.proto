@@ -46,6 +46,7 @@ message CouponEntry {
     string valid_from = 11;
     double max_amount = 12;
     int64 promotion_id = 13;
+    bool expired = 14;
 }
 
 message CouponDetail {
