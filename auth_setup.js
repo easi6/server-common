@@ -177,7 +177,7 @@ module.exports = (app, logger) => {
   function refreshTokenExchanger({ model, idkey, getData, jwtSecret, externalAccountService, opts }) {
     return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       if (externalAccountService && refreshToken.length > 32 /* new token format is longer than length of 32 */) {
-        return Promise.try(
+        return Promise.try(() =>
           externalAccountService
           .refreshTokenGrantAccessToken({
             refreshToken,
@@ -186,12 +186,13 @@ module.exports = (app, logger) => {
         ).then(({ access_token, refresh_token }) => {
             return done(null, access_token, refresh_token);
         }).catch(err => {
-          return done(OAuth2Error(
-            _.get(err, 'error.error_description', 'auth error'),
-            _.get(err, 'error.error', 'invalid_token'),
-            _.get(err, 'options.uri', ''),
-            _.get(err, 'statusCode', 500)),
-          );
+          const oAuth2Error = new OAuth2Error(
+              _.get(err, 'error.error_description', 'auth error'),
+              _.get(err, 'error.error', 'invalid_token'),
+              _.get(err, 'options.uri', ''),
+              _.get(err, 'statusCode', _.get(err, 'http_status', 500)));
+
+          return done(oAuth2Error);
         });
       }
 
