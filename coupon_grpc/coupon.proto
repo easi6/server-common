@@ -39,14 +39,16 @@ message CouponEntry {
     uint32 status = 4;
     string image_url = 5;
     bool avail = 6;
-    string valid_until = 7;
-    uint32 discount_type = 8;
-    double amount = 9;
-    string currency = 10;
-    string valid_from = 11;
-    double max_amount = 12;
-    int64 promotion_id = 13;
-    bool expired = 14;
+    uint32 discount_type = 7;
+    double amount = 8;
+    string currency = 9;
+    string valid_from = 10;
+    string valid_until = 11;
+    string valid_from_local = 12;
+    string valid_until_local = 13;
+    double max_amount = 14;
+    int64 promotion_id = 15;
+    bool expired = 16;
 }
 
 message CouponDetail {
@@ -59,7 +61,7 @@ message CouponDetail {
     uint32 discount_type = 7;
     double amount = 8;
     string currency = 9;
-    repeated string regions = 10;
+    string region = 10;
     repeated string cities = 11;
     repeated uint32 car_types = 12;
     repeated uint32 product_types = 13;
@@ -170,7 +172,7 @@ message PromotionEntry {
     uint32 count_limit = 6;
     uint32 total_count = 7;
     string title = 9;
-    repeated string regions = 11;
+    string region = 11;
     repeated string cities = 12;
     repeated uint32 car_types = 13;
     repeated uint32 product_types = 14;
