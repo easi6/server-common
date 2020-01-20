@@ -44,8 +44,8 @@ message CouponEntry {
     string currency = 9;
     string valid_from = 10;
     string valid_until = 11;
-    string valid_from_local = 12;
-    string valid_until_local = 13;
+    string valid_from_local = 12; // iso 8601
+    string valid_until_local = 13; // iso 8601
     double max_amount = 14;
     int64 promotion_id = 15;
     bool expired = 16;
@@ -67,7 +67,7 @@ message CouponDetail {
     repeated uint32 product_types = 13;
     repeated Timespan times = 14;
     bool hired_only = 15;
-    string valid_until = 16; // iso 8601
+    string valid_until = 16;
     string user_id = 17;
     string created_at = 18; // iso 8601
     string updated_at = 19; // iso 8601
