@@ -39,16 +39,16 @@ message CouponEntry {
     uint32 status = 4;
     string image_url = 5;
     bool avail = 6;
-    uint32 discount_type = 7;
-    double amount = 8;
-    string currency = 9;
-    string valid_from = 10;
-    string valid_until = 11;
-    string valid_from_local = 12; // iso 8601
-    string valid_until_local = 13; // iso 8601
-    double max_amount = 14;
-    int64 promotion_id = 15;
-    bool expired = 16;
+    string valid_until = 7;
+    uint32 discount_type = 8;
+    double amount = 9;
+    string currency = 10;
+    string valid_from = 11;
+    double max_amount = 12;
+    int64 promotion_id = 13;
+    bool expired = 14;
+    string valid_from_local = 15; // iso 8601
+    string valid_until_local = 16; // iso 8601
 }
 
 message CouponDetail {
