@@ -283,7 +283,7 @@ export const getCouponDetail = async ({code}: { code: string }): Promise<any> =>
   try {
     // @ts-ignore
     const response: messages.CouponDetailReply = await Bluebird.fromCallback(cb => client.getCouponDetail(request, cb));
-    return {coupon: convertKey(response.getCoupon().toObject()),  logs: response.getLogsList().map((log: any) => log.toObject())};
+    return convertKey(response.getCoupon().toObject());
   } catch (e) {
     logger.error('getCouponDetailFailed', e);
     return {coupon: null, logs: []};
