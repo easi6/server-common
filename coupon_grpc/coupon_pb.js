@@ -1783,13 +1783,14 @@ proto.coupon.CouponLogEntry.prototype.toObject = function(opt_includeInstance) {
  */
 proto.coupon.CouponLogEntry.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     originalPrice: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
     discountedPrice: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
-    rentalNumber: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    rideNumber: jspb.Message.getFieldWithDefault(msg, 4, ""),
     couponId: jspb.Message.getFieldWithDefault(msg, 5, 0),
     createdAt: jspb.Message.getFieldWithDefault(msg, 6, ""),
-    updatedAt: jspb.Message.getFieldWithDefault(msg, 7, "")
+    action: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    errorLog: jspb.Message.getFieldWithDefault(msg, 9, "")
   };
 
   if (includeInstance) {
@@ -1827,7 +1828,7 @@ proto.coupon.CouponLogEntry.deserializeBinaryFromReader = function(msg, reader) 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readUint64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
@@ -1840,7 +1841,7 @@ proto.coupon.CouponLogEntry.deserializeBinaryFromReader = function(msg, reader) 
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setRentalNumber(value);
+      msg.setRideNumber(value);
       break;
     case 5:
       var value = /** @type {number} */ (reader.readUint64());
@@ -1850,9 +1851,13 @@ proto.coupon.CouponLogEntry.deserializeBinaryFromReader = function(msg, reader) 
       var value = /** @type {string} */ (reader.readString());
       msg.setCreatedAt(value);
       break;
-    case 7:
+    case 8:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUpdatedAt(value);
+      msg.setAction(value);
+      break;
+    case 9:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setErrorLog(value);
       break;
     default:
       reader.skipField();
@@ -1884,8 +1889,8 @@ proto.coupon.CouponLogEntry.prototype.serializeBinary = function() {
 proto.coupon.CouponLogEntry.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
-  if (f !== 0) {
-    writer.writeUint64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1904,7 +1909,7 @@ proto.coupon.CouponLogEntry.serializeBinaryToWriter = function(message, writer) 
       f
     );
   }
-  f = message.getRentalNumber();
+  f = message.getRideNumber();
   if (f.length > 0) {
     writer.writeString(
       4,
@@ -1925,10 +1930,17 @@ proto.coupon.CouponLogEntry.serializeBinaryToWriter = function(message, writer) 
       f
     );
   }
-  f = message.getUpdatedAt();
+  f = message.getAction();
   if (f.length > 0) {
     writer.writeString(
-      7,
+      8,
+      f
+    );
+  }
+  f = message.getErrorLog();
+  if (f.length > 0) {
+    writer.writeString(
+      9,
       f
     );
   }
@@ -1936,17 +1948,17 @@ proto.coupon.CouponLogEntry.serializeBinaryToWriter = function(message, writer) 
 
 
 /**
- * optional uint64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.coupon.CouponLogEntry.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.coupon.CouponLogEntry.prototype.setId = function(value) {
-  jspb.Message.setProto3IntField(this, 1, value);
+  jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
@@ -1981,16 +1993,16 @@ proto.coupon.CouponLogEntry.prototype.setDiscountedPrice = function(value) {
 
 
 /**
- * optional string rental_number = 4;
+ * optional string ride_number = 4;
  * @return {string}
  */
-proto.coupon.CouponLogEntry.prototype.getRentalNumber = function() {
+proto.coupon.CouponLogEntry.prototype.getRideNumber = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.coupon.CouponLogEntry.prototype.setRentalNumber = function(value) {
+proto.coupon.CouponLogEntry.prototype.setRideNumber = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
@@ -2026,17 +2038,32 @@ proto.coupon.CouponLogEntry.prototype.setCreatedAt = function(value) {
 
 
 /**
- * optional string updated_at = 7;
+ * optional string action = 8;
  * @return {string}
  */
-proto.coupon.CouponLogEntry.prototype.getUpdatedAt = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+proto.coupon.CouponLogEntry.prototype.getAction = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
 };
 
 
 /** @param {string} value */
-proto.coupon.CouponLogEntry.prototype.setUpdatedAt = function(value) {
-  jspb.Message.setProto3StringField(this, 7, value);
+proto.coupon.CouponLogEntry.prototype.setAction = function(value) {
+  jspb.Message.setProto3StringField(this, 8, value);
+};
+
+
+/**
+ * optional string error_log = 9;
+ * @return {string}
+ */
+proto.coupon.CouponLogEntry.prototype.getErrorLog = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.CouponLogEntry.prototype.setErrorLog = function(value) {
+  jspb.Message.setProto3StringField(this, 9, value);
 };
 
 
