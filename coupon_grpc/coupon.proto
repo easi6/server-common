@@ -103,6 +103,9 @@ message Pagination {
 message StartCouponUseRequest {
     string user_id = 1;
     string code = 2;
+    double original_price = 3;
+    double discounted_price = 4;
+    string rental_number = 5;
 }
 
 message FinishCouponUseRequest {

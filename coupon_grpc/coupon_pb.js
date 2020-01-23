@@ -2619,7 +2619,10 @@ proto.coupon.StartCouponUseRequest.prototype.toObject = function(opt_includeInst
 proto.coupon.StartCouponUseRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     userId: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    code: jspb.Message.getFieldWithDefault(msg, 2, "")
+    code: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    originalPrice: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
+    discountedPrice: +jspb.Message.getFieldWithDefault(msg, 4, 0.0),
+    rentalNumber: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -2664,6 +2667,18 @@ proto.coupon.StartCouponUseRequest.deserializeBinaryFromReader = function(msg, r
       var value = /** @type {string} */ (reader.readString());
       msg.setCode(value);
       break;
+    case 3:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setOriginalPrice(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readDouble());
+      msg.setDiscountedPrice(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setRentalNumber(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -2707,6 +2722,27 @@ proto.coupon.StartCouponUseRequest.serializeBinaryToWriter = function(message, w
       f
     );
   }
+  f = message.getOriginalPrice();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      3,
+      f
+    );
+  }
+  f = message.getDiscountedPrice();
+  if (f !== 0.0) {
+    writer.writeDouble(
+      4,
+      f
+    );
+  }
+  f = message.getRentalNumber();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
 };
 
 
@@ -2737,6 +2773,51 @@ proto.coupon.StartCouponUseRequest.prototype.getCode = function() {
 /** @param {string} value */
 proto.coupon.StartCouponUseRequest.prototype.setCode = function(value) {
   jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional double original_price = 3;
+ * @return {number}
+ */
+proto.coupon.StartCouponUseRequest.prototype.getOriginalPrice = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 3, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.StartCouponUseRequest.prototype.setOriginalPrice = function(value) {
+  jspb.Message.setProto3FloatField(this, 3, value);
+};
+
+
+/**
+ * optional double discounted_price = 4;
+ * @return {number}
+ */
+proto.coupon.StartCouponUseRequest.prototype.getDiscountedPrice = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 4, 0.0));
+};
+
+
+/** @param {number} value */
+proto.coupon.StartCouponUseRequest.prototype.setDiscountedPrice = function(value) {
+  jspb.Message.setProto3FloatField(this, 4, value);
+};
+
+
+/**
+ * optional string rental_number = 5;
+ * @return {string}
+ */
+proto.coupon.StartCouponUseRequest.prototype.getRentalNumber = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.StartCouponUseRequest.prototype.setRentalNumber = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
 };
 
 
