@@ -107,13 +107,43 @@ module.exports = (app, logger) => {
         return done(error);
       }
 
+      // case Driver Admin
+      if (!_.isNil(model.fields.blocked)) {
+        if (entity.blocked) {
+          const error = new Error('Blocked admin');
+          error.name = 'BlockedCredentialsError';
+          return done(error);
+        }
+      }
+
       try {
         const match = await entity.comparePassword(password);
+
         if (!match) {
+          // case Driver Admin
+          if (!_.isNil(model.fields.blocked)) {
+            const isExistKey = await redisClient.existsAsync(`${model.name}_${username}_auth_fail_count`);
+
+            (isExistKey)? await redisClient.incrAsync(`${model.name}_${username}_auth_fail_count`)
+                : await redisClient.setAsync(`${model.name}_${username}_auth_fail_count`, 1);
+
+            let auth_fail_count = await redisClient.getAsync(`${model.name}_${username}_auth_fail_count`);
+            if (+auth_fail_count === 5) {
+              await entity.update({ blocked: true }, { where: { login: username }})
+            }
+          }
+
           const error = new Error('Incorrect password');
           error.name = 'IncorrectCredentialsError';
           return done(error);
         }
+
+        // case Driver Admin
+        // Success Login, Remove Key
+        if (!_.isNil(model.fields.blocked)) {
+          await redisClient.delAsync(`${model.name}_${username}_auth_fail_count`);
+        }
+
       } catch (error) {
         logger.error('compare password error', {
           message: error.message,
@@ -147,22 +177,23 @@ module.exports = (app, logger) => {
   function refreshTokenExchanger({ model, idkey, getData, jwtSecret, externalAccountService, opts }) {
     return oauth2orize.exchange.refreshToken(async (client, refreshToken, done) => {
       if (externalAccountService && refreshToken.length > 32 /* new token format is longer than length of 32 */) {
-        return externalAccountService
+        return Promise.try(() =>
+          externalAccountService
           .refreshTokenGrantAccessToken({
             refreshToken,
             appId: client.user.id,
           })
-          .then(({ access_token, refresh_token }) => {
+        ).then(({ access_token, refresh_token }) => {
             return done(null, access_token, refresh_token);
-          })
-          .catch(err => {
-            return done(OAuth2Error(
+        }).catch(err => {
+          const oAuth2Error = new OAuth2Error(
               _.get(err, 'error.error_description', 'auth error'),
               _.get(err, 'error.error', 'invalid_token'),
               _.get(err, 'options.uri', ''),
-              _.get(err, 'statusCode', 500)),
-            );
-          });
+              _.get(err, 'statusCode', _.get(err, 'http_status', 500)));
+
+          return done(oAuth2Error);
+        });
       }
 
       /* legacy logic */

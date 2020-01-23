@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node';
+import * as Integrations from '@sentry/integrations';
 import _ from 'lodash';
 import util, { inspect } from 'util';
 // @ts-ignore
@@ -12,18 +13,21 @@ export const initialize = (opts = {}) => {
     debug: !isProd,
     enabled: isProd,
     release: commitHash,
+    integrations: [new Integrations.ExtraErrorData()],
   });
   Sentry.init(initOpts);
 };
 
-export const captureException = (err: any, locale: string, clientIp?: string, user?: { id: number; email: string }) => {
+export const captureException = (err: any, locale: string, clientIp?: string, user?: any) => {
   try {
     Sentry.configureScope((scope: any) => {
       scope.setTag('locale', locale);
-      scope.setUser({
-        ..._.pick(user, ['id', 'email']),
-        ip_address: clientIp,
-      });
+      if (user || clientIp) {
+        scope.setUser({
+          ..._.pick(user, ['id', 'email']),
+          ip_address: clientIp,
+        });
+      }
     });
     Sentry.captureException(err);
   } catch (e) {
@@ -31,6 +35,7 @@ export const captureException = (err: any, locale: string, clientIp?: string, us
   }
 };
 
+// @ts-ignore
 export const BreadcrumbTransport = (winston.transports.BreadcrumbTransport = function(options: any) {
   //
   // Name this logger

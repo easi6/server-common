@@ -4,6 +4,7 @@ import request from 'request-promise';
 import URL from 'url';
 import uuidv4 from 'uuid/v4';
 import jwt from 'jsonwebtoken';
+import {Easi6Error} from "../err";
 
 const accountSvcHttpConfig = _.pick(
   config.has('account_service')
@@ -26,7 +27,7 @@ export const accountSvcRequest = request.defaults({
   json: true,
 });
 
-export const getAuthorization = (authHeader: string | string[]) => {
+export const getAuthorization = (authHeader: string) => {
   // repsonse example
   /*
   {
@@ -48,6 +49,16 @@ export const getAuthorization = (authHeader: string | string[]) => {
     "name": "bb3058dc-c543-4e7c-b0eb-fe9b7a5164b7"
   }
  */
+
+  // check token expiration
+  if (authHeader.startsWith("Basic ")) {
+    const t = authHeader.split(" ")[1];
+    const tokenDecoded = jwt.decode(t);
+    if (Date.now() / 1000 > _.get(tokenDecoded, 'exp', 0)) {
+      throw new Easi6Error('token_expired')
+    }
+  }
+
   return accountSvcRequest({
     headers: { authorization: authHeader },
     uri: '/v1/accounts/me/authorize',
@@ -77,7 +88,7 @@ export const signup = (signupDto: {
   authority?: string;
 
   // facebook account kit access token
-  akfAccessToken: string;
+  akfAccessToken?: string;
 
   // facebook or google auth use case these fields
   provider?: string;
@@ -178,6 +189,10 @@ export const refreshTokenGrantAccessToken = ({ refreshToken, appId }: { refreshT
 
   const tokenDecoded = jwt.decode(refreshToken);
   const clientId = _.get(tokenDecoded, 'client_id', basicUser);
+  const exp = _.get(tokenDecoded, 'exp', 0);
+  if (Date.now() / 1000 > exp) {
+    throw new Easi6Error('token_expired')
+  }
 
   if (clientId !== basicUser) {
     basicUser = clientId;

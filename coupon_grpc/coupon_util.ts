@@ -2,21 +2,27 @@ import Bluebird from 'bluebird';
 import config from 'config';
 import grpc from 'grpc';
 import _ from 'lodash';
-import moment, {Moment} from 'moment';
+import moment, { Moment } from 'moment';
 import logger from '../../../config/logger';
-import {Easi6Error} from '../../err';
+import { Easi6Error } from '../../err';
 import * as services from './coupon_grpc_pb';
 import * as messages from './coupon_pb';
 
 const couponServiceConfig: any = config.has('coupon_service') ? config.get('coupon_service') : {};
-const {serviceHost = 'localhost:6565'} = couponServiceConfig;
+const { serviceHost = 'localhost:6565' } = couponServiceConfig;
 
 const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
+
+export const COUPON_STATUS = {
+  READY: 0,
+  USING: 1,
+  USED: 2,
+};
 
 function convertKey(obj: any) {
   const keys = _.keys(obj);
   const res: any = {};
-  _.forEach(keys, (key) => {
+  _.forEach(keys, key => {
     const matches = key.match(/(.*)List/) || key.match(/(.*)list/);
     if (matches) {
       res[matches[1]] = obj[key];
@@ -57,8 +63,8 @@ export const getAvailCoupons = async ({
   datetime: Date;
   timezone: number;
   riderId: string;
-  pickup: {latitude: number, longitude: number};
-  dest?: {latitude: number, longitude: number};
+  pickup: { latitude: number; longitude: number };
+  dest?: { latitude: number; longitude: number };
   paymentMethod?: string;
 }): Promise<any> => {
   // stuffing request
@@ -96,8 +102,6 @@ export const getAvailCoupons = async ({
   }
 };
 
-
-
 export const registerCouponOrPromotion = async ({
   code, // promotion code
   riderId,
@@ -118,14 +122,13 @@ export const registerCouponOrPromotion = async ({
     // @ts-ignore
     return convertKey(response.toObject());
   } catch (e) {
-    logger.error('registerCouponOrPromotionFailed', e);
-    if (e.message.includes('issue count exceeded')) {
-      throw new Easi6Error('coupon_issue_count_exceeded');
-    } else if (e.message.includes('total count exceeded')) {
-      throw new Easi6Error('coupon_total_count_exceeded');
-    } else {
-      throw new Easi6Error('not_found', 'coupon');
+    // backward compat.
+    if (e.code === grpc.status.NOT_FOUND) {
+      throw new Easi6Error('coupon_not_found');
     }
+    // extract error code
+    const errorCode = _.first((e.metadata && e.metadata.get('code')) || []);
+    throw new Easi6Error((errorCode && 'coupon_' + errorCode) || 'coupon_invalid_code');
   }
 };
 
@@ -165,7 +168,7 @@ export const getMyCoupons = async ({
   }
 };
 
-export const startCouponUse = async ({riderId, code}: { riderId: string; code: string }): Promise<any> => {
+export const startCouponUse = async ({ riderId, code }: { riderId: string; code: string }): Promise<any> => {
   // @ts-ignore
   const request = new messages.StartCouponUseRequest();
   request.setUserId(riderId);
@@ -225,6 +228,7 @@ export const checkCouponAvail = async ({
   pickup,
   dest,
   paymentMethod,
+  issuer,
 }: {
   carType: number;
   productType: number;
@@ -237,9 +241,10 @@ export const checkCouponAvail = async ({
   riderId: string;
   code: string;
   skipCheck: boolean;
-  pickup: {latitude: number, longitude: number};
-  dest?: {latitude: number, longitude: number};
+  pickup: { latitude: number; longitude: number };
+  dest?: { latitude: number; longitude: number };
   paymentMethod?: string;
+  issuer?: string;
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CheckCouponAvailRequest();
@@ -259,6 +264,7 @@ export const checkCouponAvail = async ({
   if (paymentMethod) {
     request.setPaymentMethod(paymentMethod);
   }
+  request.setIssuer(issuer);
   if (dest && dest.latitude && dest.longitude) {
     request.setDestLatitude(dest.latitude);
     request.setDestLongitude(dest.longitude);
@@ -271,11 +277,25 @@ export const checkCouponAvail = async ({
     logger.verbose('checkCouponAvail response', res);
     return res;
   } catch (e) {
+    // extract error code
+    const errorCode = _.first(e.metadata && e.metadata.get("code") || []);
+    if (errorCode === 'price_exceeded') {
+      const price = _.first(e.metadata.get('price')) || 0;
+      throw new Easi6Error('coupon_price_exceeded', price);
+    } else if (errorCode === 'min_amount') {
+      const minAmount = _.first(e.metadata.get('minAmount')) || 0;
+      const couponCurrency = _.first(e.metadata.get('currency')) || '';
+      throw new Easi6Error('coupon_min_amount', minAmount, couponCurrency);
+    } else if (errorCode === 'invalid_issuer') {
+      const promotionIssuer = _.first(e.metadata.get('issuer')) || '';
+      throw new Easi6Error('coupon_invalid_issuer', promotionIssuer);
+    }
     logger.error('checkCouponAvailFailed', e);
+    throw new Easi6Error((errorCode && 'coupon_' + errorCode) || 'coupon_invalid_code');
   }
 };
 
-export const getCouponDetail = async ({code}: { code: string }): Promise<any> => {
+export const getCouponDetail = async ({ code }: { code: string }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CouponDetailRequest();
   request.setCode(code);
@@ -286,11 +306,29 @@ export const getCouponDetail = async ({code}: { code: string }): Promise<any> =>
     return convertKey(response.getCoupon().toObject());
   } catch (e) {
     logger.error('getCouponDetailFailed', e);
-    return {coupon: null, logs: []};
+    return { coupon: null, logs: [] };
   }
 };
 
-export const cancelCouponUse = async ({riderId, code}: { riderId: string; code: string }): Promise<any> => {
+export const getCouponWithPromotionDetail = async ({ code }: { code: string }): Promise<any> => {
+  // @ts-ignore
+  const request = new messages.CouponDetailRequest();
+  request.setCode(code);
+
+  try {
+    // @ts-ignore
+    const response: messages.CouponWithPromotionReply = await Bluebird.fromCallback(cb => client.getCouponWithPromotionDetail(request, cb));
+    return {
+      coupon: convertKey(response.getCoupon().toObject()),
+      promotion: (response.hasPromotion() ? convertKey(response.getPromotion().toObject()) : null),
+    };
+  } catch (e) {
+    logger.error('getCouponWithPromotionDetail', e);
+    return { coupon: null, promotion: null };
+  }
+};
+
+export const cancelCouponUse = async ({ riderId, code }: { riderId: string; code: string }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CancelCouponUseRequest();
   request.setUserId(riderId);
@@ -340,23 +378,24 @@ export const checkImplicitPromotion = async ({
   timezone,
   riderId,
   paymentMethod,
+  issuer,
   pickup,
   dest,
 }: {
-  carType: number,
-  productType: number,
-  region: string,
-  city: string,
-  fare: number,
-  currency: string,
-  datetime: Date | Moment,
-  timezone: number,
-  riderId: string,
-  paymentMethod: string,
-  pickup: {latitude: number, longitude: number},
-  dest?: {latitude: number, longitude: number},
+  carType: number;
+  productType: number;
+  region: string;
+  city: string;
+  fare: number;
+  currency: string;
+  datetime: Date | Moment;
+  timezone: number;
+  riderId: string;
+  paymentMethod: string;
+  issuer: string;
+  pickup: { latitude: number; longitude: number };
+  dest?: { latitude: number; longitude: number };
 }): Promise<any> => {
-
   // @ts-ignore
   const request = new messages.CheckCouponAvailRequest();
   request.setCarType(carType);
@@ -369,6 +408,7 @@ export const checkImplicitPromotion = async ({
   request.setTimezone(timezone);
   request.setUserId(riderId);
   request.setPaymentMethod(paymentMethod);
+  request.setIssuer(issuer);
   request.setPickupLatitude(pickup.latitude);
   request.setPickupLongitude(pickup.longitude);
   if (dest && dest.latitude && dest.longitude) {
@@ -378,7 +418,9 @@ export const checkImplicitPromotion = async ({
 
   try {
     // @ts-ignore
-    const response: messages.CheckCouponReply = await Bluebird.fromCallback(cb => client.checkImplicitPromotion(request, cb));
+    const response: messages.CheckCouponReply = await Bluebird.fromCallback(cb =>
+      client.checkImplicitPromotion(request, cb)
+    );
     return response.toObject();
   } catch (e) {
     logger.error('checkImplicitPromotion', e);
@@ -386,7 +428,7 @@ export const checkImplicitPromotion = async ({
       applicable: false,
       originalPrice: 0,
       discountedPrice: 0,
-      title: null
+      title: null,
     };
   }
 };
