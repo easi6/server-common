@@ -22,6 +22,7 @@ goog.exportSymbol('proto.coupon.CouponDetailReply', null, global);
 goog.exportSymbol('proto.coupon.CouponDetailRequest', null, global);
 goog.exportSymbol('proto.coupon.CouponEntry', null, global);
 goog.exportSymbol('proto.coupon.CouponLogEntry', null, global);
+goog.exportSymbol('proto.coupon.CouponWithPromotionReply', null, global);
 goog.exportSymbol('proto.coupon.FinishCouponUseRequest', null, global);
 goog.exportSymbol('proto.coupon.IssuePromotionCouponRequest', null, global);
 goog.exportSymbol('proto.coupon.ListAvailCouponReply', null, global);
@@ -530,7 +531,9 @@ proto.coupon.CouponEntry.toObject = function(includeInstance, msg) {
     amount: +jspb.Message.getFieldWithDefault(msg, 9, 0.0),
     currency: jspb.Message.getFieldWithDefault(msg, 10, ""),
     validFrom: jspb.Message.getFieldWithDefault(msg, 11, ""),
-    maxAmount: +jspb.Message.getFieldWithDefault(msg, 12, 0.0)
+    maxAmount: +jspb.Message.getFieldWithDefault(msg, 12, 0.0),
+    promotionId: jspb.Message.getFieldWithDefault(msg, 13, 0),
+    expired: jspb.Message.getFieldWithDefault(msg, 14, false)
   };
 
   if (includeInstance) {
@@ -614,6 +617,14 @@ proto.coupon.CouponEntry.deserializeBinaryFromReader = function(msg, reader) {
     case 12:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setMaxAmount(value);
+      break;
+    case 13:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setPromotionId(value);
+      break;
+    case 14:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setExpired(value);
       break;
     default:
       reader.skipField();
@@ -725,6 +736,20 @@ proto.coupon.CouponEntry.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0.0) {
     writer.writeDouble(
       12,
+      f
+    );
+  }
+  f = message.getPromotionId();
+  if (f !== 0) {
+    writer.writeInt64(
+      13,
+      f
+    );
+  }
+  f = message.getExpired();
+  if (f) {
+    writer.writeBool(
+      14,
       f
     );
   }
@@ -910,6 +935,38 @@ proto.coupon.CouponEntry.prototype.getMaxAmount = function() {
 /** @param {number} value */
 proto.coupon.CouponEntry.prototype.setMaxAmount = function(value) {
   jspb.Message.setProto3FloatField(this, 12, value);
+};
+
+
+/**
+ * optional int64 promotion_id = 13;
+ * @return {number}
+ */
+proto.coupon.CouponEntry.prototype.getPromotionId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 13, 0));
+};
+
+
+/** @param {number} value */
+proto.coupon.CouponEntry.prototype.setPromotionId = function(value) {
+  jspb.Message.setProto3IntField(this, 13, value);
+};
+
+
+/**
+ * optional bool expired = 14;
+ * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
+ * You should avoid comparisons like {@code val === true/false} in those cases.
+ * @return {boolean}
+ */
+proto.coupon.CouponEntry.prototype.getExpired = function() {
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 14, false));
+};
+
+
+/** @param {boolean} value */
+proto.coupon.CouponEntry.prototype.setExpired = function(value) {
+  jspb.Message.setProto3BooleanField(this, 14, value);
 };
 
 
@@ -1726,13 +1783,14 @@ proto.coupon.CouponLogEntry.prototype.toObject = function(opt_includeInstance) {
  */
 proto.coupon.CouponLogEntry.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     originalPrice: +jspb.Message.getFieldWithDefault(msg, 2, 0.0),
     discountedPrice: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
-    rentalNumber: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    rideNumber: jspb.Message.getFieldWithDefault(msg, 4, ""),
     couponId: jspb.Message.getFieldWithDefault(msg, 5, 0),
     createdAt: jspb.Message.getFieldWithDefault(msg, 6, ""),
-    updatedAt: jspb.Message.getFieldWithDefault(msg, 7, "")
+    action: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    errorLog: jspb.Message.getFieldWithDefault(msg, 9, "")
   };
 
   if (includeInstance) {
@@ -1770,7 +1828,7 @@ proto.coupon.CouponLogEntry.deserializeBinaryFromReader = function(msg, reader) 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readUint64());
+      var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
       break;
     case 2:
@@ -1783,7 +1841,7 @@ proto.coupon.CouponLogEntry.deserializeBinaryFromReader = function(msg, reader) 
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setRentalNumber(value);
+      msg.setRideNumber(value);
       break;
     case 5:
       var value = /** @type {number} */ (reader.readUint64());
@@ -1793,9 +1851,13 @@ proto.coupon.CouponLogEntry.deserializeBinaryFromReader = function(msg, reader) 
       var value = /** @type {string} */ (reader.readString());
       msg.setCreatedAt(value);
       break;
-    case 7:
+    case 8:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUpdatedAt(value);
+      msg.setAction(value);
+      break;
+    case 9:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setErrorLog(value);
       break;
     default:
       reader.skipField();
@@ -1827,8 +1889,8 @@ proto.coupon.CouponLogEntry.prototype.serializeBinary = function() {
 proto.coupon.CouponLogEntry.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getId();
-  if (f !== 0) {
-    writer.writeUint64(
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1847,7 +1909,7 @@ proto.coupon.CouponLogEntry.serializeBinaryToWriter = function(message, writer) 
       f
     );
   }
-  f = message.getRentalNumber();
+  f = message.getRideNumber();
   if (f.length > 0) {
     writer.writeString(
       4,
@@ -1868,10 +1930,17 @@ proto.coupon.CouponLogEntry.serializeBinaryToWriter = function(message, writer) 
       f
     );
   }
-  f = message.getUpdatedAt();
+  f = message.getAction();
   if (f.length > 0) {
     writer.writeString(
-      7,
+      8,
+      f
+    );
+  }
+  f = message.getErrorLog();
+  if (f.length > 0) {
+    writer.writeString(
+      9,
       f
     );
   }
@@ -1879,17 +1948,17 @@ proto.coupon.CouponLogEntry.serializeBinaryToWriter = function(message, writer) 
 
 
 /**
- * optional uint64 id = 1;
- * @return {number}
+ * optional string id = 1;
+ * @return {string}
  */
 proto.coupon.CouponLogEntry.prototype.getId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {number} value */
+/** @param {string} value */
 proto.coupon.CouponLogEntry.prototype.setId = function(value) {
-  jspb.Message.setProto3IntField(this, 1, value);
+  jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
@@ -1924,16 +1993,16 @@ proto.coupon.CouponLogEntry.prototype.setDiscountedPrice = function(value) {
 
 
 /**
- * optional string rental_number = 4;
+ * optional string ride_number = 4;
  * @return {string}
  */
-proto.coupon.CouponLogEntry.prototype.getRentalNumber = function() {
+proto.coupon.CouponLogEntry.prototype.getRideNumber = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.coupon.CouponLogEntry.prototype.setRentalNumber = function(value) {
+proto.coupon.CouponLogEntry.prototype.setRideNumber = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
@@ -1969,17 +2038,32 @@ proto.coupon.CouponLogEntry.prototype.setCreatedAt = function(value) {
 
 
 /**
- * optional string updated_at = 7;
+ * optional string action = 8;
  * @return {string}
  */
-proto.coupon.CouponLogEntry.prototype.getUpdatedAt = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+proto.coupon.CouponLogEntry.prototype.getAction = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
 };
 
 
 /** @param {string} value */
-proto.coupon.CouponLogEntry.prototype.setUpdatedAt = function(value) {
-  jspb.Message.setProto3StringField(this, 7, value);
+proto.coupon.CouponLogEntry.prototype.setAction = function(value) {
+  jspb.Message.setProto3StringField(this, 8, value);
+};
+
+
+/**
+ * optional string error_log = 9;
+ * @return {string}
+ */
+proto.coupon.CouponLogEntry.prototype.getErrorLog = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.CouponLogEntry.prototype.setErrorLog = function(value) {
+  jspb.Message.setProto3StringField(this, 9, value);
 };
 
 
@@ -3440,6 +3524,209 @@ proto.coupon.CouponDetailReply.prototype.clearLogsList = function() {
  * @extends {jspb.Message}
  * @constructor
  */
+proto.coupon.CouponWithPromotionReply = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.coupon.CouponWithPromotionReply, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.coupon.CouponWithPromotionReply.displayName = 'proto.coupon.CouponWithPromotionReply';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.coupon.CouponWithPromotionReply.prototype.toObject = function(opt_includeInstance) {
+  return proto.coupon.CouponWithPromotionReply.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.coupon.CouponWithPromotionReply} msg The msg instance to transform.
+ * @return {!Object}
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.coupon.CouponWithPromotionReply.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    coupon: (f = msg.getCoupon()) && proto.coupon.CouponDetail.toObject(includeInstance, f),
+    promotion: (f = msg.getPromotion()) && proto.coupon.PromotionEntry.toObject(includeInstance, f)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.coupon.CouponWithPromotionReply}
+ */
+proto.coupon.CouponWithPromotionReply.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.coupon.CouponWithPromotionReply;
+  return proto.coupon.CouponWithPromotionReply.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.coupon.CouponWithPromotionReply} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.coupon.CouponWithPromotionReply}
+ */
+proto.coupon.CouponWithPromotionReply.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = new proto.coupon.CouponDetail;
+      reader.readMessage(value,proto.coupon.CouponDetail.deserializeBinaryFromReader);
+      msg.setCoupon(value);
+      break;
+    case 2:
+      var value = new proto.coupon.PromotionEntry;
+      reader.readMessage(value,proto.coupon.PromotionEntry.deserializeBinaryFromReader);
+      msg.setPromotion(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.coupon.CouponWithPromotionReply.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.coupon.CouponWithPromotionReply.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.coupon.CouponWithPromotionReply} message
+ * @param {!jspb.BinaryWriter} writer
+ * @suppress {unusedLocalVariables} f is only used for nested messages
+ */
+proto.coupon.CouponWithPromotionReply.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getCoupon();
+  if (f != null) {
+    writer.writeMessage(
+      1,
+      f,
+      proto.coupon.CouponDetail.serializeBinaryToWriter
+    );
+  }
+  f = message.getPromotion();
+  if (f != null) {
+    writer.writeMessage(
+      2,
+      f,
+      proto.coupon.PromotionEntry.serializeBinaryToWriter
+    );
+  }
+};
+
+
+/**
+ * optional CouponDetail coupon = 1;
+ * @return {?proto.coupon.CouponDetail}
+ */
+proto.coupon.CouponWithPromotionReply.prototype.getCoupon = function() {
+  return /** @type{?proto.coupon.CouponDetail} */ (
+    jspb.Message.getWrapperField(this, proto.coupon.CouponDetail, 1));
+};
+
+
+/** @param {?proto.coupon.CouponDetail|undefined} value */
+proto.coupon.CouponWithPromotionReply.prototype.setCoupon = function(value) {
+  jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+proto.coupon.CouponWithPromotionReply.prototype.clearCoupon = function() {
+  this.setCoupon(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.coupon.CouponWithPromotionReply.prototype.hasCoupon = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional PromotionEntry promotion = 2;
+ * @return {?proto.coupon.PromotionEntry}
+ */
+proto.coupon.CouponWithPromotionReply.prototype.getPromotion = function() {
+  return /** @type{?proto.coupon.PromotionEntry} */ (
+    jspb.Message.getWrapperField(this, proto.coupon.PromotionEntry, 2));
+};
+
+
+/** @param {?proto.coupon.PromotionEntry|undefined} value */
+proto.coupon.CouponWithPromotionReply.prototype.setPromotion = function(value) {
+  jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+proto.coupon.CouponWithPromotionReply.prototype.clearPromotion = function() {
+  this.setPromotion(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.coupon.CouponWithPromotionReply.prototype.hasPromotion = function() {
+  return jspb.Message.getField(this, 2) != null;
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.coupon.ListAvailCouponReply = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, proto.coupon.ListAvailCouponReply.repeatedFields_, null);
 };
@@ -4162,7 +4449,8 @@ proto.coupon.PromotionEntry.toObject = function(includeInstance, msg) {
     createdAt: jspb.Message.getFieldWithDefault(msg, 19, ""),
     updatedAt: jspb.Message.getFieldWithDefault(msg, 20, ""),
     paymentMethodsList: jspb.Message.getRepeatedField(msg, 21),
-    maxAmount: +jspb.Message.getFieldWithDefault(msg, 22, 0.0)
+    maxAmount: +jspb.Message.getFieldWithDefault(msg, 22, 0.0),
+    receiptEmail: jspb.Message.getFieldWithDefault(msg, 23, "")
   };
 
   if (includeInstance) {
@@ -4274,6 +4562,10 @@ proto.coupon.PromotionEntry.deserializeBinaryFromReader = function(msg, reader) 
     case 22:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setMaxAmount(value);
+      break;
+    case 23:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setReceiptEmail(value);
       break;
     default:
       reader.skipField();
@@ -4434,6 +4726,13 @@ proto.coupon.PromotionEntry.serializeBinaryToWriter = function(message, writer) 
   if (f !== 0.0) {
     writer.writeDouble(
       22,
+      f
+    );
+  }
+  f = message.getReceiptEmail();
+  if (f.length > 0) {
+    writer.writeString(
+      23,
       f
     );
   }
@@ -4797,6 +5096,21 @@ proto.coupon.PromotionEntry.prototype.setMaxAmount = function(value) {
 };
 
 
+/**
+ * optional string receipt_email = 23;
+ * @return {string}
+ */
+proto.coupon.PromotionEntry.prototype.getReceiptEmail = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 23, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.PromotionEntry.prototype.setReceiptEmail = function(value) {
+  jspb.Message.setProto3StringField(this, 23, value);
+};
+
+
 
 /**
  * Generated by JsPbCodeGenerator.
@@ -5028,7 +5342,8 @@ proto.coupon.CheckCouponAvailRequest.toObject = function(includeInstance, msg) {
     pickupLatitude: +jspb.Message.getFieldWithDefault(msg, 13, 0.0),
     pickupLongitude: +jspb.Message.getFieldWithDefault(msg, 14, 0.0),
     destLatitude: +jspb.Message.getFieldWithDefault(msg, 15, 0.0),
-    destLongitude: +jspb.Message.getFieldWithDefault(msg, 16, 0.0)
+    destLongitude: +jspb.Message.getFieldWithDefault(msg, 16, 0.0),
+    issuer: jspb.Message.getFieldWithDefault(msg, 17, "")
   };
 
   if (includeInstance) {
@@ -5128,6 +5443,10 @@ proto.coupon.CheckCouponAvailRequest.deserializeBinaryFromReader = function(msg,
     case 16:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setDestLongitude(value);
+      break;
+    case 17:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setIssuer(value);
       break;
     default:
       reader.skipField();
@@ -5267,6 +5586,13 @@ proto.coupon.CheckCouponAvailRequest.serializeBinaryToWriter = function(message,
   if (f !== 0.0) {
     writer.writeDouble(
       16,
+      f
+    );
+  }
+  f = message.getIssuer();
+  if (f.length > 0) {
+    writer.writeString(
+      17,
       f
     );
   }
@@ -5512,6 +5838,21 @@ proto.coupon.CheckCouponAvailRequest.prototype.getDestLongitude = function() {
 /** @param {number} value */
 proto.coupon.CheckCouponAvailRequest.prototype.setDestLongitude = function(value) {
   jspb.Message.setProto3FloatField(this, 16, value);
+};
+
+
+/**
+ * optional string issuer = 17;
+ * @return {string}
+ */
+proto.coupon.CheckCouponAvailRequest.prototype.getIssuer = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.CheckCouponAvailRequest.prototype.setIssuer = function(value) {
+  jspb.Message.setProto3StringField(this, 17, value);
 };
 
 

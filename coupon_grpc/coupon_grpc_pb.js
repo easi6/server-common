@@ -114,6 +114,17 @@ function deserialize_coupon_CouponEntry(buffer_arg) {
   return coupon_pb.CouponEntry.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_coupon_CouponWithPromotionReply(arg) {
+  if (!(arg instanceof coupon_pb.CouponWithPromotionReply)) {
+    throw new Error('Expected argument of type coupon.CouponWithPromotionReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_coupon_CouponWithPromotionReply(buffer_arg) {
+  return coupon_pb.CouponWithPromotionReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_coupon_FinishCouponUseRequest(arg) {
   if (!(arg instanceof coupon_pb.FinishCouponUseRequest)) {
     throw new Error('Expected argument of type coupon.FinishCouponUseRequest');
@@ -247,6 +258,17 @@ var CouponServerService = exports.CouponServerService = {
     requestDeserialize: deserialize_coupon_CouponDetailRequest,
     responseSerialize: serialize_coupon_CouponDetailReply,
     responseDeserialize: deserialize_coupon_CouponDetailReply,
+  },
+  getCouponWithPromotionDetail: {
+    path: '/coupon.CouponServer/GetCouponWithPromotionDetail',
+    requestStream: false,
+    responseStream: false,
+    requestType: coupon_pb.CouponDetailRequest,
+    responseType: coupon_pb.CouponWithPromotionReply,
+    requestSerialize: serialize_coupon_CouponDetailRequest,
+    requestDeserialize: deserialize_coupon_CouponDetailRequest,
+    responseSerialize: serialize_coupon_CouponWithPromotionReply,
+    responseDeserialize: deserialize_coupon_CouponWithPromotionReply,
   },
   getAvailCoupons: {
     path: '/coupon.CouponServer/GetAvailCoupons',

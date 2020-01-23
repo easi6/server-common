@@ -6,26 +6,17 @@ option java_package = "global.tada.coupon.protobuf";
 package coupon;
 
 service CouponServer {
-    rpc GetMyCoupons (ListCouponRequest) returns (ListCouponReply) {
-    }
-    rpc GetMyCouponCount (CouponCountRequest) returns (CouponCountReply) {
-    }
-    rpc StartCouponUse (StartCouponUseRequest) returns (CouponEntry) {
-    }
-    rpc FinishCouponUse (FinishCouponUseRequest) returns (CouponEntry) {
-    }
-    rpc CancelCouponUse (CancelCouponUseRequest) returns (CouponEntry) {
-    }
-    rpc GetCouponDetail (CouponDetailRequest) returns (CouponDetailReply) {
-    }
-    rpc GetAvailCoupons (AvailCouponRequest) returns (ListAvailCouponReply) {
-    }
-    rpc CheckCouponAvail (CheckCouponAvailRequest) returns (CheckCouponReply) {
-    }
-    rpc RegisterCouponOrPromotion (IssuePromotionCouponRequest) returns (CouponDetail) {
-    }
-    rpc CheckImplicitPromotion (CheckCouponAvailRequest) returns (CheckCouponReply) {
-    }
+    rpc GetMyCoupons (ListCouponRequest) returns (ListCouponReply);
+    rpc GetMyCouponCount (CouponCountRequest) returns (CouponCountReply);
+    rpc StartCouponUse (StartCouponUseRequest) returns (CouponEntry);
+    rpc FinishCouponUse (FinishCouponUseRequest) returns (CouponEntry);
+    rpc CancelCouponUse (CancelCouponUseRequest) returns (CouponEntry);
+    rpc GetCouponDetail (CouponDetailRequest) returns (CouponDetailReply);
+    rpc GetCouponWithPromotionDetail (CouponDetailRequest) returns (CouponWithPromotionReply);
+    rpc GetAvailCoupons (AvailCouponRequest) returns (ListAvailCouponReply);
+    rpc CheckCouponAvail (CheckCouponAvailRequest) returns (CheckCouponReply);
+    rpc RegisterCouponOrPromotion (IssuePromotionCouponRequest) returns (CouponDetail);
+    rpc CheckImplicitPromotion (CheckCouponAvailRequest) returns (CheckCouponReply);
 }
 
 message Timespan {
@@ -54,6 +45,8 @@ message CouponEntry {
     string currency = 10;
     string valid_from = 11;
     double max_amount = 12;
+    int64 promotion_id = 13;
+    bool expired = 14;
 }
 
 message CouponDetail {
@@ -81,13 +74,15 @@ message CouponDetail {
 }
 
 message CouponLogEntry {
-    uint64 id = 1;
+    string id = 1;
     double original_price = 2;
     double discounted_price = 3;
-    string rental_number = 4;
+    string ride_number = 4;
     uint64 coupon_id = 5;
     string created_at = 6; // iso 8601
-    string updated_at = 7; // iso 8601
+//    string updated_at = 7; // iso 8601
+    string action = 8;
+    string error_log = 9;
 }
 
 message ListCouponReply {
@@ -132,6 +127,11 @@ message CouponDetailReply {
     repeated CouponLogEntry logs = 2;
 }
 
+message CouponWithPromotionReply {
+    CouponDetail coupon = 1;
+    PromotionEntry promotion = 2;
+}
+
 message ListAvailCouponReply {
     repeated CouponEntry coupons = 1;
 }
@@ -174,6 +174,7 @@ message PromotionEntry {
     string updated_at = 20;
     repeated string payment_methods = 21;
     double max_amount = 22;
+    string receipt_email = 23;
 }
 
 message IssuePromotionCouponRequest {
@@ -199,6 +200,7 @@ message CheckCouponAvailRequest {
     double pickup_longitude = 14;
     double dest_latitude = 15;
     double dest_longitude = 16;
+    string issuer = 17;
 }
 
 message CheckCouponReply {
