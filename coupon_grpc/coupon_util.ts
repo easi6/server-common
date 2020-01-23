@@ -309,7 +309,7 @@ export const getCouponDetail = async ({ code }: { code: string }): Promise<any> 
     return convertKey(response.getCoupon().toObject());
   } catch (e) {
     logger.error('getCouponDetailFailed', e);
-    return { coupon: null, logs: [] };
+    return null;
   }
 };
 
