@@ -168,10 +168,11 @@ export const getMyCoupons = async ({
   }
 };
 
-export const startCouponUse = async ({ riderId, code, rentalNumber, originalPrice, discountedPrice }: { riderId: string; code: string, rentalNumber: string, originalPrice: number, discountedPrice: number }): Promise<any> => {
+export const startCouponUse = async ({ riderId, riderPhone, code, rentalNumber, originalPrice, discountedPrice }: { riderId: string, riderPhone: string, code: string, rentalNumber: string, originalPrice: number, discountedPrice: number }): Promise<any> => {
   // @ts-ignore
   const request = new messages.StartCouponUseRequest();
   request.setUserId(riderId);
+  request.setUserPhone(riderPhone);
   request.setCode(code);
   request.setRentalNumber(rentalNumber);
   request.setDiscountedPrice(discountedPrice);

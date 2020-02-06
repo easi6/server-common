@@ -106,6 +106,7 @@ message StartCouponUseRequest {
     double original_price = 3;
     double discounted_price = 4;
     string rental_number = 5;
+    string user_phone = 6;
 }
 
 message FinishCouponUseRequest {

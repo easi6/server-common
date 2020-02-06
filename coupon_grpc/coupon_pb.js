@@ -2622,7 +2622,8 @@ proto.coupon.StartCouponUseRequest.toObject = function(includeInstance, msg) {
     code: jspb.Message.getFieldWithDefault(msg, 2, ""),
     originalPrice: +jspb.Message.getFieldWithDefault(msg, 3, 0.0),
     discountedPrice: +jspb.Message.getFieldWithDefault(msg, 4, 0.0),
-    rentalNumber: jspb.Message.getFieldWithDefault(msg, 5, "")
+    rentalNumber: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    userPhone: jspb.Message.getFieldWithDefault(msg, 6, "")
   };
 
   if (includeInstance) {
@@ -2678,6 +2679,10 @@ proto.coupon.StartCouponUseRequest.deserializeBinaryFromReader = function(msg, r
     case 5:
       var value = /** @type {string} */ (reader.readString());
       msg.setRentalNumber(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setUserPhone(value);
       break;
     default:
       reader.skipField();
@@ -2740,6 +2745,13 @@ proto.coupon.StartCouponUseRequest.serializeBinaryToWriter = function(message, w
   if (f.length > 0) {
     writer.writeString(
       5,
+      f
+    );
+  }
+  f = message.getUserPhone();
+  if (f.length > 0) {
+    writer.writeString(
+      6,
       f
     );
   }
@@ -2818,6 +2830,21 @@ proto.coupon.StartCouponUseRequest.prototype.getRentalNumber = function() {
 /** @param {string} value */
 proto.coupon.StartCouponUseRequest.prototype.setRentalNumber = function(value) {
   jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional string user_phone = 6;
+ * @return {string}
+ */
+proto.coupon.StartCouponUseRequest.prototype.getUserPhone = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.StartCouponUseRequest.prototype.setUserPhone = function(value) {
+  jspb.Message.setProto3StringField(this, 6, value);
 };
 
 
