@@ -3,15 +3,21 @@ import config from 'config';
 import jwt from 'jsonwebtoken';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import oauth2orize from 'oauth2orize';
-import redis from 'redis';
+import Redis from 'ioredis';
 import Promise from 'bluebird';
 import crypto from 'crypto';
 import _ from 'lodash';
 import CrashReportUtil from 'lib/common/sentry_util';
 import OAuth2Error from 'oauth2orize/lib/errors/oauth2error';
 
-Promise.promisifyAll(redis.RedisClient.prototype);
-const redisClient = redis.createClient(process.env.REDIS_URL || { ...config.redis, password: config.redis.pass });
+let redisClient;
+if (config.redis_cluster) {
+  redisClient = new Redis.Cluster(config.redis_cluster, { scaleReads: "slave", slotsRefreshTimeout: 5000 });
+} else if (process.env.REDIS_URL) {
+  redisClient = new Redis(process.env.REDIS_URL);
+} else {
+  redisClient = new Redis(_.extend({}, config.redis, { password: config.redis.pass }));
+}
 
 module.exports = (app, logger) => {
   app.use(passport.initialize());
@@ -50,7 +56,7 @@ module.exports = (app, logger) => {
       const namespace = `${model.name}_refresh_token`;
       const refreshToken = (await crypto.randomBytes(16)).toString('hex');
       if (opts.refreshTokenExpire) {
-        await redisClient.setexAsync(
+        await redisClient.setex(
           `${namespace}_${refreshToken}`,
           opts.refreshTokenExpire,
           `${entity[idkey]},${
@@ -58,7 +64,7 @@ module.exports = (app, logger) => {
           }`
         );
       } else {
-        await redisClient.setAsync(
+        await redisClient.set(
           `${namespace}_${refreshToken}`,
           `${entity[idkey]},${
             multi_auth_count ? _.get(entity.auth_count, _.get(client, 'user.id'), 0) : entity.auth_count
@@ -122,12 +128,12 @@ module.exports = (app, logger) => {
         if (!match) {
           // case Driver Admin
           if (!_.isNil(model.fields.blocked)) {
-            const isExistKey = await redisClient.existsAsync(`${model.name}_${username}_auth_fail_count`);
+            const isExistKey = await redisClient.exists(`${model.name}_${username}_auth_fail_count`);
 
-            (isExistKey)? await redisClient.incrAsync(`${model.name}_${username}_auth_fail_count`)
-                : await redisClient.setAsync(`${model.name}_${username}_auth_fail_count`, 1);
+            (isExistKey)? await redisClient.incr(`${model.name}_${username}_auth_fail_count`)
+                : await redisClient.set(`${model.name}_${username}_auth_fail_count`, 1);
 
-            let auth_fail_count = await redisClient.getAsync(`${model.name}_${username}_auth_fail_count`);
+            let auth_fail_count = await redisClient.get(`${model.name}_${username}_auth_fail_count`);
             if (+auth_fail_count === 5) {
               await entity.update({ blocked: true }, { where: { login: username }})
             }
@@ -141,7 +147,7 @@ module.exports = (app, logger) => {
         // case Driver Admin
         // Success Login, Remove Key
         if (!_.isNil(model.fields.blocked)) {
-          await redisClient.delAsync(`${model.name}_${username}_auth_fail_count`);
+          await redisClient.del(`${model.name}_${username}_auth_fail_count`);
         }
 
       } catch (error) {
@@ -198,7 +204,7 @@ module.exports = (app, logger) => {
 
       /* legacy logic */
       const namespace = `${model.name}_refresh_token`;
-      const str = await redisClient.getAsync(`${namespace}_${refreshToken}`);
+      const str = await redisClient.get(`${namespace}_${refreshToken}`);
 
       if (str === null) {
         const error = new Error('Expired refresh token');
@@ -236,7 +242,7 @@ module.exports = (app, logger) => {
       }
 
       // remove old refresh token
-      await redisClient.delAsync(`${namespace}_${refreshToken}`);
+      await redisClient.del(`${namespace}_${refreshToken}`);
 
       if (externalAccountService) {
         const issueToken = tokenIssuer_uuid_proxy(externalAccountService.uuidGrantAccessToken)({
