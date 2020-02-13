@@ -142,7 +142,12 @@ export const signup = (signupDto: {
     oauth: { access_token: _.get(response, 'accessToken'), refresh_token: _.get(response, 'refreshToken') },
     authority: _.get(response, 'authorities[0]'),
     uuid: _.get(response, 'uuid'),
-  }));
+  })).catch(e => {
+    if (e.error.code === "account_exist") {
+      throw new Easi6Error("phone_exists")
+    }
+    throw e
+  });
 };
 
 export const uuidGrantAccessToken = ({ uuid, appId }: { uuid: string; appId: string }) => {
