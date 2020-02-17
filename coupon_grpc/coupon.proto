@@ -71,6 +71,8 @@ message CouponDetail {
     string updated_at = 19; // iso 8601
     string valid_from = 20; // iso 8601
     double max_amount = 21;
+    uint64 promotion_id = 22;
+    string promotion_code = 23;
 }
 
 message CouponLogEntry {
