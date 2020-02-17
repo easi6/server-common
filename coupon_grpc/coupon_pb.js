@@ -1045,7 +1045,9 @@ proto.coupon.CouponDetail.toObject = function(includeInstance, msg) {
     createdAt: jspb.Message.getFieldWithDefault(msg, 18, ""),
     updatedAt: jspb.Message.getFieldWithDefault(msg, 19, ""),
     validFrom: jspb.Message.getFieldWithDefault(msg, 20, ""),
-    maxAmount: +jspb.Message.getFieldWithDefault(msg, 21, 0.0)
+    maxAmount: +jspb.Message.getFieldWithDefault(msg, 21, 0.0),
+    promotionId: jspb.Message.getFieldWithDefault(msg, 22, 0),
+    promotionCode: jspb.Message.getFieldWithDefault(msg, 23, "")
   };
 
   if (includeInstance) {
@@ -1166,6 +1168,14 @@ proto.coupon.CouponDetail.deserializeBinaryFromReader = function(msg, reader) {
     case 21:
       var value = /** @type {number} */ (reader.readDouble());
       msg.setMaxAmount(value);
+      break;
+    case 22:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setPromotionId(value);
+      break;
+    case 23:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPromotionCode(value);
       break;
     default:
       reader.skipField();
@@ -1341,6 +1351,20 @@ proto.coupon.CouponDetail.serializeBinaryToWriter = function(message, writer) {
   if (f !== 0.0) {
     writer.writeDouble(
       21,
+      f
+    );
+  }
+  f = message.getPromotionId();
+  if (f !== 0) {
+    writer.writeUint64(
+      22,
+      f
+    );
+  }
+  f = message.getPromotionCode();
+  if (f.length > 0) {
+    writer.writeString(
+      23,
       f
     );
   }
@@ -1733,6 +1757,36 @@ proto.coupon.CouponDetail.prototype.getMaxAmount = function() {
 /** @param {number} value */
 proto.coupon.CouponDetail.prototype.setMaxAmount = function(value) {
   jspb.Message.setProto3FloatField(this, 21, value);
+};
+
+
+/**
+ * optional uint64 promotion_id = 22;
+ * @return {number}
+ */
+proto.coupon.CouponDetail.prototype.getPromotionId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 22, 0));
+};
+
+
+/** @param {number} value */
+proto.coupon.CouponDetail.prototype.setPromotionId = function(value) {
+  jspb.Message.setProto3IntField(this, 22, value);
+};
+
+
+/**
+ * optional string promotion_code = 23;
+ * @return {string}
+ */
+proto.coupon.CouponDetail.prototype.getPromotionCode = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 23, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.CouponDetail.prototype.setPromotionCode = function(value) {
+  jspb.Message.setProto3StringField(this, 23, value);
 };
 
 
