@@ -332,11 +332,12 @@ export const getCouponWithPromotionDetail = async ({ code }: { code: string }): 
   }
 };
 
-export const cancelCouponUse = async ({ riderId, code }: { riderId: string; code: string }): Promise<any> => {
+export const cancelCouponUse = async ({riderId, code, rentalNumber}: { riderId: string; code: string; rentalNumber: string }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CancelCouponUseRequest();
   request.setUserId(riderId);
   request.setCode(code);
+  request.setRentalNumber(rentalNumber);
 
   try {
     // @ts-ignore
