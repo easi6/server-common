@@ -122,6 +122,7 @@ message FinishCouponUseRequest {
 message CancelCouponUseRequest {
     string user_id = 1;
     string code = 2;
+    string rental_number = 3;
 }
 
 message CouponDetailRequest {
