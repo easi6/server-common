@@ -386,6 +386,7 @@ export const checkImplicitPromotion = async ({
   issuer,
   pickup,
   dest,
+  findCoupon
 }: {
   carType: number;
   productType: number;
@@ -400,6 +401,7 @@ export const checkImplicitPromotion = async ({
   issuer: string;
   pickup: { latitude: number; longitude: number };
   dest?: { latitude: number; longitude: number };
+  findCoupon: boolean
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CheckCouponAvailRequest();
@@ -416,6 +418,7 @@ export const checkImplicitPromotion = async ({
   request.setIssuer(issuer);
   request.setPickupLatitude(pickup.latitude);
   request.setPickupLongitude(pickup.longitude);
+  request.setFindCoupon(findCoupon);
   if (dest && dest.latitude && dest.longitude) {
     request.setDestLatitude(dest.latitude);
     request.setDestLongitude(dest.longitude);
