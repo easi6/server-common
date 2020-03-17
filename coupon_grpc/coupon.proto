@@ -208,6 +208,7 @@ message CheckCouponAvailRequest {
     double dest_latitude = 15;
     double dest_longitude = 16;
     string issuer = 17;
+    bool find_coupon = 18;
 }
 
 message CheckCouponReply {
@@ -216,6 +217,7 @@ message CheckCouponReply {
     double discounted_price = 3;
     string title = 4;
     repeated string payment_methods = 5;
+    string code = 6; // applicable한 쿠폰의 코드
 }
 
 message CouponCountRequest {
