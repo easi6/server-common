@@ -2,7 +2,7 @@ import config from 'config';
 import _ from 'lodash';
 import request from 'request-promise';
 import URL from 'url';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import {Easi6Error} from "../err";
 
