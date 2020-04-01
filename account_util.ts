@@ -244,6 +244,29 @@ export const updateAccount = ({
   });
 };
 
+export const registerAccountIdentifier = ({
+  body,
+  accessToken,
+  authorization,
+}: {
+  body: any;
+  accessToken?: string;
+  authorization?: string;
+}) => {
+  return accountSvcRequest({
+    ...(accessToken && {auth: {bearer: accessToken}}),
+    ...(authorization && {headers: {authorization}}),
+    uri: '/v1/accounts/me/identifiers',
+    method: 'post',
+    body
+  }).catch(e => {
+    if (e.error.code === "account_already_bound") {
+      throw new Easi6Error("not_found");
+    }
+    throw e;
+  });
+};
+
 export const deleteAccountIdentifier = ({uuid, identifierId}: {
   uuid: string;
   identifierId: number;
@@ -253,8 +276,8 @@ export const deleteAccountIdentifier = ({uuid, identifierId}: {
     method: 'delete'
   }).catch(e => {
     if (e.error.code === "account_identifier_not_found") {
-      throw new Easi6Error("not_found")
+      throw new Easi6Error("not_found");
     }
-    throw e
+    throw e;
   });
 };
