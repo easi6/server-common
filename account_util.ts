@@ -243,3 +243,18 @@ export const updateAccount = ({
     },
   });
 };
+
+export const deleteAccountIdentifier = ({uuid, identifierId}: {
+  uuid: string;
+  identifierId: number;
+}) => {
+  return accountSvcRequest({
+    uri: `/admin/v1/accounts/${uuid}/identifiers/${identifierId}`,
+    method: 'delete'
+  }).catch(e => {
+    if (e.error.code === "account_identifier_not_found") {
+      throw new Easi6Error("not_found")
+    }
+    throw e
+  });
+};
