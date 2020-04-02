@@ -260,8 +260,9 @@ export const registerAccountIdentifier = ({
     method: 'post',
     body
   }).catch(e => {
-    if (e.error.code === "account_already_bound") {
-      throw new Easi6Error("not_found");
+    if (_.get(e, 'error.code') === "account_already_bound") {
+      const type = _.get(e, 'error.type');
+      throw new Easi6Error(e.error.code, type);
     }
     throw e;
   });
