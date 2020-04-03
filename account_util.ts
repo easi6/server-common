@@ -262,7 +262,9 @@ export const registerAccountIdentifier = ({
   }).catch(e => {
     if (_.get(e, 'error.code') === "account_already_bound") {
       const type = _.get(e, 'error.type');
-      throw new Easi6Error(e.error.code, type);
+      const err = new Easi6Error(e.error.code);
+      err.data = {type};
+      throw err
     }
     throw e;
   });
