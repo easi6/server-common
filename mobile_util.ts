@@ -103,3 +103,40 @@ export const getMobiles = async (
     return [];
   }
 };
+
+export const updateTopic = async({
+  status, region, driverType, locale = 'en', unsubscribeFromOldTopics = true
+}: {
+  status: string;
+  region: string;
+  driverType: string;
+  locale: string;
+  unsubscribeFromOldTopics: boolean;
+},
+  accessToken?: string,
+  headers?: any
+) => {
+  let auth;
+  if (accessToken) {
+    auth = { bearer: accessToken };
+  }
+
+  const body = {
+    status,
+    region,
+    driverType,
+    locale,
+    unsubOld: unsubscribeFromOldTopics
+  };
+
+  const opts: any = {
+    body,
+    headers,
+  };
+  if (auth) {
+    opts.auth = auth;
+  }
+
+  const mobiles = await request.post('/v1/topics:subscribe', opts);
+  return mobiles;
+};
