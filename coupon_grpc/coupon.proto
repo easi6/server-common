@@ -47,8 +47,6 @@ message CouponEntry {
     double max_amount = 12;
     int64 promotion_id = 13;
     bool expired = 14;
-    string valid_from_local = 15; // iso 8601
-    string valid_until_local = 16; // iso 8601
 }
 
 message CouponDetail {
@@ -61,7 +59,7 @@ message CouponDetail {
     uint32 discount_type = 7;
     double amount = 8;
     string currency = 9;
-    string region = 10;
+    repeated string regions = 10;
     repeated string cities = 11;
     repeated uint32 car_types = 12;
     repeated uint32 product_types = 13;
@@ -75,6 +73,7 @@ message CouponDetail {
     double max_amount = 21;
     uint64 promotion_id = 22;
     string promotion_code = 23;
+    string region = 24;
 }
 
 message CouponLogEntry {
@@ -172,7 +171,7 @@ message PromotionEntry {
     uint32 count_limit = 6;
     uint32 total_count = 7;
     string title = 9;
-    string region = 11;
+    repeated string regions = 11;
     repeated string cities = 12;
     repeated uint32 car_types = 13;
     repeated uint32 product_types = 14;
@@ -184,6 +183,7 @@ message PromotionEntry {
     repeated string payment_methods = 21;
     double max_amount = 22;
     string receipt_email = 23;
+    string region = 24;
 }
 
 message IssuePromotionCouponRequest {
