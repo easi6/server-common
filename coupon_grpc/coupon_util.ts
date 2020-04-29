@@ -31,12 +31,6 @@ function convertKey(obj: any) {
       res[key] = obj[key];
     }
   });
-  if (res.validUntil) {
-    res.validUntil = moment(res.validUntil).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-  }
-  if (res.validFrom) {
-    res.validFrom = moment(res.validFrom).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-  }
   return res;
 }
 
@@ -157,11 +151,11 @@ export const getMyCoupons = async ({
     const response: messages.ListCouponReply = await Bluebird.fromCallback(cb => client.getMyCoupons(request, cb));
     // @ts-ignore
     const couponList: messages.CouponEntry[] = response.getCouponsList();
+    const coupons = _.map(couponList, coupon =>
+        _.omit(convertKey(coupon.toObject()), ['avail', 'id'] /* avail flag is meaningless here */));
     return {
       hasNext: response.getHasNext(),
-      coupons: _.map(couponList, coupon =>
-        _.omit(convertKey(coupon.toObject()), ['avail', 'id'] /* avail flag is meaningless here */)
-      ),
+      coupons: coupons,
     };
   } catch (e) {
     logger.error('getMyCouponsFailed', e);

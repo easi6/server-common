@@ -65,7 +65,7 @@ message CouponDetail {
     repeated uint32 product_types = 13;
     repeated Timespan times = 14;
     bool hired_only = 15;
-    string valid_until = 16; // iso 8601
+    string valid_until = 16;
     string user_id = 17;
     string created_at = 18; // iso 8601
     string updated_at = 19; // iso 8601
@@ -73,6 +73,7 @@ message CouponDetail {
     double max_amount = 21;
     uint64 promotion_id = 22;
     string promotion_code = 23;
+    string region = 24;
 }
 
 message CouponLogEntry {
@@ -182,6 +183,7 @@ message PromotionEntry {
     repeated string payment_methods = 21;
     double max_amount = 22;
     string receipt_email = 23;
+    string region = 24;
 }
 
 message IssuePromotionCouponRequest {
