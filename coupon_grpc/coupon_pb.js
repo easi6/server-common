@@ -1047,7 +1047,8 @@ proto.coupon.CouponDetail.toObject = function(includeInstance, msg) {
     validFrom: jspb.Message.getFieldWithDefault(msg, 20, ""),
     maxAmount: +jspb.Message.getFieldWithDefault(msg, 21, 0.0),
     promotionId: jspb.Message.getFieldWithDefault(msg, 22, 0),
-    promotionCode: jspb.Message.getFieldWithDefault(msg, 23, "")
+    promotionCode: jspb.Message.getFieldWithDefault(msg, 23, ""),
+    region: jspb.Message.getFieldWithDefault(msg, 24, "")
   };
 
   if (includeInstance) {
@@ -1176,6 +1177,10 @@ proto.coupon.CouponDetail.deserializeBinaryFromReader = function(msg, reader) {
     case 23:
       var value = /** @type {string} */ (reader.readString());
       msg.setPromotionCode(value);
+      break;
+    case 24:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setRegion(value);
       break;
     default:
       reader.skipField();
@@ -1365,6 +1370,13 @@ proto.coupon.CouponDetail.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writeString(
       23,
+      f
+    );
+  }
+  f = message.getRegion();
+  if (f.length > 0) {
+    writer.writeString(
+      24,
       f
     );
   }
@@ -1787,6 +1799,21 @@ proto.coupon.CouponDetail.prototype.getPromotionCode = function() {
 /** @param {string} value */
 proto.coupon.CouponDetail.prototype.setPromotionCode = function(value) {
   jspb.Message.setProto3StringField(this, 23, value);
+};
+
+
+/**
+ * optional string region = 24;
+ * @return {string}
+ */
+proto.coupon.CouponDetail.prototype.getRegion = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 24, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.CouponDetail.prototype.setRegion = function(value) {
+  jspb.Message.setProto3StringField(this, 24, value);
 };
 
 
@@ -4639,7 +4666,8 @@ proto.coupon.PromotionEntry.toObject = function(includeInstance, msg) {
     updatedAt: jspb.Message.getFieldWithDefault(msg, 20, ""),
     paymentMethodsList: jspb.Message.getRepeatedField(msg, 21),
     maxAmount: +jspb.Message.getFieldWithDefault(msg, 22, 0.0),
-    receiptEmail: jspb.Message.getFieldWithDefault(msg, 23, "")
+    receiptEmail: jspb.Message.getFieldWithDefault(msg, 23, ""),
+    region: jspb.Message.getFieldWithDefault(msg, 24, "")
   };
 
   if (includeInstance) {
@@ -4755,6 +4783,10 @@ proto.coupon.PromotionEntry.deserializeBinaryFromReader = function(msg, reader) 
     case 23:
       var value = /** @type {string} */ (reader.readString());
       msg.setReceiptEmail(value);
+      break;
+    case 24:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setRegion(value);
       break;
     default:
       reader.skipField();
@@ -4922,6 +4954,13 @@ proto.coupon.PromotionEntry.serializeBinaryToWriter = function(message, writer) 
   if (f.length > 0) {
     writer.writeString(
       23,
+      f
+    );
+  }
+  f = message.getRegion();
+  if (f.length > 0) {
+    writer.writeString(
+      24,
       f
     );
   }
@@ -5297,6 +5336,21 @@ proto.coupon.PromotionEntry.prototype.getReceiptEmail = function() {
 /** @param {string} value */
 proto.coupon.PromotionEntry.prototype.setReceiptEmail = function(value) {
   jspb.Message.setProto3StringField(this, 23, value);
+};
+
+
+/**
+ * optional string region = 24;
+ * @return {string}
+ */
+proto.coupon.PromotionEntry.prototype.getRegion = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 24, ""));
+};
+
+
+/** @param {string} value */
+proto.coupon.PromotionEntry.prototype.setRegion = function(value) {
+  jspb.Message.setProto3StringField(this, 24, value);
 };
 
 
