@@ -270,6 +270,13 @@ export const registerAccountIdentifier = ({
   });
 };
 
+export const test = () => {
+  return accountSvcRequest({
+    uri: 'v1/test',
+    method: 'post'
+  });
+};
+
 export const deleteAccountIdentifier = ({uuid, identifierId}: {
   uuid: string;
   identifierId: number;
