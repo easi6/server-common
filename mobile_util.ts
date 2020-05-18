@@ -2,6 +2,7 @@ import config from 'config';
 import rp from 'request-promise';
 import * as URL from 'url';
 import logger from '../../config/logger';
+import _ from 'lodash';
 
 const mobileSvcConfig: any = config.has('mobile_service')
   ? config.get('mobile_service')
@@ -57,10 +58,12 @@ export const registerMobile = async (
   try {
     const opts: any = {
       body,
-      headers,
     };
     if (auth) {
       opts.auth = auth;
+    }
+    if (headers) {
+      opts.headers = _.omit(headers, ['content-length', 'Content-Length']);
     }
 
     const mobile = await request.post('/v1/mobiles', opts);
@@ -130,9 +133,11 @@ export const updateTopic = async({
   };
 
   const opts: any = {
-    body,
-    headers,
+    body
   };
+  if (headers) {
+    opts.headers = _.omit(headers, ['content-length', 'Content-Length']);
+  }
   if (auth) {
     opts.auth = auth;
   }
