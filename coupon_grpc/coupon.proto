@@ -9,7 +9,6 @@ service CouponServer {
     rpc GetMyCoupons (ListCouponRequest) returns (ListCouponReply);
     rpc GetMyCouponCount (CouponCountRequest) returns (CouponCountReply);
     rpc StartCouponUse (StartCouponUseRequest) returns (CouponEntry);
-    rpc FinishCouponUse (FinishCouponUseRequest) returns (CouponEntry);
     rpc CancelCouponUse (CancelCouponUseRequest) returns (CouponEntry);
     rpc GetCouponDetail (CouponDetailRequest) returns (CouponDetailReply);
     rpc GetCouponWithPromotionDetail (CouponDetailRequest) returns (CouponWithPromotionReply);
@@ -110,14 +109,6 @@ message StartCouponUseRequest {
     double discounted_price = 4;
     string rental_number = 5;
     string user_phone = 6;
-}
-
-message FinishCouponUseRequest {
-    string user_id = 1;
-    string code = 2;
-    double original_price = 3;
-    double discounted_price = 4;
-    string rental_number = 5;
 }
 
 message CancelCouponUseRequest {
