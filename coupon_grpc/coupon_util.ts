@@ -2,13 +2,20 @@ import Bluebird from 'bluebird';
 import config from 'config';
 import grpc from 'grpc';
 import _ from 'lodash';
+import request from 'request-promise';
+import URL from 'url';
 import moment, { Moment } from 'moment';
 import logger from '../../../config/logger';
 import { Easi6Error } from '../../err';
 import * as services from './coupon_grpc_pb';
 import * as messages from './coupon_pb';
 
-const couponServiceConfig: any = config.has('coupon_service') ? config.get('coupon_service') : {};
+const couponServiceConfig: any = config.has('coupon_service') ? config.get('coupon_service') : {
+  protocol: 'http:',
+  hostname: 'localhost',
+  port: 8080,
+  pathname: '/v1',
+};
 const { serviceHost = 'localhost:6565' } = couponServiceConfig;
 
 const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
@@ -18,6 +25,12 @@ export const COUPON_STATUS = {
   USING: 1,
   USED: 2,
 };
+
+export const couponSvcRequest = request.defaults({
+  baseUrl: URL.format(couponServiceConfig),
+  json: true,
+});
+
 
 function convertKey(obj: any) {
   const keys = _.keys(obj);
