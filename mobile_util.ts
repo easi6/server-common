@@ -27,6 +27,7 @@ export const registerMobile = async (
     appType,
     appVersion,
     imei,
+    rooted,
   }: {
     token: string;
     locale: string;
@@ -36,6 +37,7 @@ export const registerMobile = async (
     appType: 'rider' | 'driver';
     appVersion: string;
     imei?: string;
+    rooted?: boolean;
   },
   accessToken?: string,
   headers?: any
@@ -49,6 +51,7 @@ export const registerMobile = async (
     appType,
     appVersion,
     imei,
+    rooted,
   };
 
   let auth;
