@@ -67,7 +67,7 @@ BreadcrumbTransport.prototype.log = (
   Sentry.addBreadcrumb({
     level,
     message: msg,
-    data: inspect(meta),
+    data: { meta: inspect(meta) },
   });
   //
   // Store this message and metadata, maybe use some custom logic

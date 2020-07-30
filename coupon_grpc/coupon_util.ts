@@ -18,7 +18,7 @@ const couponServiceConfig: any = config.has('coupon_service') ? config.get('coup
 };
 const { serviceHost = 'localhost:6565' } = couponServiceConfig;
 
-const client = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
+const client: any = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
 
 export const COUPON_STATUS = {
   READY: 0,
