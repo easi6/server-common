@@ -230,6 +230,7 @@ export const checkCouponAvail = async ({
   region,
   city,
   fare,
+  systemFee,
   currency,
   datetime,
   timezone,
@@ -246,6 +247,7 @@ export const checkCouponAvail = async ({
   region: string;
   city: string;
   fare: number;
+  systemFee: number;
   currency: string;
   datetime: Date;
   timezone: number;
@@ -264,7 +266,7 @@ export const checkCouponAvail = async ({
   request.setRegion(region);
   request.setCity(city);
   request.setDatetime(moment(datetime).format());
-  request.setFare(fare);
+  request.setFare(fare - systemFee); // discount 기준 가격은 systemFee를 제외해야함.
   request.setCurrency(currency);
   request.setTimezone(timezone);
   request.setUserId(riderId);
@@ -286,6 +288,10 @@ export const checkCouponAvail = async ({
     const response: messages.CheckCouponReply = await Bluebird.fromCallback(cb => client.checkCouponAvail(request, cb));
     const res = response.toObject();
     logger.verbose('checkCouponAvail response', res);
+    res.originalPrice = fare; // originalPrice는 systemFee를 포함해야됨.
+    if (res.discountedPrice > 0) {
+      res.discountedPrice += systemFee // discountedPrice에 systemFee를 더해줘야 됨.
+    }
     return res;
   } catch (e) {
     // extract error code
@@ -385,6 +391,7 @@ export const checkImplicitPromotion = async ({
   region,
   city,
   fare,
+  systemFee,
   currency,
   datetime,
   timezone,
@@ -400,6 +407,7 @@ export const checkImplicitPromotion = async ({
   region: string;
   city: string;
   fare: number;
+  systemFee: number;
   currency: string;
   datetime: Date | Moment;
   timezone: number;
@@ -417,7 +425,7 @@ export const checkImplicitPromotion = async ({
   request.setRegion(region);
   request.setCity(city);
   request.setDatetime(moment(datetime).format());
-  request.setFare(fare);
+  request.setFare(fare - systemFee); // discount 기준 가격은 systemFee를 제외해야함.
   request.setCurrency(currency);
   request.setTimezone(timezone);
   request.setUserId(riderId);
@@ -436,7 +444,12 @@ export const checkImplicitPromotion = async ({
     const response: messages.CheckCouponReply = await Bluebird.fromCallback(cb =>
       client.checkImplicitPromotion(request, cb)
     );
-    return response.toObject();
+    const res = response.toObject(); // originalPrice는 systemFee를 포함해야됨.
+    res.originalPrice = fare;
+    if (res.discountedPrice > 0) {
+      res.discountedPrice += systemFee // discountedPrice에 systemFee를 더해줘야 됨.
+    }
+    return res;
   } catch (e) {
     logger.error('checkImplicitPromotion', e);
     return {
