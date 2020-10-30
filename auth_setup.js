@@ -277,18 +277,24 @@ module.exports = (app, logger) => {
         ]),
       },
       async (jwtPayload, done) => {
-        const entity = await model.find({ where: { [idkey]: jwtPayload.sub } });
-        if (!entity) {
-          return done(null, false);
+        let entity ;
+        if (!!model) {
+          entity = await model.find({where: {[idkey]: jwtPayload.sub}});
+          if (!entity) {
+            return done(null, false);
+          }
+
+
+          if (
+            jwtPayload.app
+              ? _.get(entity.auth_count, jwtPayload.app, 0) !== jwtPayload.cnt
+              : entity.auth_count !== jwtPayload.cnt
+          ) {
+            return done(null, false);
+          }
         }
 
-        if (
-          jwtPayload.app
-            ? _.get(entity.auth_count, jwtPayload.app, 0) !== jwtPayload.cnt
-            : entity.auth_count !== jwtPayload.cnt
-        ) {
-          return done(null, false);
-        }
+        entity = jwtPayload;
 
         return done(null, entity, jwtPayload);
       }
