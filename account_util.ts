@@ -5,6 +5,7 @@ import URL from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import {Easi6Error} from "../err";
+import logger from '../../config/logger';
 
 const accountSvcHttpConfig = _.pick(
   config.has('account_service')
@@ -63,18 +64,22 @@ export const getAuthorization = (authHeader: string) => {
     headers: { authorization: authHeader },
     uri: '/v1/accounts/me/authorize',
     method: 'get',
-  }).then(authentication => ({
-    authInfo: {
-      ...authentication.oauth2Request,
-      app:
-        authentication.oauth2Request.clientId === 'tada-rider-app' ||
-        authentication.oauth2Request.clientId === 'tada_customer_app'
-          ? 'tada_customer_app'
-          : 'tada_driver_app',
-    },
-    principal: authentication.principal,
-    authority: _.get(authentication, 'authorities[0].authority'),
-  }));
+  }).then(authentication => {
+    logger.debug(`authentication=${JSON.stringify(authentication)}`);
+    const clientId = _.get(authentication, 'principal.claims.client_id');
+    return {
+      authInfo: {
+        ...authentication.oauth2Request,
+        app:
+          clientId === 'tada-rider-app' ||
+          clientId === 'tada_customer_app'
+            ? 'tada_customer_app'
+            : 'tada_driver_app',
+      },
+      principal: _.get(authentication, 'principal.id'),
+      authority: _.get(authentication, 'authorities[0].authority'),
+    };
+  });
 };
 
 export const signup = (signupDto: {
