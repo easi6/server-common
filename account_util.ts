@@ -76,7 +76,7 @@ export const getAuthorization = (authHeader: string) => {
             ? 'tada_customer_app'
             : 'tada_driver_app',
       },
-      principal: _.get(authentication, 'principal.id'),
+      principal: _.get(authentication, 'principal.claims.user_name'),
       authority: _.get(authentication, 'authorities[0].authority'),
     };
   });
