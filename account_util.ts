@@ -28,6 +28,15 @@ export const accountSvcRequest = request.defaults({
   json: true,
 });
 
+export const getAccount = (uuid: string)  => {
+  const riderBasicAuth = new Buffer(`${basicUserRider}:${basicPasswordRider}`).toString('base64');
+  return accountSvcRequest({
+    headers: { authorization: `Basic ${riderBasicAuth}` },
+    uri: `/v1/accounts/${uuid}`,
+    method: 'get',
+  });
+};
+
 export const getAuthorization = (authHeader: string) => {
   // repsonse example
   /*
