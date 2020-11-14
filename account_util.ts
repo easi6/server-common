@@ -74,7 +74,6 @@ export const getAuthorization = (authHeader: string) => {
     uri: '/v1/accounts/me/authorize',
     method: 'get',
   }).then(authentication => {
-    logger.debug(`authentication=${JSON.stringify(authentication)}`);
     const clientId = _.get(authentication, 'principal.claims.client_id');
     return {
       authInfo: {
