@@ -77,12 +77,10 @@ export const registerMobile = async (
 };
 
 export const getAllMobiles = (uuid: string) => {
-  try {
-    return request.get(`/v1/users/${uuid}/mobiles:all`);
-  } catch (err) {
-    logger.warn(`get all mobiles of user=${uuid} error: ${err.message}`);
-    return [];
-  }
+    return request.get(`/v1/users/${uuid}/mobiles:all`).catch((err) => {
+      logger.warn(`get all mobiles of user=${uuid} error: ${err.message}`);
+      return [];
+    });
 };
 
 export const getMobiles = async (
