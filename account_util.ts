@@ -157,7 +157,7 @@ export const signup = (signupDto: {
     uuid: _.get(response, 'uuid'),
   })).catch(e => {
     if (e.error.code === "account_exist") {
-      throw new Easi6Error("phone_exists")
+      throw new Easi6Error("phone_exists", process.env.BRAND || 'TADA', process.env.CS_EMAIL || 'support@tada.global')
     }
     throw e
   });
