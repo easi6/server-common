@@ -22,6 +22,8 @@ const basicUserRider = _.get(config, "account_service.basicAuth.rider.name");
 const basicPasswordRider = _.get(config, "account_service.basicAuth.rider.secret");
 const basicUserDriver = _.get(config, "account_service.basicAuth.driver.name");
 const basicPasswordDriver = _.get(config, "account_service.basicAuth.driver.secret");
+const basicUserCorp = _.get(config, "account_service.basicAuth.corp.name", "");
+const basicPasswordCorp = _.get(config, "account_service.basicAuth.corp.secret", "");
 
 export const accountSvcRequest = request.defaults({
   baseUrl: URL.format(accountSvcHttpConfig),
@@ -98,6 +100,7 @@ export const signup = (signupDto: {
   uuid?: string;
 
   isRider: boolean;
+  isCorp?: boolean;
   authority?: string;
 
   // facebook account kit access token
@@ -109,12 +112,18 @@ export const signup = (signupDto: {
   appId?: string;
   idtoken?: string;
   accessToken?: string;
+
+  // for corporate manager signup
+  password?: string;
 }) => {
   let basicUser;
   let basicPassword;
   if (signupDto.isRider) {
     basicUser = basicUserRider;
     basicPassword = basicPasswordRider;
+  } else if (signupDto.isCorp === true) {
+    basicUser = basicUserCorp;
+    basicPassword = basicPasswordCorp;
   } else {
     basicUser = basicUserDriver;
     basicPassword = basicPasswordDriver;
