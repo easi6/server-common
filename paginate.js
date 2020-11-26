@@ -1,6 +1,6 @@
 export default (limit, maxLimit) => (req, res, next) => {
-  let limit = parseInt(limit, 10) || 10;
-  let maxLimit = parseInt(maxLimit, 10) || 50;
+  let _limit = parseInt(limit, 10) || 10;
+  let _maxLimit = parseInt(maxLimit, 10) || 50;
 
   req.query.page = (typeof req.query.page === 'string') ? parseInt(req.query.page, 10) || 0 : 0;
   if (typeof req.query.limit === 'string') {
@@ -8,11 +8,11 @@ export default (limit, maxLimit) => (req, res, next) => {
   } else if (typeof req.query.size === 'string') {
     req.query.size = parseInt(req.query.size, 10) || 0;
   } else {
-    req.query.size = limit;
+    req.query.size = _limit;
   }
 
-  if (req.query.size > maxLimit) {
-    req.query.size = maxLimit;
+  if (req.query.size > _maxLimit) {
+    req.query.size = _maxLimit;
   }
 
   if (req.query.page < 0) {
