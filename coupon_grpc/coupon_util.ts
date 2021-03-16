@@ -136,7 +136,7 @@ export const registerCouponOrPromotion = async ({
     // extract error code
     let errorCode = _.first((e.metadata && e.metadata.get('code')) || []);
     if (errorCode && !(errorCode as string).startsWith('coupon_')) {
-      errorCode = 'coupon_' + errorCode
+      errorCode = 'coupon_' + errorCode;
     }
     throw new Easi6Error(errorCode || 'coupon_invalid_code');
   }
