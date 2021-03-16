@@ -134,8 +134,11 @@ export const registerCouponOrPromotion = async ({
       throw new Easi6Error('coupon_not_found');
     }
     // extract error code
-    const errorCode = _.first((e.metadata && e.metadata.get('code')) || []);
-    throw new Easi6Error((errorCode && 'coupon_' + errorCode) || 'coupon_invalid_code');
+    let errorCode = _.first((e.metadata && e.metadata.get('code')) || []);
+    if (errorCode && !(errorCode as string).startsWith('coupon_')) {
+      errorCode = 'coupon_' + errorCode
+    }
+    throw new Easi6Error(errorCode || 'coupon_invalid_code');
   }
 };
 
