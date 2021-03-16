@@ -39,6 +39,18 @@ export const getAccount = (uuid: string)  => {
   });
 };
 
+export const deleteAccount = (uuid: string) => {
+  const riderBasicAuth = new Buffer(`${basicUserRider}:${basicPasswordRider}`).toString('base64');
+  return accountSvcRequest({
+    headers: { authorization: `Basic ${riderBasicAuth}` },
+    uri: `admin/v1/accounts`,
+    method: 'delete',
+    body: {
+      uuid
+    }
+  });
+};
+
 export const getAuthorization = (authHeader: string) => {
   // repsonse example
   /*
