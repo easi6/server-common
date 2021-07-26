@@ -127,6 +127,8 @@ export const signup = (signupDto: {
 
   // for corporate manager signup
   password?: string;
+
+  brand?: string;
 }) => {
   let basicUser;
   let basicPassword;
