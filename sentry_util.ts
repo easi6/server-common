@@ -4,6 +4,7 @@ import _ from 'lodash';
 import util, { inspect } from 'util';
 // @ts-ignore
 import winston from 'winston';
+import { Severity } from '@sentry/node';
 
 const isProd = process.env.NODE_ENV === 'production';
 const commitHash = process.env.COMMIT_HASH;
@@ -30,6 +31,22 @@ export const captureException = (err: any, locale: string, clientIp?: string, us
       }
     });
     Sentry.captureException(err);
+  } catch (e) {
+    console.error(e.stack);
+  }
+};
+
+export const captureMessage = (msg: string, level: Severity, clientIp?: string, user?: any) => {
+  try {
+    Sentry.configureScope((scope: any) => {
+      if (user || clientIp) {
+        scope.setUser({
+          ..._.pick(user, ['id', 'email']),
+          ip_address: clientIp,
+        });
+      }
+    });
+    Sentry.captureMessage(msg, level)
   } catch (e) {
     console.error(e.stack);
   }
@@ -80,6 +97,7 @@ export const CrashReportUtil = {
   initialize,
   captureException,
   BreadcrumbTransport,
+  captureMessage,
 };
 
 export default CrashReportUtil;
