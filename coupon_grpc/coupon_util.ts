@@ -10,12 +10,14 @@ import { Easi6Error } from '../../err';
 import * as services from './coupon_grpc_pb';
 import * as messages from './coupon_pb';
 
-const couponServiceConfig: any = config.has('coupon_service') ? config.get('coupon_service') : {
-  protocol: 'http:',
-  hostname: 'localhost',
-  port: 8080,
-  pathname: '/v1',
-};
+const couponServiceConfig: any = config.has('coupon_service')
+  ? config.get('coupon_service')
+  : {
+      protocol: 'http:',
+      hostname: 'localhost',
+      port: 8080,
+      pathname: '/v1',
+    };
 const { serviceHost = 'localhost:6565' } = couponServiceConfig;
 
 const client: any = new services.CouponServerClient(serviceHost, grpc.credentials.createInsecure());
@@ -31,11 +33,10 @@ export const couponSvcRequest = request.defaults({
   json: true,
 });
 
-
 function convertKey(obj: any) {
   const keys = _.keys(obj);
   const res: any = {};
-  _.forEach(keys, key => {
+  _.forEach(keys, (key) => {
     const matches = key.match(/(.*)List/) || key.match(/(.*)list/);
     if (matches) {
       res[matches[1]] = obj[key];
@@ -98,12 +99,12 @@ export const getAvailCoupons = async ({
 
   try {
     // @ts-ignore
-    const response: messages.ListAvailCouponReply = await Bluebird.fromCallback(cb =>
+    const response: messages.ListAvailCouponReply = await Bluebird.fromCallback((cb) =>
       client.getAvailCoupons(request, cb)
     );
     // @ts-ignore
     const couponList: messages.CouponEntry[] = response.getCouponsList();
-    return _.map(couponList, coupon => _.omit(convertKey(coupon.toObject()), ['id']));
+    return _.map(couponList, (coupon) => _.omit(convertKey(coupon.toObject()), ['id']));
   } catch (e) {
     logger.error('availCouponFailed', e);
   }
@@ -123,7 +124,7 @@ export const registerCouponOrPromotion = async ({
 
   try {
     // @ts-ignore
-    const response: messages.CouponDetail = await Bluebird.fromCallback(cb =>
+    const response: messages.CouponDetail = await Bluebird.fromCallback((cb) =>
       client.registerCouponOrPromotion(request, cb)
     );
     // @ts-ignore
@@ -164,11 +165,12 @@ export const getMyCoupons = async ({
 
   try {
     // @ts-ignore
-    const response: messages.ListCouponReply = await Bluebird.fromCallback(cb => client.getMyCoupons(request, cb));
+    const response: messages.ListCouponReply = await Bluebird.fromCallback((cb) => client.getMyCoupons(request, cb));
     // @ts-ignore
     const couponList: messages.CouponEntry[] = response.getCouponsList();
-    const coupons = _.map(couponList, coupon =>
-        _.omit(convertKey(coupon.toObject()), ['avail', 'id'] /* avail flag is meaningless here */));
+    const coupons = _.map(couponList, (coupon) =>
+      _.omit(convertKey(coupon.toObject()), ['avail', 'id'] /* avail flag is meaningless here */)
+    );
     return {
       hasNext: response.getHasNext(),
       coupons: coupons,
@@ -178,7 +180,21 @@ export const getMyCoupons = async ({
   }
 };
 
-export const startCouponUse = async ({ riderId, riderPhone, code, rentalNumber, originalPrice, discountedPrice }: { riderId: string, riderPhone: string, code: string, rentalNumber: string, originalPrice: number, discountedPrice: number }): Promise<any> => {
+export const startCouponUse = async ({
+  riderId,
+  riderPhone,
+  code,
+  rentalNumber,
+  originalPrice,
+  discountedPrice,
+}: {
+  riderId: string;
+  riderPhone: string;
+  code: string;
+  rentalNumber: string;
+  originalPrice: number;
+  discountedPrice: number;
+}): Promise<any> => {
   // @ts-ignore
   const request = new messages.StartCouponUseRequest();
   request.setUserId(riderId);
@@ -190,7 +206,7 @@ export const startCouponUse = async ({ riderId, riderPhone, code, rentalNumber, 
 
   try {
     // @ts-ignore
-    const response: messages.CouponEntry = await Bluebird.fromCallback(cb => client.startCouponUse(request, cb));
+    const response: messages.CouponEntry = await Bluebird.fromCallback((cb) => client.startCouponUse(request, cb));
     return convertKey(response.toObject());
   } catch (e) {
     logger.error('startCouponUseFailed', e);
@@ -220,7 +236,7 @@ export const finishCouponUse = async ({
 
   try {
     // @ts-ignore
-    const response: messages.CouponEntry = await Bluebird.fromCallback(cb => client.finishCouponUse(request, cb));
+    const response: messages.CouponEntry = await Bluebird.fromCallback((cb) => client.finishCouponUse(request, cb));
     return convertKey(response.toObject());
   } catch (e) {
     logger.error('finishCouponUseFailed', e);
@@ -288,17 +304,22 @@ export const checkCouponAvail = async ({
 
   try {
     // @ts-ignore
-    const response: messages.CheckCouponReply = await Bluebird.fromCallback(cb => client.checkCouponAvail(request, cb));
+    const response: messages.CheckCouponReply = await Bluebird.fromCallback((cb) =>
+      client.checkCouponAvail(request, cb)
+    );
     const res = response.toObject();
     logger.verbose('checkCouponAvail response', res);
     res.originalPrice = fare; // originalPrice는 systemFee를 포함해야됨.
     if (res.discountedPrice > 0) {
-      res.discountedPrice += systemFee // discountedPrice에 systemFee를 더해줘야 됨.
+      res.discountedPrice += systemFee; // discountedPrice에 systemFee를 더해줘야 됨.
+    }
+    if (res.paymentMethodsList) {
+      res.paymentMethodsList = _.map(res.paymentMethodsList, (pm) => _.toLower(pm));
     }
     return res;
   } catch (e) {
     // extract error code
-    const errorCode = _.first(e.metadata && e.metadata.get("code") || []);
+    const errorCode = _.first((e.metadata && e.metadata.get('code')) || []);
     if (errorCode === 'price_exceeded') {
       const price = _.first(e.metadata.get('price')) || 0;
       throw new Easi6Error('coupon_price_exceeded', price);
@@ -322,7 +343,9 @@ export const getCouponDetail = async ({ code }: { code: string }): Promise<any> 
 
   try {
     // @ts-ignore
-    const response: messages.CouponDetailReply = await Bluebird.fromCallback(cb => client.getCouponDetail(request, cb));
+    const response: messages.CouponDetailReply = await Bluebird.fromCallback((cb) =>
+      client.getCouponDetail(request, cb)
+    );
     return convertKey(response.getCoupon().toObject());
   } catch (e) {
     logger.error('getCouponDetailFailed', e);
@@ -337,10 +360,12 @@ export const getCouponWithPromotionDetail = async ({ code }: { code: string }): 
 
   try {
     // @ts-ignore
-    const response: messages.CouponWithPromotionReply = await Bluebird.fromCallback(cb => client.getCouponWithPromotionDetail(request, cb));
+    const response: messages.CouponWithPromotionReply = await Bluebird.fromCallback((cb) =>
+      client.getCouponWithPromotionDetail(request, cb)
+    );
     return {
       coupon: convertKey(response.getCoupon().toObject()),
-      promotion: (response.hasPromotion() ? convertKey(response.getPromotion().toObject()) : null),
+      promotion: response.hasPromotion() ? convertKey(response.getPromotion().toObject()) : null,
     };
   } catch (e) {
     logger.error('getCouponWithPromotionDetail', e);
@@ -348,7 +373,15 @@ export const getCouponWithPromotionDetail = async ({ code }: { code: string }): 
   }
 };
 
-export const cancelCouponUse = async ({riderId, code, rentalNumber}: { riderId: string; code: string; rentalNumber: string }): Promise<any> => {
+export const cancelCouponUse = async ({
+  riderId,
+  code,
+  rentalNumber,
+}: {
+  riderId: string;
+  code: string;
+  rentalNumber: string;
+}): Promise<any> => {
   // @ts-ignore
   const request = new messages.CancelCouponUseRequest();
   request.setUserId(riderId);
@@ -357,7 +390,7 @@ export const cancelCouponUse = async ({riderId, code, rentalNumber}: { riderId: 
 
   try {
     // @ts-ignore
-    const response: messages.CouponEntry = await Bluebird.fromCallback(cb => client.cancelCouponUse(request, cb));
+    const response: messages.CouponEntry = await Bluebird.fromCallback((cb) => client.cancelCouponUse(request, cb));
     return convertKey(response.toObject());
   } catch (e) {
     logger.error('cancelCouponUseUseFailed', e);
@@ -380,7 +413,9 @@ export const getMyCouponCount = async ({
 
   try {
     // @ts-ignore
-    const response: messages.CouponCountReply = await Bluebird.fromCallback(cb => client.getMyCouponCount(request, cb));
+    const response: messages.CouponCountReply = await Bluebird.fromCallback((cb) =>
+      client.getMyCouponCount(request, cb)
+    );
     return response.getCount();
   } catch (e) {
     logger.error('getMyCouponCountFailed', e);
@@ -403,7 +438,7 @@ export const checkImplicitPromotion = async ({
   issuer,
   pickup,
   dest,
-  findCoupon
+  findCoupon,
 }: {
   carType: number;
   productType: number;
@@ -419,7 +454,7 @@ export const checkImplicitPromotion = async ({
   issuer: string;
   pickup: { latitude: number; longitude: number };
   dest?: { latitude: number; longitude: number };
-  findCoupon: boolean
+  findCoupon: boolean;
 }): Promise<any> => {
   // @ts-ignore
   const request = new messages.CheckCouponAvailRequest();
@@ -444,13 +479,13 @@ export const checkImplicitPromotion = async ({
 
   try {
     // @ts-ignore
-    const response: messages.CheckCouponReply = await Bluebird.fromCallback(cb =>
+    const response: messages.CheckCouponReply = await Bluebird.fromCallback((cb) =>
       client.checkImplicitPromotion(request, cb)
     );
     const res = response.toObject(); // originalPrice는 systemFee를 포함해야됨.
     res.originalPrice = fare;
     if (res.discountedPrice > 0) {
-      res.discountedPrice += systemFee // discountedPrice에 systemFee를 더해줘야 됨.
+      res.discountedPrice += systemFee; // discountedPrice에 systemFee를 더해줘야 됨.
     }
     return res;
   } catch (e) {
